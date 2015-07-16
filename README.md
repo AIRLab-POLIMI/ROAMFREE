@@ -1,4 +1,6 @@
-# ROAMFREE
+![ROAMFREE]
+(https://github.com/AIRLab-POLIMI/ROAMFREE/blob/master/roamfree02.jpg)
+
 The ROAMFREE sensor fusion library
 
 # Dependencies
