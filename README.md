@@ -1,7 +1,22 @@
 ![ROAMFREE]
 (https://github.com/AIRLab-POLIMI/ROAMFREE/blob/master/doc/images/roamfree02.jpg)
 
-The ROAMFREE sensor fusion library
+The ROAMFREE sensor fusion library allows to formulate and solve complex pose tracking and sensor parameter self-calibraion estimation problems. It is based on state-of-the-art pose-graph formulation and it relies on the popular g2o solver.
+
+### Bibliography
+
+Plase, don't forget to cite our work:
+
+```
+@inproceedings{cucci2014position,
+  title={Position tracking and sensors self-calibration in autonomous mobile robots by Gauss-Newton optimization},
+  author={Cucci, Davide Antonio and Matteucci, Matteo},
+  booktitle={Robotics and Automation (ICRA), 2014 IEEE International Conference on},
+  pages={1269--1275},
+  year={2014},
+  organization={IEEE}
+}
+```
 
 # Dependencies
 
@@ -106,5 +121,4 @@ runViewer
 
 ![ROAMFREE]
 (https://github.com/AIRLab-POLIMI/ROAMFREE/blob/master/doc/images/IMUGPSFusionTestViewer.png)
-
 
