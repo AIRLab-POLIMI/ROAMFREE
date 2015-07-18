@@ -1,0 +1,3 @@
+err(1+_OFF) = x(1+_OFF) - z(1+_OFF);
+err(2+_OFF) = x(2+_OFF) - z(2+_OFF);
+err(3+_OFF) = x(3+_OFF) - z(3+_OFF);

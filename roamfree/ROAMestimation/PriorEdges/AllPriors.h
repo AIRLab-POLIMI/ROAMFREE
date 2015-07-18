@@ -1,0 +1,28 @@
+/*
+Copyright (c) 2013-2014 Politecnico di Milano.
+All rights reserved. This program and the accompanying materials
+are made available under the terms of the GNU Lesser Public License v3
+which accompanies this distribution, and is available at
+https://www.gnu.org/licenses/lgpl.html
+
+Contributors:
+    Davide A. Cucci (cucci@elet.polimi.it)
+*/
+
+/*
+ * AllPriors.h
+ *
+ *  Created on: Jun 12, 2013
+ *      Author: davide
+ */
+
+#ifndef ALLPRIORS_H_
+#define ALLPRIORS_H_
+
+#include "SE3PriorEdge.h"
+#include "Eucl1DPriorEdge.h"
+#include "Eucl3DPriorEdge.h"
+#include "Matrix3DPriorEdge.h"
+#include "FHPPriorOnHomogeneousPointEdge.h"
+
+#endif /* ALLPRIORS_H_ */

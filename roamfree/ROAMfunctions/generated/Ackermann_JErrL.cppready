@@ -1,0 +1,6 @@
+J(1+_OFF,1+_OFF) = 0;
+J(2+_OFF,1+_OFF) = (kSpeed(1+_OFF)*std::tan(psiSteer(1+_OFF) + kSteer(1+_OFF)*z(2+_OFF))*z(1+_OFF))/std::pow(l(1+_OFF),2);
+J(3+_OFF,1+_OFF) = 0;
+J(4+_OFF,1+_OFF) = 0;
+J(5+_OFF,1+_OFF) = 0;
+J(6+_OFF,1+_OFF) = 0;

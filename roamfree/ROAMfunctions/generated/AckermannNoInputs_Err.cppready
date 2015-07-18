@@ -1,0 +1,7 @@
+double tmp0 = cv(1+_OFF);
+err(1+_OFF) = -tmp0 + x(8+_OFF);
+err(2+_OFF) = -((tmp0*std::tan(cdelta(1+_OFF)))/l(1+_OFF)) + x(13+_OFF);
+err(3+_OFF) = x(9+_OFF);
+err(4+_OFF) = x(10+_OFF);
+err(5+_OFF) = x(11+_OFF);
+err(6+_OFF) = x(12+_OFF);

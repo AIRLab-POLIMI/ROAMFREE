@@ -1,0 +1,1 @@
+w(1+_OFF) = x(1+_OFF)*z(1+_OFF) + x(2+_OFF)*z(2+_OFF) + x(3+_OFF)*z(3+_OFF) + x(4+_OFF)*z(4+_OFF);

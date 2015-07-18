@@ -1,0 +1,8 @@
+double tmp0 = kSpeed(1+_OFF);
+double tmp1 = z(1+_OFF);
+err(1+_OFF) = x(8+_OFF) - tmp0*tmp1;
+err(2+_OFF) = x(13+_OFF) - (tmp0*std::tan(psiSteer(1+_OFF) + kSteer(1+_OFF)*z(2+_OFF))*tmp1)/l(1+_OFF);
+err(3+_OFF) = x(9+_OFF);
+err(4+_OFF) = x(10+_OFF);
+err(5+_OFF) = x(11+_OFF);
+err(6+_OFF) = x(12+_OFF);

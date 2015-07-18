@@ -1,0 +1,78 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 9.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       157,          7]
+NotebookDataLength[      1931,         69]
+NotebookOptionsPosition[      1525,         52]
+NotebookOutlinePosition[      1958,         69]
+CellTagsIndexPosition[      1915,         66]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[
+ RowBox[{"Import", "[", 
+  RowBox[{
+   RowBox[{"NotebookDirectory", "[", "]"}], "<>", 
+   "\"\<QuaternionFunctions.m\>\""}], "]"}]], "Input"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"ZMagv", "=", 
+   RowBox[{"{", 
+    RowBox[{"ZMagx", ",", "ZMagy", ",", "ZMagz"}], "}"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"ZGPSv", "=", 
+   RowBox[{"{", 
+    RowBox[{"ZGPSx", ",", "ZGPSy", ",", "ZGPSz"}], "}"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.595318095758398*^9, 3.595318192912282*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"theta", "=", 
+   RowBox[{"ArcTan", "[", 
+    RowBox[{"ZMagx", ",", "ZMagx"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"Q", "=", 
+  RowBox[{"{", 
+   RowBox[{
+    RowBox[{"Cos", "[", 
+     RowBox[{"theta", "/", "2"}], "]"}], ",", "0", ",", "0", ",", 
+    RowBox[{"Sin", "[", 
+     RowBox[{"theta", "/", "2"}], "]"}]}], "}"}]}]}], "Input",
+ CellChangeTimes->{{3.595318196870953*^9, 3.595318260273278*^9}}]
+},
+WindowSize->{1680, 983},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+Magnification:>FEPrivate`If[
+  FEPrivate`Equal[FEPrivate`$VersionNumber, 6.], 2., 2. Inherited],
+FrontEndVersion->"9.0 for Linux x86 (64-bit) (November 20, 2012)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[557, 20, 155, 4, 61, "Input"],
+Cell[715, 26, 356, 10, 101, "Input"],
+Cell[1074, 38, 447, 12, 101, "Input"]
+}
+]
+*)
+
+(* End of internal cache information *)

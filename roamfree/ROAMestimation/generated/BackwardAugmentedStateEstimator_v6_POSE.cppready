@@ -1,0 +1,17 @@
+double tmp0 = x2(4+_OFF);
+double tmp1 = x2(6+_OFF);
+double tmp2 = x2(5+_OFF);
+double tmp3 = x2(7+_OFF);
+double tmp4 = tmp2*tmp1;
+double tmp5 = std::pow(tmp0,2);
+double tmp6 = std::pow(tmp2,2);
+double tmp7 = std::pow(tmp1,2);
+double tmp8 = std::pow(tmp3,2);
+double tmp9 = -tmp8;
+double tmp10 = tmp2*tmp3;
+double tmp11 = tmp1*tmp3;
+double tmp12 = -tmp6;
+double tmp13 = -tmp7;
+part(1+_OFF) = x2(1+_OFF) + 2*sO2*(tmp4 - tmp0*tmp3) + 2*sO3*(tmp0*tmp1 + tmp10) + sO1*(tmp5 + tmp6 + tmp13 + tmp9);
+part(2+_OFF) = x2(2+_OFF) + 2*sO1*(tmp4 + tmp0*tmp3) + 2*sO3*(-(tmp0*tmp2) + tmp11) + sO2*(tmp5 + tmp12 + tmp7 + tmp9);
+part(3+_OFF) = x2(3+_OFF) + 2*sO1*(-(tmp0*tmp1) + tmp10) + 2*sO2*(tmp0*tmp2 + tmp11) + sO3*(tmp5 + tmp12 + tmp13 + tmp8);

@@ -1,0 +1,7 @@
+double tmp0 = x2(4+_OFF);
+double tmp1 = x2(5+_OFF);
+double tmp2 = x2(6+_OFF);
+double tmp3 = x2(7+_OFF);
+J(1+_OFF,1+_OFF) = 2*(tmp0*tmp2 + tmp1*tmp3);
+J(2+_OFF,1+_OFF) = 2*(-(tmp0*tmp1) + tmp2*tmp3);
+J(3+_OFF,1+_OFF) = std::pow(tmp0,2) - std::pow(tmp1,2) - std::pow(tmp2,2) + std::pow(tmp3,2);

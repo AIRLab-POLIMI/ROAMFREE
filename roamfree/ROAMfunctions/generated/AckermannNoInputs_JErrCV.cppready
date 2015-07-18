@@ -1,0 +1,6 @@
+J(1+_OFF,1+_OFF) = -1;
+J(2+_OFF,1+_OFF) = -(std::tan(cdelta(1+_OFF))/l(1+_OFF));
+J(3+_OFF,1+_OFF) = 0;
+J(4+_OFF,1+_OFF) = 0;
+J(5+_OFF,1+_OFF) = 0;
+J(6+_OFF,1+_OFF) = 0;

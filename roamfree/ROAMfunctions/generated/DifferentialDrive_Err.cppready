@@ -1,0 +1,11 @@
+double tmp0 = r(1+_OFF);
+double tmp1 = 1/tmp0;
+double tmp2 = x(8+_OFF);
+double tmp3 = l(1+_OFF);
+double tmp4 = x(13+_OFF);
+err(1+_OFF) = tmp1*(tmp2 - (tmp3*tmp4)/2.) + z(1+_OFF);
+err(2+_OFF) = (tmp1*(2*tmp2 + tmp3*tmp4 - 2*tmp0*z(2+_OFF)))/2.;
+err(3+_OFF) = x(9+_OFF);
+err(4+_OFF) = x(10+_OFF);
+err(5+_OFF) = x(11+_OFF);
+err(6+_OFF) = x(12+_OFF);

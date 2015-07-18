@@ -1,0 +1,14 @@
+double tmp0 = x(6+_OFF);
+double tmp1 = z(4+_OFF);
+double tmp2 = x(7+_OFF);
+double tmp3 = z(5+_OFF);
+double tmp4 = x(4+_OFF);
+double tmp5 = z(6+_OFF);
+double tmp6 = x(5+_OFF);
+double tmp7 = z(7+_OFF);
+err(1+_OFF) = x(1+_OFF) - z(1+_OFF);
+err(2+_OFF) = x(2+_OFF) - z(2+_OFF);
+err(3+_OFF) = x(3+_OFF) - z(3+_OFF);
+err(4+_OFF) = sign*(-(tmp6*tmp1) + tmp4*tmp3 + tmp2*tmp5 - tmp0*tmp7);
+err(5+_OFF) = sign*(-(tmp0*tmp1) - tmp2*tmp3 + tmp4*tmp5 + tmp6*tmp7);
+err(6+_OFF) = sign*(-(tmp2*tmp1) + tmp0*tmp3 - tmp6*tmp5 + tmp4*tmp7);

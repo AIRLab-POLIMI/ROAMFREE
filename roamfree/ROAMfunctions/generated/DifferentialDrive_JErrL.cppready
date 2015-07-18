@@ -1,0 +1,9 @@
+double tmp0 = r(1+_OFF);
+double tmp1 = 1/tmp0;
+double tmp2 = x(13+_OFF);
+J(1+_OFF,1+_OFF) = -(tmp1*tmp2)/2.;
+J(2+_OFF,1+_OFF) = (tmp1*tmp2)/2.;
+J(3+_OFF,1+_OFF) = 0;
+J(4+_OFF,1+_OFF) = 0;
+J(5+_OFF,1+_OFF) = 0;
+J(6+_OFF,1+_OFF) = 0;

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package>
+  <name>roamfree</name>
+  <version>1.0.0</version>
+  <description>The ROAMFREE library</description>
+
+  <maintainer email="davideantonio.cucci@polimi.it">Davide A. Cucci</maintainer>
+
+  <license>LGPLv3</license>
+
+  <author email="davideantonio.cucci@polimi.it">Davide Antonio Cucci</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+</package>

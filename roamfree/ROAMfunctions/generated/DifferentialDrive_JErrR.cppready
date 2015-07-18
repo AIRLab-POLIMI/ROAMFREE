@@ -1,0 +1,12 @@
+double tmp0 = r(1+_OFF);
+double tmp1 = std::pow(tmp0,-2);
+double tmp2 = x(8+_OFF);
+double tmp3 = l(1+_OFF);
+double tmp4 = x(13+_OFF);
+double tmp5 = z(2+_OFF);
+J(1+_OFF,1+_OFF) = -(tmp1*(tmp2 - (tmp3*tmp4)/2.));
+J(2+_OFF,1+_OFF) = -(tmp5/tmp0) - (tmp1*(2*tmp2 + tmp3*tmp4 - 2*tmp0*tmp5))/2.;
+J(3+_OFF,1+_OFF) = 0;
+J(4+_OFF,1+_OFF) = 0;
+J(5+_OFF,1+_OFF) = 0;
+J(6+_OFF,1+_OFF) = 0;

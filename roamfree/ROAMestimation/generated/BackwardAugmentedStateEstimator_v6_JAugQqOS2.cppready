@@ -1,0 +1,16 @@
+double tmp0 = std::pow(qOS1,2);
+double tmp1 = -tmp0;
+double tmp2 = std::pow(qOS2,2);
+double tmp3 = -tmp2;
+double tmp4 = std::pow(qOS3,2);
+double tmp5 = -tmp4;
+double tmp6 = 1 + tmp1 + tmp3 + tmp5;
+double tmp7 = 1/std::sqrt(tmp6);
+double tmp8 = x2(4+_OFF);
+double tmp9 = x2(6+_OFF);
+double tmp10 = x2(5+_OFF);
+double tmp11 = x2(7+_OFF);
+J(1+_OFF,1+_OFF) = -(qOS2*tmp7*tmp8) - tmp9;
+J(2+_OFF,1+_OFF) = -(qOS2*tmp7*tmp10) - tmp11;
+J(3+_OFF,1+_OFF) = tmp8 - qOS2*tmp7*tmp9;
+J(4+_OFF,1+_OFF) = tmp10 - qOS2*tmp7*tmp11;

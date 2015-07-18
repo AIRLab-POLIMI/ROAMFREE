@@ -1,0 +1,9 @@
+J(1+_OFF,1+_OFF) = -z(16+_OFF);
+J(1+_OFF,2+_OFF) = -z(17+_OFF);
+J(1+_OFF,3+_OFF) = -z(18+_OFF);
+J(2+_OFF,1+_OFF) = -z(19+_OFF);
+J(2+_OFF,2+_OFF) = -z(20+_OFF);
+J(2+_OFF,3+_OFF) = -z(21+_OFF);
+J(3+_OFF,1+_OFF) = -z(22+_OFF);
+J(3+_OFF,2+_OFF) = -z(23+_OFF);
+J(3+_OFF,3+_OFF) = -z(24+_OFF);

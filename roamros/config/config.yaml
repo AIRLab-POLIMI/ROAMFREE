@@ -1,0 +1,53 @@
+solver:
+  base_link_frame_id: /odom_combined
+  global_frame_id: /world
+
+  pose_window_length: 0.5
+  dead_reckoning: True  
+  frequency: 10.0
+  n_gauss_newton_iterations: 5
+
+sensors:
+  'Odometry':
+    type: GenericOdometer
+    is_master: True
+    frame_id: /base_link
+    topic: /base_odometry/odom
+    topic_type: nav_msgs/Odometry
+    use_header_stamp: True
+    static_covariance: True
+    covariance: [ 1.0e-2,  1.0e-4,        0.0,        0.0,        0.0,        1.0e-4,
+                  1.0e-4,  1.0e-2,        0.0,        0.0,        0.0,        1.0e-4,
+                  0.0,        0.0,     1.0e-6,        0.0,        0.0,        0.0,
+                  0.0,        0.0,        0.0,     1.0e-6,        0.0,        0.0,
+                  0.0,        0.0,        0.0,        0.0,     1.0e-6,        0.0,
+                  1.0e-4,  1.0e-4,        0.0,        0.0,        0.0,        1.0e-2]
+
+  'Accelerometer':
+    type: LinearAcceleration
+    is_master: False
+    frame_id: /imu_link
+    topic: /torso_lift_imu/data
+    topic_type: sensor_msgs/Imu
+    use_header_stamp: True
+    static_covariance: False
+    covariance: [ 1.0e-2, 0.0, 0.0,
+                  0.0, 1.0e-2, 0.0,
+                  0.0, 0.0, 1.0e-2]
+
+    parameters:
+      G: [1.0, 1.0, 1.0]
+      B: [0.0, 0.0, 0.0]
+
+  'Gyroscope':
+    type: AngularVelocity
+    is_master: False
+    frame_id: /imu_link
+    topic: /torso_lift_imu/data
+    topic_type: sensor_msgs/Imu
+    use_header_stamp: True
+    static_covariance: False
+
+    parameters:
+      G: [1.0, 1.0, 1.0]
+      B: [0.0, 0.0, 0.0]
