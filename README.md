@@ -112,12 +112,14 @@ cd <src_dir>/_development/Matlab/PluginViewer/configs/ROAMtest
 configIMUGPSFusionTest
 ```
 
-then launch the viewer
+then launch the viewer, again **in Matlab**, write
 
 ```
 cd ../..
 runViewer
 ```
+
+you should see something like this:
 
 ![ROAMFREE]
 (https://github.com/AIRLab-POLIMI/ROAMFREE/blob/master/doc/images/IMUGPSFusionTestViewer.png)
