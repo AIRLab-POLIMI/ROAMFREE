@@ -5,7 +5,8 @@ The ROAMFREE sensor fusion library allows to formulate and solve complex pose tr
 
 ### Bibliography
 
-Plase, don't forget to cite our work:
+For more information on the mathematical and algorithmic details you can refer to the [ICRA](http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=6907016) 
+and [JOSER](http://joser.unibg.it/index.php?journal=joser&page=article&op=view&path%5B%5D=76) papers. Please, don't forget to cite us:
 
 ```
 @inproceedings{cucci2014position,
@@ -15,6 +16,16 @@ Plase, don't forget to cite our work:
   pages={1269--1275},
   year={2014},
   organization={IEEE}
+}
+
+@article{cucci2014development,
+  title={On the Development of a Generic Multi-Sensor Fusion Framework for Robust Odometry Estimation},
+  author={Cucci, Davide Antonio and Matteucci, Matteo},
+  journal={Journal of Software Engineering for Robotics},
+  volume={5},
+  number={1},
+  pages={48--62},
+  year={2014}
 }
 ```
 
@@ -123,4 +134,3 @@ you should see something like this:
 
 ![ROAMFREE]
 (https://github.com/AIRLab-POLIMI/ROAMFREE/blob/master/doc/images/IMUGPSFusionTestViewer.png)
-
