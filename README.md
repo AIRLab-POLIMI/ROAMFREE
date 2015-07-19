@@ -3,6 +3,8 @@
 
 The ROAMFREE sensor fusion library allows to formulate and solve complex pose tracking and sensor parameter self-calibraion estimation problems. It is based on state-of-the-art pose-graph formulation and it relies on the popular g2o solver.
 
+ROAMFREE is released under the LGPLv3 licence.
+
 ### Bibliography
 
 For more information on the mathematical and algorithmic details you can refer to the [ICRA](http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=6907016) 
