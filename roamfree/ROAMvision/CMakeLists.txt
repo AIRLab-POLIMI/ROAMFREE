@@ -8,7 +8,7 @@ add_library(ROAMvision SHARED
 	${sources}
 )
 
-add_executable(rectTest src/RectangularInitialization.cpp)
+# add_executable(rectTest src/RectangularInitialization.cpp)
 
 if(catkin_FOUND)
 # Install libraries
