@@ -129,16 +129,16 @@ int main(int argc, char *argv[]) {
   ParameterWrapper_Ptr ba_par = f->addLinearlyInterpolatedParameter(Euclidean3D,
       "IMUintegralDeltaP_Ba", accBias, isbafixed, 1.0);
 
-  ba_par->setDerivativePriorsEnabled(true);
+  ba_par->setProcessModelType(RandomWalk);
   ba_par->setFixed(isbafixed);
-  ba_par->setDerivativePriorNoisCov(10 * Eigen::MatrixXd::Identity(3, 3));
+  ba_par->setRandomWalkNoiseCov(10 * Eigen::MatrixXd::Identity(3, 3));
 
   ParameterWrapper_Ptr bw_par = f->addLinearlyInterpolatedParameter(Euclidean3D,
       "IMUintegralDeltaP_Bw", gyroBias, isbwfixed, 1.0);
 
-  bw_par->setDerivativePriorsEnabled(true);
+  bw_par->setProcessModelType(RandomWalk);
   bw_par->setFixed(isbwfixed);
-  bw_par->setDerivativePriorNoisCov(10 * Eigen::MatrixXd::Identity(3, 3));
+  bw_par->setRandomWalkNoiseCov(10 * Eigen::MatrixXd::Identity(3, 3));
 
   Eigen::VectorXd T_OS_IMU(7); // Transformation between Odometer and robot frame
   T_OS_IMU << 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0;
@@ -287,7 +287,7 @@ int main(int argc, char *argv[]) {
 
         cnt++;
 
-        f->marginalizeOldNodes(2);
+        f->marginalizeOldNodes(3);
 
       }
 

@@ -21,6 +21,8 @@ Contributors:
 
 #include <Eigen/Dense>
 
+#include "Enums.h"
+
 namespace ROAMestimation {
 
 /**
@@ -45,8 +47,8 @@ public:
 
   virtual void getValueAt(Eigen::VectorXd &ret, double t) = 0; //!< get the value for the parameter at time t (may involve interpolation);
 
-  virtual void setDerivativePriorsEnabled(bool enable) = 0; //!< enables or disables the priors on the parameter derivative
-  virtual void setDerivativePriorNoisCov(const Eigen::MatrixXd &cov) = 0; //!< sets the noise covariance matrix for the parameter derivative prior
+  virtual void setProcessModelType(ProcessTypes t) = 0;
+  virtual void setRandomWalkNoiseCov(const Eigen::MatrixXd &cov) = 0; //!< sets the noise covariance matrix for the parameter derivative prior
 };
 
 } /* namespace ROAMestimation */

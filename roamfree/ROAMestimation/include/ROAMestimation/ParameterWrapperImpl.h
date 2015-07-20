@@ -51,11 +51,11 @@ public:
 
   virtual void getValueAt(Eigen::VectorXd &ret, double t);
 
-  inline virtual void setDerivativePriorsEnabled(bool enable) {
-    _param->setRandomWalkProcessEnabled(enable);
+  inline virtual void setProcessModelType(ProcessTypes t) {
+    _param->setProcessModelType(t);
   }
-  inline virtual void setDerivativePriorNoisCov(const Eigen::MatrixXd &cov) {
-    _param->setRandomWalkProcessNoisCov(cov);
+  inline virtual void setRandomWalkNoiseCov(const Eigen::MatrixXd &cov) {
+    _param->setRandomWalkProcessNoiseCov(cov);
   }
 
 };

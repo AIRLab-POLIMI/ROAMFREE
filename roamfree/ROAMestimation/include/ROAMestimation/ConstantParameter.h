@@ -42,10 +42,6 @@ class ConstantParameter: public ParameterVerticesManager {
     ConstantParameter(g2o::AutoIDSparseOptimizer * opt, ParameterTypes typ,
         const std::string &name, GenericVertexInterface *vertex);
 
-    virtual void setRandomWalkProcessEnabled(bool enable);
-
-    virtual void setRandomWalkProcessNoisCov(const Eigen::MatrixXd &cov);
-
     inline virtual std::map<double, g2o::OptimizableGraph::Vertex *>::const_iterator getVertices(
         double tstamp) const {
       return _v.begin();

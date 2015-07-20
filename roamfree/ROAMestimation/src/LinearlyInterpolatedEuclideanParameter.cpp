@@ -172,14 +172,4 @@ bool LinearlyInterpolatedEuclideanParameter::getJacobianAt(double tstamp, int j,
 
 }
 
-void LinearlyInterpolatedEuclideanParameter::setRandomWalkProcessEnabled(
-    bool enable) {
-  _randomWalkProcess = enable;
-}
-
-void LinearlyInterpolatedEuclideanParameter::setRandomWalkProcessNoisCov(
-    const Eigen::MatrixXd& cov) {
-  _randomWalkProcessNoiseCov = cov;
-}
-
 } /* namespace ROAMestimation */

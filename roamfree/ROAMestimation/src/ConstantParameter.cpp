@@ -57,16 +57,4 @@ bool ConstantParameter::getJacobianAt(double tstamp, int j,
   return false;
 }
 
-void ConstantParameter::setRandomWalkProcessEnabled(bool enable) {
-  std::cerr
-      << "[ConstantParameter] Error: Derivative priors are meaningless for constant parameters!"
-      << std::endl;
-}
-
-void ConstantParameter::setRandomWalkProcessNoisCov(const Eigen::MatrixXd& cov) {
-  std::cerr
-      << "[ConstantParameter] Error: Derivative priors are meaningless for constant parameters!"
-      << std::endl;
-}
-
 } /* namespace ROAMestimation */

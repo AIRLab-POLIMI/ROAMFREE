@@ -63,14 +63,14 @@ class ParameterVerticesManager {
     virtual ~ParameterVerticesManager();
 
     /**
-     * \brief if enabled, a RandomWalkProcessEdge will be inserted incident on successive vertices
+     * \brief set the type of the process model for the parameter signal (default None)
      */
-    virtual void setRandomWalkProcessEnabled(bool enable) = 0;
+    virtual void setProcessModelType(ProcessTypes t);
 
     /**
      * \brief set the noise covariance matrix for the RandomWalkProcessEdge
      */
-    virtual void setRandomWalkProcessNoisCov(const Eigen::MatrixXd &cov) = 0;
+    virtual void setRandomWalkProcessNoiseCov(const Eigen::MatrixXd &cov);
 
     /**
      * \brief returns an iterator to relevant parameter nodes for tstamp
@@ -211,6 +211,12 @@ class ParameterVerticesManager {
     std::string _name;
     ParameterTypes _type;
     bool _isFixed;
+
+    // stuff for process models
+    ProcessTypes _process; //!< type of the process model for the parameter
+
+    Eigen::MatrixXd _randomWalkNoiseCov;
+
 
     VertexMap _v;
 

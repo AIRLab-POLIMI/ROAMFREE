@@ -51,7 +51,7 @@ std::string Eucl3DRandomWalkProcessEdge::writeDebugInfo() const {
   g2o::OptimizableGraph::Vertex *x0 = static_cast<g2o::OptimizableGraph::Vertex *>(_vertices[0]);
   g2o::OptimizableGraph::Vertex *x1 = static_cast<g2o::OptimizableGraph::Vertex *>(_vertices[1]);
 
-  s << "Eucl3DDerivativePriorEdge(" << x0->id() << "," << x1->id() << ")";
+  s << "Eucl3DRandomWalkProcessEdge(" << x0->id() << "," << x1->id() << ")";
 
   return s.str();
 }

@@ -112,8 +112,8 @@ int main(int argc, char *argv[]) {
   ParameterWrapper_Ptr ba_par = f->addLinearlyInterpolatedParameter(Euclidean3D,
       "Accelerometer_B", accBias0, false, 25 / imuRate);
 
-  ba_par->setDerivativePriorsEnabled(true);
-  ba_par->setDerivativePriorNoisCov(10 * Eigen::MatrixXd::Identity(3, 3));
+  ba_par->setProcessModelType(RandomWalk);
+  ba_par->setRandomWalkNoiseCov(10 * Eigen::MatrixXd::Identity(3, 3));
 
   Eigen::MatrixXd accelerometerCov(3, 3); // covariance of Accelerometer readings
   accelerometerCov = 0.0016 * Eigen::MatrixXd::Identity(3, 3);

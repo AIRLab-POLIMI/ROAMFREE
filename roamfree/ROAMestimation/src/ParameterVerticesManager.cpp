@@ -1,13 +1,13 @@
 /*
-Copyright (c) 2013-2016 Politecnico di Milano.
-All rights reserved. This program and the accompanying materials
-are made available under the terms of the GNU Lesser Public License v3
-which accompanies this distribution, and is available at
-https://www.gnu.org/licenses/lgpl.html
+ Copyright (c) 2013-2016 Politecnico di Milano.
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the GNU Lesser Public License v3
+ which accompanies this distribution, and is available at
+ https://www.gnu.org/licenses/lgpl.html
 
-Contributors:
-    Davide A. Cucci (davide.cucci@epfl.ch)    
-*/
+ Contributors:
+ Davide A. Cucci (davide.cucci@epfl.ch)
+ */
 
 /*
  * Parameter.cpp
@@ -29,7 +29,7 @@ namespace ROAMestimation {
 ParameterVerticesManager::ParameterVerticesManager(
     g2o::AutoIDSparseOptimizer *opt, ParameterTypes typ,
     const std::string& name) :
-    _optimizer(opt), _name(name), _type(typ), _isFixed(true) {
+    _optimizer(opt), _name(name), _type(typ), _isFixed(true), _process(None) {
 }
 
 ParameterVerticesManager::~ParameterVerticesManager() {
@@ -115,9 +115,42 @@ g2o::OptimizableGraph::Vertex * ParameterVerticesManager::newVertex(
 
   _optimizer->addVertex(v);
 
-  _v[tstamp] = v;
+  auto ret = _v.insert(
+      std::pair<double, g2o::OptimizableGraph::Vertex *>(tstamp, v));
+  assert(ret.second == true); // check that this vertex was really new
+
+  // in case we have to put some process model edge
+  if (_process != None && _v.size() > 1) {
+
+    VertexMap::iterator it = ret.first;
+
+    // decide the direction
+    g2o::OptimizableGraph::Vertex *older, *newer;
+
+    if (it != _v.begin()) { // forward
+      newer = it->second; //the vertex just inserted
+      --it;
+      older = it->second;
+
+    } else {
+      older = it->second;
+      ++it;
+      newer = it->second;
+
+      assert(it != _v.end());
+    }
+
+    switch (_process) {
+    case RandomWalk:
+      addRandomWalkProcessEdge(older, newer, _randomWalkNoiseCov);
+    }
+  }
 
   return v;
+}
+
+void ParameterVerticesManager::setProcessModelType(ProcessTypes t) {
+  _process = t;
 }
 
 g2o::OptimizableGraph::Edge* ParameterVerticesManager::addRandomWalkProcessEdge(
@@ -150,6 +183,17 @@ g2o::OptimizableGraph::Edge* ParameterVerticesManager::addRandomWalkProcessEdge(
 
   return oe;
 
+}
+
+void ParameterVerticesManager::setRandomWalkProcessNoiseCov(
+    const Eigen::MatrixXd& cov) {
+  if (_process != ProcessTypes::RandomWalk) {
+    std::cerr
+        << "[ParameterVerticesManager] Warning: setting Random Walk process noise covariance with different process type"
+        << std::endl;
+  }
+
+  _randomWalkNoiseCov = cov;
 }
 
 GenericVertexInterface* ParameterVerticesManager::getVertexNearestTo(
@@ -206,4 +250,3 @@ void ParameterVerticesManager::setVertexEstimate(double tstamp,
 }
 
 } /* namespace ROAMestimation */
-
