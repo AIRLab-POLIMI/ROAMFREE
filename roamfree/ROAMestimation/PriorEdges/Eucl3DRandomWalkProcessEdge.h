@@ -19,18 +19,17 @@ Contributors:
 #ifndef EUCL3DDERIVATIVEPRIOREDGE_H_
 #define EUCL3DDERIVATIVEPRIOREDGE_H_
 
-#include "BaseDerivativePriorEdge.h"
-
+#include "BaseRandomWalkProcessEdge.h"
 #include "GenericVertex.h"
 
 namespace ROAMestimation {
 
-class Eucl3DDerivativePriorEdge: public ROAMestimation::BaseDerivativePriorEdge<
+class Eucl3DRandomWalkProcessEdge: public ROAMestimation::BaseRandomWalkProcessEdge<
     3, GenericVertex<ROAMfunctions::Eucl3DV> > {
 
   public:
 
-    Eucl3DDerivativePriorEdge();
+    Eucl3DRandomWalkProcessEdge();
 
     void computeError();
     void linearizeOplus();

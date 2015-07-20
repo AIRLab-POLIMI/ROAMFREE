@@ -25,7 +25,7 @@ namespace ROAMestimation {
 LinearlyInterpolatedEuclideanParameter::LinearlyInterpolatedEuclideanParameter(
     double spacing, g2o::AutoIDSparseOptimizer* opt, ParameterTypes typ,
     const std::string& name, const Eigen::VectorXd& x0) :
-    ParameterVerticesManager(opt, typ, name), _spacing(spacing), _x0(x0), _derivativePriors(
+    ParameterVerticesManager(opt, typ, name), _spacing(spacing), _x0(x0), _randomWalkProcess(
         false) {
 }
 
@@ -54,10 +54,10 @@ bool LinearlyInterpolatedEuclideanParameter::updateVertexSet(double mintstamp,
         last->second->accessEstimateData(), parameterEstimateDimension());
 
     g2o::OptimizableGraph::Vertex *newv = newVertex(newt, last_estimate);
-    if (_derivativePriors) {
+    if (_randomWalkProcess) {
       // the variance of a randow walk grows linearly with time! so now pow(_spacing,2)
-      addDerivativePriorEdge(last->second, newv,
-          _spacing * _derivativePriorNoiseCov);
+      addRandomWalkProcessEdge(last->second, newv,
+          _spacing * _randomWalkProcessNoiseCov);
     }
 
 #   ifdef DEBUG_PRINT_INFO_MESSAGES
@@ -77,10 +77,10 @@ bool LinearlyInterpolatedEuclideanParameter::updateVertexSet(double mintstamp,
         parameterEstimateDimension());
 
     g2o::OptimizableGraph::Vertex * newv = newVertex(newt, first_estimate);
-    if (_derivativePriors) {
+    if (_randomWalkProcess) {
       // the variance of a randow walk grows linearly with time! so now pow(_spacing,2)
-      addDerivativePriorEdge(newv, oldestVertex->second,
-          _spacing * _derivativePriorNoiseCov);
+      addRandomWalkProcessEdge(newv, oldestVertex->second,
+          _spacing * _randomWalkProcessNoiseCov);
     }
 
 #   ifdef DEBUG_PRINT_INFO_MESSAGES
@@ -172,14 +172,14 @@ bool LinearlyInterpolatedEuclideanParameter::getJacobianAt(double tstamp, int j,
 
 }
 
-void LinearlyInterpolatedEuclideanParameter::setDerivativePriorsEnabled(
+void LinearlyInterpolatedEuclideanParameter::setRandomWalkProcessEnabled(
     bool enable) {
-  _derivativePriors = enable;
+  _randomWalkProcess = enable;
 }
 
-void LinearlyInterpolatedEuclideanParameter::setDerivativePriorNoisCov(
+void LinearlyInterpolatedEuclideanParameter::setRandomWalkProcessNoisCov(
     const Eigen::MatrixXd& cov) {
-  _derivativePriorNoiseCov = cov;
+  _randomWalkProcessNoiseCov = cov;
 }
 
 } /* namespace ROAMestimation */

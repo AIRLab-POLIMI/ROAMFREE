@@ -176,14 +176,14 @@ bool LimitedBandwithEuclideanParameter::getJacobianAt(double tstamp, int j,
   return false; // this does NOT depend on the value of the parameter vertices
 }
 
-void ROAMestimation::LimitedBandwithEuclideanParameter::setDerivativePriorsEnabled(
+void ROAMestimation::LimitedBandwithEuclideanParameter::setRandomWalkProcessEnabled(
     bool enable) {
   std::cerr
       << "[LimitedBandwithEuclideanParameter] Error: DerivativePriors not supported for this parameter type"
       << std::endl;
 }
 
-void ROAMestimation::LimitedBandwithEuclideanParameter::setDerivativePriorNoisCov(
+void ROAMestimation::LimitedBandwithEuclideanParameter::setRandomWalkProcessNoisCov(
     const Eigen::MatrixXd& cov) {
   std::cerr
       << "[LimitedBandwithEuclideanParameter] Error: DerivativePriors not supported for this parameter type"

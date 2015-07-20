@@ -63,14 +63,14 @@ class ParameterVerticesManager {
     virtual ~ParameterVerticesManager();
 
     /**
-     * \brief if enabled, a DerivativePriorEdge will be inserted incident on successive vertices
+     * \brief if enabled, a RandomWalkProcessEdge will be inserted incident on successive vertices
      */
-    virtual void setDerivativePriorsEnabled(bool enable) = 0;
+    virtual void setRandomWalkProcessEnabled(bool enable) = 0;
 
     /**
-     * \brief set the noise covariance matrix for the DerivativePriorEdges
+     * \brief set the noise covariance matrix for the RandomWalkProcessEdge
      */
-    virtual void setDerivativePriorNoisCov(const Eigen::MatrixXd &cov) = 0;
+    virtual void setRandomWalkProcessNoisCov(const Eigen::MatrixXd &cov) = 0;
 
     /**
      * \brief returns an iterator to relevant parameter nodes for tstamp
@@ -229,7 +229,7 @@ class ParameterVerticesManager {
     /**
      * insert edges between two vertices limiting the difference between their estimate
      */
-    g2o::OptimizableGraph::Edge * addDerivativePriorEdge(
+    g2o::OptimizableGraph::Edge * addRandomWalkProcessEdge(
         g2o::OptimizableGraph::Vertex *older,
         g2o::OptimizableGraph::Vertex *newer, const Eigen::MatrixXd &noiseCov);
 

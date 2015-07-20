@@ -120,7 +120,7 @@ g2o::OptimizableGraph::Vertex * ParameterVerticesManager::newVertex(
   return v;
 }
 
-g2o::OptimizableGraph::Edge* ParameterVerticesManager::addDerivativePriorEdge(
+g2o::OptimizableGraph::Edge* ParameterVerticesManager::addRandomWalkProcessEdge(
     g2o::OptimizableGraph::Vertex* older, g2o::OptimizableGraph::Vertex* newer,
     const Eigen::MatrixXd& noiseCov) {
 
@@ -129,7 +129,7 @@ g2o::OptimizableGraph::Edge* ParameterVerticesManager::addDerivativePriorEdge(
 
   switch (_type) {
   case Euclidean3D:
-    ei = new Eucl3DDerivativePriorEdge;
+    ei = new Eucl3DRandomWalkProcessEdge;
     break;
   default:
     std::cerr

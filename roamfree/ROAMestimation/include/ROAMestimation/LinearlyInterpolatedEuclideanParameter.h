@@ -37,9 +37,9 @@ class LinearlyInterpolatedEuclideanParameter: public ParameterVerticesManager {
         g2o::AutoIDSparseOptimizer * opt, ParameterTypes typ,
         const std::string &name, const Eigen::VectorXd &x0);
 
-    virtual void setDerivativePriorsEnabled(bool enable);
+    virtual void setRandomWalkProcessEnabled(bool enable);
 
-    virtual void setDerivativePriorNoisCov(const Eigen::MatrixXd &cov);
+    virtual void setRandomWalkProcessNoisCov(const Eigen::MatrixXd &cov);
 
     virtual std::map<double, g2o::OptimizableGraph::Vertex *>::const_iterator getVertices(
         double tstamp) const;
@@ -70,8 +70,8 @@ class LinearlyInterpolatedEuclideanParameter: public ParameterVerticesManager {
 
     Eigen::VectorXd _x0; /*!< initial value for the parameter */
 
-    bool _derivativePriors;
-    Eigen::MatrixXd _derivativePriorNoiseCov;
+    bool _randomWalkProcess;
+    Eigen::MatrixXd _randomWalkProcessNoiseCov;
 
 }
 ;

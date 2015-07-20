@@ -57,13 +57,13 @@ bool ConstantParameter::getJacobianAt(double tstamp, int j,
   return false;
 }
 
-void ConstantParameter::setDerivativePriorsEnabled(bool enable) {
+void ConstantParameter::setRandomWalkProcessEnabled(bool enable) {
   std::cerr
       << "[ConstantParameter] Error: Derivative priors are meaningless for constant parameters!"
       << std::endl;
 }
 
-void ConstantParameter::setDerivativePriorNoisCov(const Eigen::MatrixXd& cov) {
+void ConstantParameter::setRandomWalkProcessNoisCov(const Eigen::MatrixXd& cov) {
   std::cerr
       << "[ConstantParameter] Error: Derivative priors are meaningless for constant parameters!"
       << std::endl;

@@ -10,7 +10,7 @@ Contributors:
 */
 
 /*
- * BaseDerivativePriorEdge.h
+ * BaseRandomWalkProcessEdge.h
  *
  *  Created on: May 7, 2015
  *      Author: davide
@@ -20,8 +20,8 @@ Contributors:
  *
  */
 
-#ifndef BASEDERIVATIVEPRIOR_H_
-#define BASEDERIVATIVEPRIOR_H_
+#ifndef BASERANDOMWALKPROCESSEDGE_H_
+#define BASERANDOMWALKPROCESSEDGE_H_
 
 #include <iomanip>
 
@@ -35,7 +35,7 @@ namespace ROAMestimation {
 
 template<int D, typename VertexXi>
 
-class BaseDerivativePriorEdge: public g2o::BaseBinaryEdge<D, Eigen::VectorXd, VertexXi, VertexXi>,
+class BaseRandomWalkProcessEdge: public g2o::BaseBinaryEdge<D, Eigen::VectorXd, VertexXi, VertexXi>,
     public BasePriorEdgeInterface {
 
 protected:
@@ -47,7 +47,7 @@ protected:
 
 public:
 
-  virtual ~BaseDerivativePriorEdge() {
+  virtual ~BaseRandomWalkProcessEdge() {
   }
 
   virtual void setNoiseCov(const Eigen::MatrixXd &noiseCov) {
@@ -98,4 +98,4 @@ public:
 };
 
 } /* namespace ROAMestimation */
-#endif /* BASEDERIVATIVEPRIOR_H_ */
+#endif /* BASERANDOMWALKPROCESSEDGE_H_ */

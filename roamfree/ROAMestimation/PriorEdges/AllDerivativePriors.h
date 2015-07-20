@@ -19,6 +19,6 @@ Contributors:
 #ifndef ALLDERIVATIVEPRIORS_H_
 #define ALLDERIVATIVEPRIORS_H_
 
-#include "Eucl3DDerivativePriorEdge.h"
+#include "Eucl3DRandomWalkProcessEdge.h"
 
 #endif /* ALLDERIVATIVEPRIORS_H_ */

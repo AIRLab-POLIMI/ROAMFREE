@@ -16,11 +16,11 @@ Contributors:
  *      Author: davide
  */
 
-#include "Eucl3DDerivativePriorEdge.h"
+#include "Eucl3DRandomWalkProcessEdge.h"
 
 namespace ROAMestimation {
 
-Eucl3DDerivativePriorEdge::Eucl3DDerivativePriorEdge() {
+Eucl3DRandomWalkProcessEdge::Eucl3DRandomWalkProcessEdge() {
   _measurement.resize(3);
   _measurement.setZero(); // by default the prior on the derivative is zero
 
@@ -29,7 +29,7 @@ Eucl3DDerivativePriorEdge::Eucl3DDerivativePriorEdge() {
 
 }
 
-void Eucl3DDerivativePriorEdge::computeError() {
+void Eucl3DRandomWalkProcessEdge::computeError() {
 
   const Eigen::VectorXd & first = static_cast<GenericVertex<
       ROAMfunctions::Eucl3DV> *>(_vertices[0])->estimate();
@@ -41,11 +41,11 @@ void Eucl3DDerivativePriorEdge::computeError() {
   _error = second - first - z;
 }
 
-void Eucl3DDerivativePriorEdge::linearizeOplus() {
+void Eucl3DRandomWalkProcessEdge::linearizeOplus() {
   // do nothing, _jacobianOplusXj and _jacobianOplusXi are constant
 }
 
-std::string Eucl3DDerivativePriorEdge::writeDebugInfo() const {
+std::string Eucl3DRandomWalkProcessEdge::writeDebugInfo() const {
   std::stringstream s;
 
   g2o::OptimizableGraph::Vertex *x0 = static_cast<g2o::OptimizableGraph::Vertex *>(_vertices[0]);
