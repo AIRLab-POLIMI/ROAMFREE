@@ -1,13 +1,13 @@
 /*
-Copyright (c) 2013-2016 Politecnico di Milano.
-All rights reserved. This program and the accompanying materials
-are made available under the terms of the GNU Lesser Public License v3
-which accompanies this distribution, and is available at
-https://www.gnu.org/licenses/lgpl.html
+ Copyright (c) 2013-2016 Politecnico di Milano.
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the GNU Lesser Public License v3
+ which accompanies this distribution, and is available at
+ https://www.gnu.org/licenses/lgpl.html
 
-Contributors:
-    Davide A. Cucci (davide.cucci@epfl.ch)    
-*/
+ Contributors:
+ Davide A. Cucci (davide.cucci@epfl.ch)
+ */
 
 /*
  * BaseRandomWalkProcessEdge.h
@@ -35,66 +35,45 @@ namespace ROAMestimation {
 
 template<int D, typename VertexXi>
 
-class BaseRandomWalkProcessEdge: public g2o::BaseBinaryEdge<D, Eigen::VectorXd, VertexXi, VertexXi>,
-    public BasePriorEdgeInterface {
+class BaseRandomWalkProcessEdge: public g2o::BaseBinaryEdge<D, Eigen::VectorXd,
+    VertexXi, VertexXi>, public BasePriorEdgeInterface {
 
-protected:
+  protected:
 
-  using g2o::BaseBinaryEdge<D, Eigen::VectorXd, VertexXi, VertexXi>::_measurement;
-  using g2o::BaseBinaryEdge<D, Eigen::VectorXd, VertexXi, VertexXi>::_information;
+    using g2o::BaseBinaryEdge<D, Eigen::VectorXd, VertexXi, VertexXi>::_measurement;
+    using g2o::BaseBinaryEdge<D, Eigen::VectorXd, VertexXi, VertexXi>::_information;
 
-  Eigen::Matrix<double, D, D> _noiseCov;
+    Eigen::Matrix<double, D, D> _noiseCov;
 
-public:
+  public:
 
-  virtual ~BaseRandomWalkProcessEdge() {
-  }
-
-  virtual void setNoiseCov(const Eigen::MatrixXd &noiseCov) {
-    _noiseCov = noiseCov;
-
-    // TODO: this causes an extra inversion for those edges which have non-identity jacobian wrt error
-    ROAMmath::inv(_noiseCov, _information);
-  }
-
-  virtual void setMeasurement(const Eigen::VectorXd &measurement) {
-    _measurement = measurement;
-  }
-
-  bool read(std::istream &s) {
-    for (unsigned int i = 0; i < _measurement.rows(); i++) {
-      s >> _measurement(i);
+    virtual ~BaseRandomWalkProcessEdge() {
     }
 
-    for (unsigned int i = 0; i < _noiseCov.rows(); i++) {
-      for (unsigned int j = i; j < _noiseCov.cols(); j++) {
-        s >> _noiseCov(i, j);
-        _noiseCov(j, i) = _noiseCov(i, j);
-      }
+    virtual void setNoiseCov(const Eigen::MatrixXd &noiseCov) {
+      _noiseCov = noiseCov;
+
+      // TODO: this causes an extra inversion for those edges which have non-identity jacobian wrt error
+      ROAMmath::inv(_noiseCov, _information);
     }
 
-    return true;
-  }
-
-  bool write(std::ostream &s) const {
-    for (unsigned int i = 0; i < _measurement.rows(); i++) {
-      s << std::fixed << std::setprecision(8) << _measurement(i) << " ";
+    virtual void setMeasurement(const Eigen::VectorXd &measurement) {
+      _measurement = measurement;
     }
 
-    for (unsigned int i = 0; i < _noiseCov.rows(); i++) {
-      for (unsigned int j = i; j < _noiseCov.cols(); j++) {
-        s << std::fixed << std::setprecision(8) << _noiseCov(i, j) << " ";
-      }
+    virtual g2o::OptimizableGraph::Edge *getg2oOptGraphPointer() {
+      return static_cast<g2o::OptimizableGraph::Edge *>(this);
     }
 
-    return s.good();
-  }
+    bool read(std::istream &s) {
+      return false;
+    }
 
-  virtual g2o::OptimizableGraph::Edge *getg2oOptGraphPointer() {
-    return static_cast<g2o::OptimizableGraph::Edge *>(this);
-  }
+    bool write(std::ostream &s) const {
+      return false;
+    }
 
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 } /* namespace ROAMestimation */

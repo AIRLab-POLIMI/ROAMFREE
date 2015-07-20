@@ -1,13 +1,13 @@
 /*
-Copyright (c) 2013-2016 Politecnico di Milano.
-All rights reserved. This program and the accompanying materials
-are made available under the terms of the GNU Lesser Public License v3
-which accompanies this distribution, and is available at
-https://www.gnu.org/licenses/lgpl.html
+ Copyright (c) 2013-2016 Politecnico di Milano.
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the GNU Lesser Public License v3
+ which accompanies this distribution, and is available at
+ https://www.gnu.org/licenses/lgpl.html
 
-Contributors:
-    Davide A. Cucci (davide.cucci@epfl.ch)    
-*/
+ Contributors:
+ Davide A. Cucci (davide.cucci@epfl.ch)
+ */
 
 /*
  * GenericEdge.h
@@ -39,73 +39,72 @@ template<int D>
 class GenericEdge: public g2o::BaseMultiEdge<D, Eigen::VectorXd>,
     public GenericEdgeInterface {
 
-public:
+  public:
 
-  GenericEdge(int nParams);
-  virtual ~GenericEdge();
+    GenericEdge(int nParams);
+    virtual ~GenericEdge();
 
-  virtual void setNoiseCov(const Eigen::MatrixXd &noiseCov);
-  virtual const Eigen::MatrixXd & getNoiseCov() const;
+    virtual void setNoiseCov(const Eigen::MatrixXd &noiseCov);
+    virtual const Eigen::MatrixXd & getNoiseCov() const;
 
-  virtual int measurementDimension() const;
-  virtual double *accessMeasurementData();
+    virtual int measurementDimension() const;
+    virtual double *accessMeasurementData();
 
-  virtual int noiseDimension() const;
+    virtual int noiseDimension() const;
 
-  virtual const Eigen::VectorXd& getMeasurement_GE() const;
-  virtual void setMeasurement_GE(const Eigen::VectorXd& m);
+    virtual const Eigen::VectorXd& getMeasurement_GE() const;
+    virtual void setMeasurement_GE(const Eigen::VectorXd& m);
 
-  virtual void handleParamTemporaries();
-  virtual void updateParamPtrs();
-  virtual const std::vector<ParameterTemporaries> & getParameterTemporariesVector() const;
+    virtual void handleParamTemporaries();
+    virtual void updateParamPtrs();
+    virtual const std::vector<ParameterTemporaries> & getParameterTemporariesVector() const;
 
-  virtual bool read(std::istream &s);
-  virtual bool write(std::ostream &s) const;
+    virtual void setTimestamp(double timestamp);
+    virtual double getTimestamp() const;
 
-  virtual void setTimestamp(double timestamp);
-  virtual double getTimestamp() const;
+    virtual void setCategory(const std::string &name);
+    virtual const std::string &getCategory() const;
 
-  virtual void setCategory(const std::string &name);
-  virtual const std::string &getCategory() const;
+    virtual const Eigen::VectorXd &getAugmentedState() const;
 
-  virtual const Eigen::VectorXd &getAugmentedState() const;
+    virtual long int getFrameCounter() const;
+    virtual void setFrameCounter(long int c);
 
-  virtual long int getFrameCounter() const;
-  virtual void setFrameCounter(long int c);
+    virtual std::string getEdgeHash() const;
 
-  virtual std::string getEdgeHash() const;
+    inline operator g2o::OptimizableGraph::Edge *() {
+      return this;
+    }
+    inline operator g2o::OptimizableGraph::Edge &() {
+      return *this;
+    }
 
-  inline operator g2o::OptimizableGraph::Edge *() {
-    return this;
-  }
-  inline operator g2o::OptimizableGraph::Edge &() {
-    return *this;
-  }
+    virtual bool read(std::istream &s);
+    virtual bool write(std::ostream &s) const;
 
-protected:
+  protected:
 
-  std::string _name; /**< the name of the sensor this edge refers to */
+    std::string _name; /**< the name of the sensor this edge refers to */
 
-  double _tstamp; /**< timestamp of the measurement */
+    double _tstamp; /**< timestamp of the measurement */
 
-  long int _frameCounter;
+    long int _frameCounter;
 
-  Eigen::VectorXd _x; /**< augmented state: [x, q, v, omega, a, alpha,. disp, dispQ, IMUintdP, IMUintdQ], 33 variables */
+    Eigen::VectorXd _x; /**< augmented state: [x, q, v, omega, a, alpha,. disp, dispQ, IMUintdP, IMUintdQ], 33 variables */
 
-  Eigen::MatrixXd _noiseCov; /**< noise covariance matrix, it is not necessarily the inverse of _information
-   *                               i.e. the noise vector and the measurement vector have different sizes */
+    Eigen::MatrixXd _noiseCov; /**< noise covariance matrix, it is not necessarily the inverse of _information
+     *                               i.e. the noise vector and the measurement vector have different sizes */
 
-  std::vector<ParameterTemporaries> _params; /**< data structure which describe parameters and local temporary values */
-  int _paramsPtrsSize; /**< size of the parameter pointer arrays, it is the number of non standard parameters of the edge */
-  double **_paramsPtrs; /**< shortcuts to memory where current interpolated parameter estimate is stored */
+    std::vector<ParameterTemporaries> _params; /**< data structure which describe parameters and local temporary values */
+    int _paramsPtrsSize; /**< size of the parameter pointer arrays, it is the number of non standard parameters of the edge */
+    double **_paramsPtrs; /**< shortcuts to memory where current interpolated parameter estimate is stored */
 
-  using g2o::BaseMultiEdge<D, Eigen::VectorXd>::_information;
-  using g2o::BaseMultiEdge<D, Eigen::VectorXd>::_measurement;
+    using g2o::BaseMultiEdge<D, Eigen::VectorXd>::_information;
+    using g2o::BaseMultiEdge<D, Eigen::VectorXd>::_measurement;
 
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  ;
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    ;
 };
-
 
 #define USINGDIRECTIVES using GenericEdge<MT::_ERROR_SIZE>::_noiseCov;      \
 using GenericEdge<MT::_ERROR_SIZE>::_params;                                \
@@ -178,7 +177,7 @@ inline int ROAMestimation::GenericEdge<D>::noiseDimension() const {
 template<int D>
 inline void ROAMestimation::GenericEdge<D>::handleParamTemporaries() {
 
-	for (auto it = _params.begin(); it != _params.end(); ++it) {
+  for (auto it = _params.begin(); it != _params.end(); ++it) {
     it->updateTemporaries();
   }
 
@@ -201,15 +200,11 @@ inline const std::vector<ROAMestimation::ParameterTemporaries>& ROAMestimation::
 
 template<int D>
 inline bool ROAMestimation::GenericEdge<D>::read(std::istream& s) {
-  std::cerr << "[ROAMGenericEdge] read from g2o dataset not implemented"
-      << std::endl;
   return false;
 }
 
 template<int D>
 inline bool ROAMestimation::GenericEdge<D>::write(std::ostream& s) const {
-  std::cerr << "[ROAMGenericEdge] write to g2o dataset not implemented"
-      << std::endl;
   return false;
 }
 
