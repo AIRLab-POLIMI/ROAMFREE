@@ -18,9 +18,8 @@
 
 #include "ParameterVerticesManager.h"
 
-#include "GenericLinearConstraint.h"
-
 #include "PriorEdges/AllDerivativePriors.h"
+#include "GenericLinearConstraint.h"
 
 #include "ROAMutils/StringUtils.h"
 

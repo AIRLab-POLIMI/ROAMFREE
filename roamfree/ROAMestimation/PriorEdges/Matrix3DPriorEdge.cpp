@@ -16,7 +16,7 @@ Contributors:
  *      Author: davide
  */
 
-#include "Matrix3DPriorEdge.h"
+#include "PriorEdges/Matrix3DPriorEdge.h"
 
 namespace ROAMestimation {
 

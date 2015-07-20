@@ -16,7 +16,7 @@ Contributors:
  *      Author: davide
  */
 
-#include "../include/ROAMfunctions/AnchoredRectangularObjectM.h"
+#include "AnchoredRectangularObjectM.h"
 
 namespace ROAMfunctions {
 

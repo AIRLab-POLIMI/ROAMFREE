@@ -19,10 +19,11 @@ Contributors:
 #ifndef ALLPRIORS_H_
 #define ALLPRIORS_H_
 
-#include "SE3PriorEdge.h"
 #include "Eucl1DPriorEdge.h"
 #include "Eucl3DPriorEdge.h"
+#include "SE3PriorEdge.h"
 #include "Matrix3DPriorEdge.h"
 #include "FHPPriorOnHomogeneousPointEdge.h"
+#include "Eucl3DRandomWalkProcessEdge.h"
 
 #endif /* ALLPRIORS_H_ */

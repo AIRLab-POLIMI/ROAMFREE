@@ -16,7 +16,7 @@ Contributors:
  *      Author: davide
  */
 
-#include "../include/ROAMfunctions/RectangularObjectM.h"
+#include "RectangularObjectM.h"
 
 namespace ROAMfunctions {
 const bool RectangularObjectM::_usedComponents[] = {true, true, false, false, false, false, false, false, false, false};

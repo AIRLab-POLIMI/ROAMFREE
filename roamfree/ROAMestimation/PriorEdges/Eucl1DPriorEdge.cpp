@@ -16,7 +16,7 @@ Contributors:
  *      Author: davide
  */
 
-#include "Eucl1DPriorEdge.h"
+#include "PriorEdges/Eucl1DPriorEdge.h"
 
 namespace ROAMestimation {
 

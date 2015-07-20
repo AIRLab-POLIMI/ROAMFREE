@@ -20,7 +20,6 @@ Contributors:
 #define EUCL1DPRIOREDGE_H_
 
 #include "BasePriorEdge.h"
-
 #include "GenericVertex.h"
 
 namespace ROAMestimation {

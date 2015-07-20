@@ -16,8 +16,7 @@ Contributors:
  *      Author: davide
  */
 
-#include "SE3PriorEdge.h"
-
+#include "PriorEdges/SE3PriorEdge.h"
 #include "ROAMmath/MatricesOperations.h"
 
 namespace ROAMestimation {

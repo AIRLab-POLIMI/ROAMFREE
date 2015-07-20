@@ -16,7 +16,7 @@ Contributors:
  *      Author: davide
  */
 
-#include "FHPPriorOnHomogeneousPointEdge.h"
+#include "PriorEdges/FHPPriorOnHomogeneousPointEdge.h"
 
 namespace ROAMestimation {
 

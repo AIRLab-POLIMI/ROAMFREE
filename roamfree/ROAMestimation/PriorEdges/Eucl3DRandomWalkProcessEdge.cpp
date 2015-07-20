@@ -16,7 +16,7 @@ Contributors:
  *      Author: davide
  */
 
-#include "Eucl3DRandomWalkProcessEdge.h"
+#include "PriorEdges/Eucl3DRandomWalkProcessEdge.h"
 
 namespace ROAMestimation {
 

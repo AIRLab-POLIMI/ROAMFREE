@@ -10,34 +10,38 @@ Contributors:
 */
 
 /*
- * Matrix3DPriorEdge.h
+ * SE3Prior.h
  *
- *  Created on: Jul 11, 2013
+ *  Created on: Apr 8, 2013
  *      Author: davide
  */
 
-#ifndef MATRIX3DPRIOREDGE_H_
-#define MATRIX3DPRIOREDGE_H_
+#ifndef SE3PRIOREDGE_H_
+#define SE3PRIOREDGE_H_
 
 #include "BasePriorEdge.h"
-
 #include "GenericVertex.h"
 
 namespace ROAMestimation {
 
-class Matrix3DPriorEdge: public ROAMestimation::BasePriorEdge<9,
-GenericVertex<ROAMfunctions::Matrix3DV> > {
+class SE3PriorEdge: public ROAMestimation::BasePriorEdge<6, GenericVertex<ROAMfunctions::SE3V> > {
 
 public:
 
-Matrix3DPriorEdge();
+  SE3PriorEdge();
 
-void computeError();
-void linearizeOplus();
+  void afterVertexUpdate();
 
-std::string writeDebugInfo() const;
+  void computeError();
+  void linearizeOplus();
 
+  std::string writeDebugInfo() const;
+
+protected:
+  static const int _OFF = -1;
+  double sign;
 };
 
-} /* namespace ROAMestimation */
-#endif /* MATRIX3DPRIOREDGE_H_ */
+}
+/* namespace ROAMestimation */
+#endif /* SE3PRIOR_H_ */

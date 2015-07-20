@@ -23,14 +23,13 @@ Contributors:
 
 #include <utility>
 
+#include "PriorEdges/AllPriors.h"
 #include "ROAMfunctions/AllVariables.h"
 #include "ROAMfunctions/AllFunctions.h"
 
 #include "ROAMutils/StringUtils.h"
 
 #include "ROAMlog/GraphLogger.h"
-
-#include "PriorEdges/AllPriors.h"
 
 #include "QuaternionGenericEdge.h"
 #include "GenericEdgeInterface.h"

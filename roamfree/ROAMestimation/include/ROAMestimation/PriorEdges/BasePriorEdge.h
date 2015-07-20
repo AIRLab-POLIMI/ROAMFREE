@@ -25,6 +25,7 @@
 #include "ROAMmath/MatricesOperations.h"
 
 #include "g2o/core/base_unary_edge.h"
+
 #include "BasePriorEdgeInterface.h"
 
 namespace ROAMestimation {

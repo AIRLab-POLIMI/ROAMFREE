@@ -16,7 +16,7 @@ Contributors:
  *      Author: davide
  */
 
-#include "../include/ROAMfunctions/RotatingPushbroomM.h"
+#include "RotatingPushbroomM.h"
 
 namespace ROAMfunctions {
 

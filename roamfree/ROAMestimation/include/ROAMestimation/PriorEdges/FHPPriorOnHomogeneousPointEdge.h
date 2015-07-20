@@ -10,34 +10,32 @@ Contributors:
 */
 
 /*
- * Eucl3DPriorEdge.h
+ * FHPPriorOnHomogeneousPoint.h
  *
- *  Created on: Jun 12, 2013
+ *  Created on: Dec 2, 2014
  *      Author: davide
  */
 
-#ifndef EUCL3DPRIOREDGE_H_
-#define EUCL3DPRIOREDGE_H_
+#ifndef FHPPRIORONHOMOGENEOUSPOINT_H_
+#define FHPPRIORONHOMOGENEOUSPOINT_H_
 
 #include "BasePriorEdge.h"
-
 #include "GenericVertex.h"
 
 namespace ROAMestimation {
 
-class Eucl3DPriorEdge: public ROAMestimation::BasePriorEdge<3,
+class FHPPriorOnHomogeneousPointEdge: public ROAMestimation::BasePriorEdge<2,
     GenericVertex<ROAMfunctions::Eucl3DV> > {
 
 public:
 
-  Eucl3DPriorEdge();
+	FHPPriorOnHomogeneousPointEdge();
 
   void computeError();
   void linearizeOplus();
 
   std::string writeDebugInfo() const;
-
 };
 
-} /* namespace ROAMlog */
-#endif /* EUCL3DPRIOREDGE_H_ */
+} /* namespace ROAMestimation */
+#endif /* FHPPRIORONHOMOGENEOUSPOINT_H_ */
