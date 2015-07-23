@@ -20,10 +20,10 @@ Contributors:
 #define ALLPRIORS_H_
 
 #include "Eucl1DPriorEdge.h"
+#include "Eucl3DGaussMarkovProcessEdge.h"
 #include "Eucl3DPriorEdge.h"
 #include "SE3PriorEdge.h"
 #include "Matrix3DPriorEdge.h"
 #include "FHPPriorOnHomogeneousPointEdge.h"
-#include "Eucl3DRandomWalkProcessEdge.h"
 
 #endif /* ALLPRIORS_H_ */

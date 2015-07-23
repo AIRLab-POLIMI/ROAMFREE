@@ -54,9 +54,12 @@ public:
   inline virtual void setProcessModelType(ProcessTypes t) {
     _param->setProcessModelType(t);
   }
-  inline virtual void setRandomWalkNoiseCov(const Eigen::MatrixXd &cov) {
-    _param->setRandomWalkProcessNoiseCov(cov);
+  inline virtual void setGaussMarkovNoiseCov(const Eigen::MatrixXd &cov) {
+    _param->setGaussMarkovProcessNoiseCov(cov);
   }
+  inline virtual void setGaussMarkovBeta(const Eigen::VectorXd &beta) {
+      _param->setGaussMarkovProcessBeta(beta);
+    }
 
 };
 

@@ -10,26 +10,26 @@ Contributors:
 */
 
 /*
- * Eucl3DDerivativePriorEdge.h
+ * Eucl3DGaussMarkovProcessEdge.h
  *
  *  Created on: May 7, 2015
  *      Author: davide
  */
 
-#ifndef EUCL3DDERIVATIVEPRIOREDGE_H_
-#define EUCL3DDERIVATIVEPRIOREDGE_H_
+#ifndef EUCL3DGAUSSMARKOVPROCESSEDGE_H_
+#define EUCL3DGAUSSMARKOVPROCESSEDGE_H_
 
-#include "BaseRandomWalkProcessEdge.h"
+#include "BaseGaussMarkovProcessEdge.h"
 #include "GenericVertex.h"
 
 namespace ROAMestimation {
 
-class Eucl3DRandomWalkProcessEdge: public ROAMestimation::BaseRandomWalkProcessEdge<
+class Eucl3DGaussMarkovProcessEdge: public ROAMestimation::BaseGaussMarkovProcessEdge<
     3, GenericVertex<ROAMfunctions::Eucl3DV> > {
 
   public:
 
-    Eucl3DRandomWalkProcessEdge();
+    Eucl3DGaussMarkovProcessEdge();
 
     void computeError();
     void linearizeOplus();
@@ -39,4 +39,4 @@ class Eucl3DRandomWalkProcessEdge: public ROAMestimation::BaseRandomWalkProcessE
 };
 
 } /* namespace ROAMestimation */
-#endif /* EUCL3DDERIVATIVEPRIOREDGE_H_ */
+#endif /* EUCL3DGAUSSMARKOVPROCESSEDGE_H_ */

@@ -48,7 +48,8 @@ public:
   virtual void getValueAt(Eigen::VectorXd &ret, double t) = 0; //!< get the value for the parameter at time t (may involve interpolation);
 
   virtual void setProcessModelType(ProcessTypes t) = 0;
-  virtual void setRandomWalkNoiseCov(const Eigen::MatrixXd &cov) = 0; //!< sets the noise covariance matrix for the parameter derivative prior
+  virtual void setGaussMarkovNoiseCov(const Eigen::MatrixXd &cov) = 0; //!< sets the noise covariance matrix for the Gauss-Markov process
+  virtual void setGaussMarkovBeta(const Eigen::VectorXd &beta) = 0; //!< sets beta for the Gauss-Markov process (with beta = 0 you have a random walk)
 };
 
 } /* namespace ROAMestimation */

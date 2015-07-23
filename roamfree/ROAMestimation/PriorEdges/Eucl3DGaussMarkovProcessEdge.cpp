@@ -10,48 +10,44 @@ Contributors:
 */
 
 /*
- * Eucl3DDerivativePriorEdge.cpp
+ * Eucl3DGaussMarkovProcessEdge.cpp
  *
  *  Created on: May 7, 2015
  *      Author: davide
  */
 
-#include "PriorEdges/Eucl3DRandomWalkProcessEdge.h"
+#include "../include/ROAMestimation/PriorEdges/Eucl3DGaussMarkovProcessEdge.h"
 
 namespace ROAMestimation {
 
-Eucl3DRandomWalkProcessEdge::Eucl3DRandomWalkProcessEdge() {
+Eucl3DGaussMarkovProcessEdge::Eucl3DGaussMarkovProcessEdge() {
   _measurement.resize(3);
   _measurement.setZero(); // by default the prior on the derivative is zero
-
-  _jacobianOplusXj = Eigen::Matrix3d::Identity(); // second ...
-  _jacobianOplusXi = -Eigen::Matrix3d::Identity(); // - first
-
 }
 
-void Eucl3DRandomWalkProcessEdge::computeError() {
+void Eucl3DGaussMarkovProcessEdge::computeError() {
 
-  const Eigen::VectorXd & first = static_cast<GenericVertex<
+  const Eigen::VectorXd & older = static_cast<GenericVertex<
       ROAMfunctions::Eucl3DV> *>(_vertices[0])->estimate();
-  const Eigen::VectorXd & second = static_cast<GenericVertex<
+  const Eigen::VectorXd & newer = static_cast<GenericVertex<
         ROAMfunctions::Eucl3DV> *>(_vertices[1])->estimate();
 
-  const Eigen::VectorXd & z = _measurement;
-
-  _error = second - first - z;
+  for (int i = 0; i < 3; i++) {
+    _error(i) = newer(i) - exp(-_beta(i)*_dt) * older(i);
+  }
 }
 
-void Eucl3DRandomWalkProcessEdge::linearizeOplus() {
+void Eucl3DGaussMarkovProcessEdge::linearizeOplus() {
   // do nothing, _jacobianOplusXj and _jacobianOplusXi are constant
 }
 
-std::string Eucl3DRandomWalkProcessEdge::writeDebugInfo() const {
+std::string Eucl3DGaussMarkovProcessEdge::writeDebugInfo() const {
   std::stringstream s;
 
   g2o::OptimizableGraph::Vertex *x0 = static_cast<g2o::OptimizableGraph::Vertex *>(_vertices[0]);
   g2o::OptimizableGraph::Vertex *x1 = static_cast<g2o::OptimizableGraph::Vertex *>(_vertices[1]);
 
-  s << "Eucl3DRandomWalkProcessEdge(" << x0->id() << "," << x1->id() << ")";
+  s << "Eucl3DGaussMarkovProcessEdge(" << x0->id() << "," << x1->id() << ")";
 
   return s.str();
 }

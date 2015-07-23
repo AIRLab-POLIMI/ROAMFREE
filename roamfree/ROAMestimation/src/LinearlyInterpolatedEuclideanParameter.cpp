@@ -1,13 +1,13 @@
 /*
-Copyright (c) 2013-2016 Politecnico di Milano.
-All rights reserved. This program and the accompanying materials
-are made available under the terms of the GNU Lesser Public License v3
-which accompanies this distribution, and is available at
-https://www.gnu.org/licenses/lgpl.html
+ Copyright (c) 2013-2016 Politecnico di Milano.
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the GNU Lesser Public License v3
+ which accompanies this distribution, and is available at
+ https://www.gnu.org/licenses/lgpl.html
 
-Contributors:
-    Davide A. Cucci (davide.cucci@epfl.ch)    
-*/
+ Contributors:
+ Davide A. Cucci (davide.cucci@epfl.ch)
+ */
 
 /*
  * LinearlyInterpolatedEuclideanParameter.cpp
@@ -25,8 +25,7 @@ namespace ROAMestimation {
 LinearlyInterpolatedEuclideanParameter::LinearlyInterpolatedEuclideanParameter(
     double spacing, g2o::AutoIDSparseOptimizer* opt, ParameterTypes typ,
     const std::string& name, const Eigen::VectorXd& x0) :
-    ParameterVerticesManager(opt, typ, name), _spacing(spacing), _x0(x0), _randomWalkProcess(
-        false) {
+    ParameterVerticesManager(opt, typ, name), _spacing(spacing), _x0(x0) {
 }
 
 std::map<double, g2o::OptimizableGraph::Vertex*>::const_iterator LinearlyInterpolatedEuclideanParameter::getVertices(
@@ -54,11 +53,6 @@ bool LinearlyInterpolatedEuclideanParameter::updateVertexSet(double mintstamp,
         last->second->accessEstimateData(), parameterEstimateDimension());
 
     g2o::OptimizableGraph::Vertex *newv = newVertex(newt, last_estimate);
-    if (_randomWalkProcess) {
-      // the variance of a randow walk grows linearly with time! so now pow(_spacing,2)
-      addRandomWalkProcessEdge(last->second, newv,
-          _spacing * _randomWalkProcessNoiseCov);
-    }
 
 #   ifdef DEBUG_PRINT_INFO_MESSAGES
     std::cerr << "[LinearlyInterpolatedEuclideanParameter] Info: adding vertex at t=" << ROAMutils::StringUtils::writeNiceTimestamp(newt)
@@ -77,11 +71,6 @@ bool LinearlyInterpolatedEuclideanParameter::updateVertexSet(double mintstamp,
         parameterEstimateDimension());
 
     g2o::OptimizableGraph::Vertex * newv = newVertex(newt, first_estimate);
-    if (_randomWalkProcess) {
-      // the variance of a randow walk grows linearly with time! so now pow(_spacing,2)
-      addRandomWalkProcessEdge(newv, oldestVertex->second,
-          _spacing * _randomWalkProcessNoiseCov);
-    }
 
 #   ifdef DEBUG_PRINT_INFO_MESSAGES
     std::cerr << "[LinearlyInterpolatedEuclideanParameter] Info: adding vertex at t=" << ROAMutils::StringUtils::writeNiceTimestamp(newt)
@@ -124,9 +113,9 @@ void LinearlyInterpolatedEuclideanParameter::prepareForPoseRemoval(
       _v.erase(oldestVertex);
 
 #     ifdef DEBUG_PRINT_INFO_MESSAGES
-        std::cerr
-        << "[LinearlyInterpolatedEuclideanParameter] Info: scheduling delete for vertex at t="
-        << ROAMutils::StringUtils::writeNiceTimestamp(oldestVertex->first) << " for " << _name << std::endl;
+      std::cerr
+      << "[LinearlyInterpolatedEuclideanParameter] Info: scheduling delete for vertex at t="
+      << ROAMutils::StringUtils::writeNiceTimestamp(oldestVertex->first) << " for " << _name << std::endl;
 #     endif
     }
   }

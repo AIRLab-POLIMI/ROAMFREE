@@ -1,13 +1,13 @@
 /*
-Copyright (c) 2013-2016 Politecnico di Milano.
-All rights reserved. This program and the accompanying materials
-are made available under the terms of the GNU Lesser Public License v3
-which accompanies this distribution, and is available at
-https://www.gnu.org/licenses/lgpl.html
+ Copyright (c) 2013-2016 Politecnico di Milano.
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the GNU Lesser Public License v3
+ which accompanies this distribution, and is available at
+ https://www.gnu.org/licenses/lgpl.html
 
-Contributors:
-    Davide A. Cucci (davide.cucci@epfl.ch)    
-*/
+ Contributors:
+ Davide A. Cucci (davide.cucci@epfl.ch)
+ */
 
 /*
  * Parameter.h
@@ -68,9 +68,14 @@ class ParameterVerticesManager {
     virtual void setProcessModelType(ProcessTypes t);
 
     /**
-     * \brief set the noise covariance matrix for the RandomWalkProcessEdge
+     * \brief set the noise covariance matrix for the GaussMarkovProcessEdge
      */
-    virtual void setRandomWalkProcessNoiseCov(const Eigen::MatrixXd &cov);
+    virtual void setGaussMarkovProcessNoiseCov(const Eigen::MatrixXd &cov);
+
+    /**
+     * \brief set the beta for the GaussMarkovProcessEdge. With beta = 0 you have a random walk.
+     */
+    virtual void setGaussMarkovProcessBeta(const Eigen::VectorXd &beta);
 
     /**
      * \brief returns an iterator to relevant parameter nodes for tstamp
@@ -149,7 +154,8 @@ class ParameterVerticesManager {
      */
     inline
     void scheduleDelete(double t, g2o::OptimizableGraph::Vertex * v) {
-      _noLongerNeeded.insert(std::pair<double, g2o::OptimizableGraph::Vertex *> (t, v));
+      _noLongerNeeded.insert(
+          std::pair<double, g2o::OptimizableGraph::Vertex *>(t, v));
     }
 
     /**
@@ -215,8 +221,8 @@ class ParameterVerticesManager {
     // stuff for process models
     ProcessTypes _process; //!< type of the process model for the parameter
 
-    Eigen::MatrixXd _randomWalkNoiseCov;
-
+    Eigen::MatrixXd _gaussMarkovNoiseCov;
+    Eigen::VectorXd _gaussMarkovBeta;
 
     VertexMap _v;
 
@@ -235,9 +241,10 @@ class ParameterVerticesManager {
     /**
      * insert edges between two vertices limiting the difference between their estimate
      */
-    g2o::OptimizableGraph::Edge * addRandomWalkProcessEdge(
+    g2o::OptimizableGraph::Edge * addGaussMarkovProcessEdge(
         g2o::OptimizableGraph::Vertex *older,
-        g2o::OptimizableGraph::Vertex *newer, const Eigen::MatrixXd &noiseCov);
+        g2o::OptimizableGraph::Vertex *newer, const Eigen::MatrixXd &noiseCov,
+        const Eigen::VectorXd &beta, double dt);
 
     /**
      * returns the vertex in the set which is nearest to tstamp

@@ -129,16 +129,15 @@ int main(int argc, char *argv[]) {
   ParameterWrapper_Ptr ba_par = f->addLinearlyInterpolatedParameter(Euclidean3D,
       "IMUintegralDeltaP_Ba", accBias, isbafixed, 1.0);
 
-  ba_par->setProcessModelType(RandomWalk);
+  ba_par->setProcessModelType(GaussMarkov);
   ba_par->setFixed(isbafixed);
-  ba_par->setRandomWalkNoiseCov(10 * Eigen::MatrixXd::Identity(3, 3));
+  ba_par->setGaussMarkovNoiseCov(10 * Eigen::MatrixXd::Identity(3, 3));
+  ba_par->setGaussMarkovBeta(Eigen::VectorXd::Zero(3));
 
-  ParameterWrapper_Ptr bw_par = f->addLinearlyInterpolatedParameter(Euclidean3D,
-      "IMUintegralDeltaP_Bw", gyroBias, isbwfixed, 1.0);
+  ParameterWrapper_Ptr bw_par = f->addConstantParameter(Euclidean3D,
+      "IMUintegralDeltaP_Bw", gyroBias, isbwfixed);
 
-  bw_par->setProcessModelType(RandomWalk);
   bw_par->setFixed(isbwfixed);
-  bw_par->setRandomWalkNoiseCov(10 * Eigen::MatrixXd::Identity(3, 3));
 
   Eigen::VectorXd T_OS_IMU(7); // Transformation between Odometer and robot frame
   T_OS_IMU << 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0;
@@ -279,7 +278,7 @@ int main(int argc, char *argv[]) {
           f->getNthOldestPose(1)->setFixed(true);
         }
 
-        keepOn = f->estimate(10);
+        keepOn = f->estimate(5);
 
         if (!keepOn) {
           return 1;

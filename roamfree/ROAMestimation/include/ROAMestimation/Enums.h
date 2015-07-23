@@ -68,7 +68,7 @@ enum PriorEdgeTypes {
 
 enum ProcessTypes {
   None,
-  RandomWalk
+  GaussMarkov
 };
 
 enum AugStateComponents {

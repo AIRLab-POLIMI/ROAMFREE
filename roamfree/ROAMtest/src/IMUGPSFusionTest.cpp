@@ -112,12 +112,12 @@ int main(int argc, char *argv[]) {
   ParameterWrapper_Ptr ba_par = f->addLinearlyInterpolatedParameter(Euclidean3D,
       "Accelerometer_B", accBias0, false, 25 / imuRate);
 
-  ba_par->setProcessModelType(RandomWalk);
-  ba_par->setRandomWalkNoiseCov(10 * Eigen::MatrixXd::Identity(3, 3));
+  ba_par->setProcessModelType(GaussMarkov);
+  ba_par->setGaussMarkovNoiseCov(10 * Eigen::MatrixXd::Identity(3, 3));
+  ba_par->setGaussMarkovBeta(Eigen::VectorXd::Zero(3));
 
   Eigen::MatrixXd accelerometerCov(3, 3); // covariance of Accelerometer readings
   accelerometerCov = 0.0016 * Eigen::MatrixXd::Identity(3, 3);
-  //accelerometerCov = Eigen::MatrixXd::Identity(3, 3);
 
   // Gyroscope sensor
 
@@ -226,7 +226,7 @@ int main(int argc, char *argv[]) {
 
     if (t > 0.5 && cntImu % 100 == 0) { // after 1s of data, then each time
 
-      keepOn = f->estimate(25);
+      keepOn = f->estimate(5);
 
       if (!keepOn) {
         return 1;
@@ -234,7 +234,7 @@ int main(int argc, char *argv[]) {
 
       cntEst++;
 
-      //f->marginalizeOldNodes(2);
+      f->marginalizeOldNodes(3);
     }
   }
 

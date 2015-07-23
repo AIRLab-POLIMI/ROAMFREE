@@ -66,9 +66,6 @@ class LinearlyInterpolatedEuclideanParameter: public ParameterVerticesManager {
 
     Eigen::VectorXd _x0; /*!< initial value for the parameter */
 
-    bool _randomWalkProcess;
-    Eigen::MatrixXd _randomWalkProcessNoiseCov;
-
 }
 ;
 
