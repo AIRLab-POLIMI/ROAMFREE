@@ -173,9 +173,6 @@ bool FactorGraphFilter_Impl::addSensor(const string& name, MeasTypes type,
   case GenericOdometer:
     s.order = GenericOdometerM::_ORDER;
     break;
-  case PlaneDynamicModel:
-    s.order = PlaneDynamicModelM::_ORDER;
-    break;
   case Displacement:
     s.order = DisplacementM::_ORDER;
     break;
@@ -1234,9 +1231,6 @@ GenericEdgeInterface *FactorGraphFilter_Impl::addMeasurement_i(
     break;
   case GenericOdometer:
     e = new QuaternionGenericEdge<GenericOdometerM>;
-    break;
-  case PlaneDynamicModel:
-    e = new QuaternionGenericEdge<PlaneDynamicModelM>;
     break;
   case Displacement:
     e = new QuaternionGenericEdge<DisplacementM>;

@@ -82,14 +82,6 @@ g2o::OptimizableGraph::Vertex * ParameterVerticesManager::newVertex(
     gv->setTimestamp(tstamp);
   }
     break;
-  case PlaneDynamicModelParams: {
-    GenericVertex<PlaneDynamicModelParamsV> *gv = new GenericVertex<
-        PlaneDynamicModelParamsV>;
-    v = gv;
-    v2 = gv;
-    gv->setTimestamp(tstamp);
-  }
-    break;
   default:
     std::cerr << "[ParameterVerticesManager] Error: unknown parameter type"
         << std::endl;

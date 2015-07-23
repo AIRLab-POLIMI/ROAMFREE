@@ -29,7 +29,6 @@ Contributors:
 #include "GenericOdometerM.h"
 #include "AckermannKinematicM.h"
 #include "AckermannKinematicNoInputsM.h"
-#include "PlaneDynamicModelM.h"
 #include "RectangularObjectM.h"
 #include "AnchoredRectangularObjectM.h"
 #include "AnchoredRectangularObjectFirstM.h"

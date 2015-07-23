@@ -2,6 +2,7 @@ function t = watchFile(config)
 
 period = 0.5; %seconds between directory checks
 
+
 cb = @(x,y)(hasChanged(x, @runPlugins, config));
 
 t = timer('TimerFcn', cb, 'Period', period, 'executionmode', 'fixedrate');
