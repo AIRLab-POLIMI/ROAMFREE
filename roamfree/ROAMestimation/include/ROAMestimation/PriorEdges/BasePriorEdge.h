@@ -42,6 +42,9 @@ class BasePriorEdge: public g2o::BaseUnaryEdge<D, Eigen::VectorXd, VertexXi>,
 
     Eigen::Matrix<double, D, D> _noiseCov;
 
+    std::string _name;
+    double _tstamp;
+
   public:
 
     virtual ~BasePriorEdge() {
@@ -60,6 +63,22 @@ class BasePriorEdge: public g2o::BaseUnaryEdge<D, Eigen::VectorXd, VertexXi>,
 
     virtual g2o::OptimizableGraph::Edge *getg2oOptGraphPointer() {
       return static_cast<g2o::OptimizableGraph::Edge *>(this);
+    }
+
+    virtual void setCategory(const std::string &name) {
+      _name = name;
+    }
+
+    virtual const std::string &getCategory() const {
+      return _name;
+    }
+
+    virtual void setTimestamp(double timestamp) {
+      _tstamp = timestamp;
+    }
+
+    virtual double getTimestamp() const {
+      return _tstamp;
     }
 
     bool read(std::istream &s) {

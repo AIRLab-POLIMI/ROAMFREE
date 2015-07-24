@@ -24,6 +24,7 @@ Contributors:
 
 #include "ROAMestimation/GenericVertexInterface.h"
 #include "ROAMestimation/GenericEdgeInterface.h"
+#include "ROAMestimation/PriorEdges/BasePriorEdgeInterface.h"
 
 namespace ROAMlog {
 
@@ -94,11 +95,16 @@ template <>
 int SlotRandomLogger::getToLogVectorSize(ROAMestimation::GenericEdgeInterface &o) const;
 
 template <>
+int SlotRandomLogger::getToLogVectorSize(ROAMestimation::BasePriorEdgeInterface &o) const;
+
+template <>
 double SlotRandomLogger::getToLogComponent(int i, ROAMestimation::GenericVertexInterface &o);
 
 template <>
 double SlotRandomLogger::getToLogComponent(int i, ROAMestimation::GenericEdgeInterface &o);
 
+template <>
+double SlotRandomLogger::getToLogComponent(int i, ROAMestimation::BasePriorEdgeInterface &o);
 
 } /* namespace ROAMlog */
 

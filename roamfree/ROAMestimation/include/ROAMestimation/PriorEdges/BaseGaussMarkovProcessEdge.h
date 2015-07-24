@@ -30,22 +30,21 @@
 
 #include "g2o/core/base_binary_edge.h"
 
-#include "BasePriorEdgeInterface.h"
+#include "BaseBinaryProcessEdge.h"
 
 namespace ROAMestimation {
 
 template<int D, typename VertexXi>
 
-class BaseGaussMarkovProcessEdge: public g2o::BaseBinaryEdge<D, Eigen::VectorXd,
-    VertexXi, VertexXi>, public BasePriorEdgeInterface {
+class BaseGaussMarkovProcessEdge: public BaseBinaryProcessEdge<D, VertexXi> {
 
   protected:
 
     Eigen::Matrix<double, D, 1> _beta;
-    Eigen::Matrix<double, D, D> _noiseCov;
     double _dt;
 
-    using g2o::BaseBinaryEdge<D, Eigen::VectorXd, VertexXi, VertexXi>::_measurement;
+    using BaseBinaryProcessEdge<D, VertexXi>::_noiseCov;
+
     using g2o::BaseBinaryEdge<D, Eigen::VectorXd, VertexXi, VertexXi>::_information;
 
     using g2o::BaseBinaryEdge<D, Eigen::VectorXd, VertexXi, VertexXi>::_jacobianOplusXj;
@@ -84,29 +83,10 @@ class BaseGaussMarkovProcessEdge: public g2o::BaseBinaryEdge<D, Eigen::VectorXd,
       ROAMmath::inv(_noiseCov, _information);
     }
 
-    virtual void setNoiseCov(const Eigen::MatrixXd &noiseCov) {
-      _noiseCov = noiseCov;
-    }
-
-    virtual void setMeasurement(const Eigen::VectorXd &measurement) {
-      std::cerr << "[BaseGaussMarkovProcessEdge] Warning: measurement plays no role here " << std::endl;
-
-      _measurement = measurement;
-    }
-
     virtual g2o::OptimizableGraph::Edge *getg2oOptGraphPointer() {
       return static_cast<g2o::OptimizableGraph::Edge *>(this);
     }
 
-    bool read(std::istream &s) {
-      return false;
-    }
-
-    bool write(std::ostream &s) const {
-      return false;
-    }
-
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 } /* namespace ROAMestimation */

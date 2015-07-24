@@ -61,6 +61,15 @@ int SlotRandomLogger::getToLogVectorSize(
 }
 
 template<>
+int SlotRandomLogger::getToLogVectorSize(
+    ROAMestimation::BasePriorEdgeInterface& o) const {
+
+  g2o::OptimizableGraph::Edge *ov = o.getg2oOptGraphPointer();
+
+  return 1 + ov->dimension();
+}
+
+template<>
 double SlotRandomLogger::getToLogComponent(int i,
     ROAMestimation::GenericVertexInterface& o) {
 
@@ -125,6 +134,28 @@ double SlotRandomLogger::getToLogComponent(int i,
     } while (pos >= accsize);
 
     return params[k].value(pos - (accsize - params[k].value.rows()));
+  }
+}
+
+template<>
+double SlotRandomLogger::getToLogComponent(int i,
+    ROAMestimation::BasePriorEdgeInterface& o) {
+
+  g2o::OptimizableGraph::Edge *oe = o.getg2oOptGraphPointer();
+
+  int n0 = 1;
+  int n1 = n0 + oe->dimension();
+
+  if (i < n0) {
+    return 0; //TODO; there is no frameCounter for prior edges
+    //return oe->getFrameCounter();
+  } else {
+    // if the edge is robustified we have to undo the process before storing the result
+    if (oe->robustKernel() == true) {
+      return oe->errorData()[i-n0]/oe->currentHuberWeight();
+    } else {
+      return oe->errorData()[i-n0];
+    }
   }
 }
 

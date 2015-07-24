@@ -1,13 +1,13 @@
 /*
-Copyright (c) 2013-2016 Politecnico di Milano.
-All rights reserved. This program and the accompanying materials
-are made available under the terms of the GNU Lesser Public License v3
-which accompanies this distribution, and is available at
-https://www.gnu.org/licenses/lgpl.html
+ Copyright (c) 2013-2016 Politecnico di Milano.
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the GNU Lesser Public License v3
+ which accompanies this distribution, and is available at
+ https://www.gnu.org/licenses/lgpl.html
 
-Contributors:
-    Davide A. Cucci (davide.cucci@epfl.ch)    
-*/
+ Contributors:
+ Davide A. Cucci (davide.cucci@epfl.ch)
+ */
 
 /*
  * GraphLogger.cpp
@@ -46,10 +46,9 @@ void GraphLogger::sync() {
     g2o::OptimizableGraph::Vertex *v =
         static_cast<g2o::OptimizableGraph::Vertex *>(*it);
 
-    ROAMestimation::GenericVertexInterface *vi =
-        dynamic_cast<ROAMestimation::GenericVertexInterface *>(v);
+    ROAMestimation::GenericVertexInterface *vi;
 
-    if (vi) {
+    if ((vi = dynamic_cast<ROAMestimation::GenericVertexInterface *>(v)) != NULL) {
       // TODO: add some filter at this level, we may not want to log EVERY kind of vertex..
       std::map<std::string, SlotRandomLogger *>::iterator l_it = _loggers.find(
           vi->getCategory());
@@ -81,10 +80,10 @@ void GraphLogger::sync() {
     g2o::OptimizableGraph::Edge *e =
         static_cast<g2o::OptimizableGraph::Edge *>(*it);
 
-    ROAMestimation::GenericEdgeInterface *ei =
-        dynamic_cast<ROAMestimation::GenericEdgeInterface *>(e);
+    ROAMestimation::GenericEdgeInterface *ei;
+    ROAMestimation::BasePriorEdgeInterface *pi;
 
-    if (ei) {
+    if ((ei = dynamic_cast<ROAMestimation::GenericEdgeInterface *>(e)) != NULL) {
       std::map<std::string, SlotRandomLogger *>::iterator l_it = _loggers.find(
           ei->getCategory());
 
@@ -103,14 +102,33 @@ void GraphLogger::sync() {
       }
 
       l_it->second->logObject(*ei);
+    } else if ((pi = dynamic_cast<ROAMestimation::BasePriorEdgeInterface *>(e))
+        != NULL) {
+      std::map<std::string, SlotRandomLogger *>::iterator l_it = _loggers.find(
+          pi->getCategory());
 
+      if (l_it == _loggers.end()) {
+        std::stringstream s;
+        s << _basepath << "/" << pi->getCategory() << ".log";
+
+        SlotRandomLogger *l = new SlotRandomLogger(s.str(), 16);
+
+        std::pair<std::map<std::string, SlotRandomLogger *>::iterator, bool> ret =
+            _loggers.insert(
+                std::pair<std::string, SlotRandomLogger *>(pi->getCategory(),
+                    l));
+
+        l_it = ret.first;
+      }
+
+      l_it->second->logObject(*pi);
     } else {
       // std::cerr << "[GraphLogger] Cannot log edge" << std::endl;
     }
 
   }
 
-  // After I have written all the vertices, I flush the files.
+// After I have written all the vertices, I flush the files.
 
   std::map<std::string, SlotRandomLogger *>::const_iterator it =
       _loggers.begin();

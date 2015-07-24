@@ -167,6 +167,9 @@ g2o::OptimizableGraph::Edge* ParameterVerticesManager::addGaussMarkovProcessEdge
     gmpe->setNoiseCov(noiseCov);
     gmpe->init(beta, dt);
 
+    gmpe->setCategory(_name+"_GM");
+    gmpe->setTimestamp(static_cast<GenericVertex<Eucl3DV> *>(newer)->getTimestamp());
+
     oe = gmpe->getg2oOptGraphPointer();
 
     break;

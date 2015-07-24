@@ -29,6 +29,12 @@ public:
   virtual void setNoiseCov(const Eigen::MatrixXd &noiseCov) = 0;
   virtual void setMeasurement(const Eigen::VectorXd &meas) = 0;
 
+  virtual void setCategory(const std::string &name) = 0;
+  virtual const std::string &getCategory() const  = 0;
+
+  virtual void setTimestamp(double timestamp) = 0;
+  virtual double getTimestamp() const = 0;
+
   virtual g2o::OptimizableGraph::Edge *getg2oOptGraphPointer() = 0;
 
   virtual std::string writeDebugInfo() const = 0;
