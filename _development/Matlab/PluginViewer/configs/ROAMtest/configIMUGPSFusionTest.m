@@ -13,19 +13,19 @@ config.global.logPath = '/tmp/roamfree/';
 config.global.plugins = {'Trajectory', 'GenericEdge', 'GenericEdge', 'GenericEdge', 'LinearlyInterpolatedEuclideanParameter'};
 
 config.pluginConfig{1}.axesLenght = 0.5;
-config.pluginConfig{1}.sensorName = 'GPS'; %display also measures from an AbsolutePosition sensor
+config.pluginConfig{end}.sensorName = 'GPS'; %display also measures from an AbsolutePosition sensor
 
-config.pluginConfig{2}.sensorName = 'GPS';
-config.pluginConfig{2}.errorSize = 3;
-config.pluginConfig{2}.measureSize = 3;
+config.pluginConfig{end+1}.sensorName = 'GPS';
+config.pluginConfig{end}.errorSize = 3;
+config.pluginConfig{end}.measureSize = 3;
 
-config.pluginConfig{3}.sensorName = 'Accelerometer';
-config.pluginConfig{3}.errorSize = 3;
-config.pluginConfig{3}.measureSize = 3;
+config.pluginConfig{end+1}.sensorName = 'Accelerometer';
+config.pluginConfig{end}.errorSize = 3;
+config.pluginConfig{end}.measureSize = 3;
 
-config.pluginConfig{4}.sensorName = 'Gyroscope';
-config.pluginConfig{4}.errorSize = 4;
-config.pluginConfig{4}.measureSize = 3;
+config.pluginConfig{end+1}.sensorName = 'Gyroscope';
+config.pluginConfig{end}.errorSize = 4;
+config.pluginConfig{end}.measureSize = 3;
 
-config.pluginConfig{5}.parameterName = 'Accelerometer_B';
-config.pluginConfig{5}.parameterSize = 3;
+config.pluginConfig{end+1}.parameterName = 'Accelerometer_B';
+config.pluginConfig{end}.parameterSize = 3;

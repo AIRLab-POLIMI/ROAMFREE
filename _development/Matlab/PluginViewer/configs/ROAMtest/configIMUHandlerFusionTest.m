@@ -10,27 +10,25 @@ config.global.layout = 'horizontal';
 config.global.figureOuterPosition = [ss(2,1) ss(2,2) ss(2,3) ss(2,4)]; % monitor 2
 config.global.logPath = '/tmp/roamfree/';
 
-config.global.plugins = {'Trajectory', 'GenericEdge', 'GenericEdge', 'GenericEdge', 'LinearlyInterpolatedEuclideanParameter', 'LinearlyInterpolatedEuclideanParameter', 'TimeStats'};
+config.global.plugins = {'Trajectory', 'GenericEdge', 'GenericEdge', 'GenericEdge', 'LinearlyInterpolatedEuclideanParameter', 'LinearlyInterpolatedEuclideanParameter'};
 
 config.pluginConfig{1}.axesLenght = 0.5;
-config.pluginConfig{1}.sensorName = 'GPS'; %display also measures from an AbsolutePosition sensor
+config.pluginConfig{end}.sensorName = 'GPS'; %display also measures from an AbsolutePosition sensor
  
-config.pluginConfig{2}.sensorName = 'GPS';
-config.pluginConfig{2}.errorSize = 3;
-config.pluginConfig{2}.measureSize = 3;
+config.pluginConfig{end+1}.sensorName = 'GPS';
+config.pluginConfig{end}.errorSize = 3;
+config.pluginConfig{end}.measureSize = 3;
 
-config.pluginConfig{3}.sensorName = 'IMUintegralDeltaP';
-config.pluginConfig{3}.errorSize = 3;
-config.pluginConfig{3}.measureSize = 27;
+config.pluginConfig{end+1}.sensorName = 'IMUintegralDeltaP';
+config.pluginConfig{end}.errorSize = 3;
+config.pluginConfig{end}.measureSize = 27;
 
-config.pluginConfig{4}.sensorName = 'IMUintegralDeltaQ';
-config.pluginConfig{4}.errorSize = 4;
-config.pluginConfig{4}.measureSize = 16;
+config.pluginConfig{end+1}.sensorName = 'IMUintegralDeltaQ';
+config.pluginConfig{end}.errorSize = 4;
+config.pluginConfig{end}.measureSize = 16;
 
-config.pluginConfig{5}.parameterName = 'IMUintegralDeltaP_Ba';
-config.pluginConfig{5}.parameterSize = 3;
+config.pluginConfig{end+1}.parameterName = 'IMUintegralDeltaP_Ba';
+config.pluginConfig{end}.parameterSize = 3;
 
-config.pluginConfig{6}.parameterName = 'IMUintegralDeltaP_Bw';
-config.pluginConfig{6}.parameterSize = 3;
-
-config.pluginConfig{7}.emptyConfig = 1;
+config.pluginConfig{end+1}.parameterName = 'IMUintegralDeltaP_Bw';
+config.pluginConfig{end}.parameterSize = 3;
