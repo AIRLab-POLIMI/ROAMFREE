@@ -156,6 +156,15 @@ g2o::OptimizableGraph::Vertex * ParameterVerticesManager::newVertex(
   return v;
 }
 
+void ParameterVerticesManager::getVerticesPointers(double tstamp,
+    std::vector<g2o::HyperGraph::Vertex *>& to, int freePosition) const {
+  std::map<double, g2o::OptimizableGraph::Vertex *>::const_iterator first = getVertices(tstamp);
+
+  for (int i = 0; i < getWindowSize(); ++i, ++first) {
+    to[i+freePosition] = first->second;
+  }
+}
+
 void ParameterVerticesManager::setProcessModelType(ProcessTypes t) {
   _process = t;
 }

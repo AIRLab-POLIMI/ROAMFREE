@@ -89,10 +89,23 @@ class ParameterVerticesManager {
      * the value of the parameter at time t. The getWindowSize method
      * has to be called to determine the last one
      *
+     * TODO: convert this method to return a collection of iterators
+     *
      * @param time at which we ask for needed vertices pointers
      */
     virtual std::map<double, g2o::OptimizableGraph::Vertex *>::const_iterator getVertices(
         double tstamp) const = 0;
+
+    /**
+     * \brief fills the supplied arrays with the vertices pointers
+     *
+     * @param time at which we ask for needed vertices pointers
+     * @param to the vector that will be filled with the vertex pointers (it has to be of the proper size)
+     * @param freePosition destination vector will be filled starting from this position
+     */
+    virtual void getVerticesPointers(double tstamp,
+        std::vector<g2o::HyperGraph::Vertex *> & to,
+        int freePosition = 0) const;
 
     /**
      * \brief adds necessary parameter vertices in the future or in the past

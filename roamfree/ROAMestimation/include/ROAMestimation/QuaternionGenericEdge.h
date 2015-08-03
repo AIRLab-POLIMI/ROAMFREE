@@ -211,32 +211,25 @@ public:
 		for (std::vector<ParameterTemporaries>::const_iterator it = _params.begin();
 				it != _params.end(); ++it) {
 
+		  //
+		  it->p->getVerticesPointers(_tstamp, _vertices, freeVertexPosition);
+		  freeVertexPosition += it->p->getWindowSize();
+		  //*/
+
+		  /* old code with getVertices
 			std::map<double, g2o::OptimizableGraph::Vertex *>::const_iterator vit =
 			it->p->getVertices(_tstamp);
-
-			/* too prolyps debug info
-			 #			ifdef DEBUG_PRINT_INFO_MESSAGES
-			 std::cerr << "[QuaternionGenericEdge] collecting parameters vertices for edge: " << writeDebugInfo() << std::endl;
-			 #			endif
-			 //*/
 
 			for (int k = 0; k < it->p->getWindowSize(); k++) {
 				g2o::OptimizableGraph::Vertex * ov = vit->second;
 				assert(ov != NULL); // debug check for consistency in the getVertices window.
-
-				/* too prolyps debug info
-				 #				ifdef DEBUG_PRINT_INFO_MESSAGES
-				 GenericVertexInterface *gv = dynamic_cast<GenericVertexInterface *>(ov);\
-				assert(gv != NULL);
-				 std::cerr << "vertex " << gv->getCategory() << "{" << gv->getTimestamp() << "}" << std::endl;
-				 #				endif
-				 //*/
 
 				_vertices[freeVertexPosition] = ov;// set the vertex
 
 				freeVertexPosition++;
 				vit++;
 			}
+			//*/
 		}
 
 #		ifdef DEBUG_BUILD

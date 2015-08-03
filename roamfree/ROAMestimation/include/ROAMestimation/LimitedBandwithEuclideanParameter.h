@@ -1,13 +1,13 @@
 /*
-Copyright (c) 2013-2016 Politecnico di Milano.
-All rights reserved. This program and the accompanying materials
-are made available under the terms of the GNU Lesser Public License v3
-which accompanies this distribution, and is available at
-https://www.gnu.org/licenses/lgpl.html
+ Copyright (c) 2013-2016 Politecnico di Milano.
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the GNU Lesser Public License v3
+ which accompanies this distribution, and is available at
+ https://www.gnu.org/licenses/lgpl.html
 
-Contributors:
-    Davide A. Cucci (davide.cucci@epfl.ch)    
-*/
+ Contributors:
+ Davide A. Cucci (davide.cucci@epfl.ch)
+ */
 
 /*
  * LimitedBandwithParameter.h
@@ -45,6 +45,9 @@ class LimitedBandwithEuclideanParameter: public ParameterVerticesManager {
     LimitedBandwithEuclideanParameter(double bandwith, int a,
         g2o::AutoIDSparseOptimizer * opt, ParameterTypes typ,
         const std::string &name, const Eigen::VectorXd &x0);
+
+    virtual ~LimitedBandwithEuclideanParameter() {
+    }
 
     virtual std::map<double, g2o::OptimizableGraph::Vertex *>::const_iterator getVertices(
         double tstamp) const;
