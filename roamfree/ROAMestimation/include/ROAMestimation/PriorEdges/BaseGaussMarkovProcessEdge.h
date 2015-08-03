@@ -57,30 +57,34 @@ class BaseGaussMarkovProcessEdge: public BaseBinaryProcessEdge<D, VertexXi> {
 
     virtual void init(const Eigen::VectorXd &beta, double dt) {
       assert(beta.rows() == D);
-      _beta = beta;
-      _dt = dt;
 
-      _jacobianOplusXj = Eigen::Matrix3d::Identity(); // second ...
-
-      _jacobianOplusXi.setZero(); // -exp(beta dt) * first
-      for (int i = 0; i<D; i++) {
-        _jacobianOplusXi(i,i) = -exp(-_beta(i)*_dt);
-      }
-
-      // obtain the discrete time covariance matrix as a function
-      // of beta and dt
-
-      for (int i = 0; i<D; i++) {
-        assert(_beta(i) >= 0);
-
-        if (_beta(i) != 0) {
-          _noiseCov(i,i) *= 1.0/(2.0*_beta(i))*(1.0 - exp(-2.0*_beta(i)*_dt));
-        } else {
-          _noiseCov(i,i) *= _dt;
+      for (int i = 0; i < D; i++) {
+        if (beta(i) < 0) {
+          std::cerr
+              << "[BaseGaussMarkovProcessEdge] Error: beta has to be > 0, for zero beta use ConstantParameter and None process model"
+              << std::endl;
         }
       }
 
-      ROAMmath::inv(_noiseCov, _information);
+      _beta = beta;
+      _dt = dt;
+
+      _jacobianOplusXj = Eigen::MatrixXd::Identity(D, D); // newer ...
+
+      _jacobianOplusXi.setZero(); // -exp(beta dt) * older
+      for (int i = 0; i < D; i++) {
+        _jacobianOplusXi(i, i) = -exp(-_beta(i) * _dt);
+      }
+
+      ROAMmath::invDiagonal(_noiseCov, _information);
+
+      // obtain the discrete time covariance matrix as a function
+      // of beta and dt
+      for (int i = 0; i < D; i++) {
+        _information(i, i) /= 1.0 / (2.0 * _beta(i))
+            * (1.0 - exp(-2.0 * _beta(i) * _dt));
+      }
+
     }
 
     virtual g2o::OptimizableGraph::Edge *getg2oOptGraphPointer() {

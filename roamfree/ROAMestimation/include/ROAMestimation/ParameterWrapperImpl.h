@@ -1,13 +1,13 @@
 /*
-Copyright (c) 2013-2016 Politecnico di Milano.
-All rights reserved. This program and the accompanying materials
-are made available under the terms of the GNU Lesser Public License v3
-which accompanies this distribution, and is available at
-https://www.gnu.org/licenses/lgpl.html
+ Copyright (c) 2013-2016 Politecnico di Milano.
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the GNU Lesser Public License v3
+ which accompanies this distribution, and is available at
+ https://www.gnu.org/licenses/lgpl.html
 
-Contributors:
-    Davide A. Cucci (davide.cucci@epfl.ch)    
-*/
+ Contributors:
+ Davide A. Cucci (davide.cucci@epfl.ch)
+ */
 
 /*
  * ParameterVertexWrapperImpl.h
@@ -26,38 +26,41 @@ namespace ROAMestimation {
 
 class ParameterWrapper_Impl: public ParameterWrapper {
 
-protected:
-	ParameterVerticesManager *_param;
+  protected:
+    ParameterVerticesManager *_param;
 
-public:
-	ParameterWrapper_Impl(ParameterVerticesManager *param);
+  public:
+    ParameterWrapper_Impl(ParameterVerticesManager *param);
 
-	inline virtual bool getFixed() const {
-		return _param->fixed();
-	}
+    inline virtual bool getFixed() const {
+      return _param->fixed();
+    }
 
-	inline virtual void setFixed(bool isFixed) {
-		_param->setFixed(isFixed);
-	}
+    inline virtual void setFixed(bool isFixed) {
+      _param->setFixed(isFixed);
+    }
 
-	virtual const Eigen::VectorXd &getEstimate() const;
-	virtual const Eigen::VectorXd &getEstimate(double t) const;
+    virtual const Eigen::VectorXd &getEstimate() const;
+    virtual const Eigen::VectorXd &getEstimate(double t) const;
 
-	virtual void setEstimate(const Eigen::VectorXd &x, double t);
-	virtual void setEstimate(const Eigen::VectorXd &x);
+    virtual void setEstimate(const Eigen::VectorXd &x, double t);
+    virtual void setEstimate(const Eigen::VectorXd &x);
 
-	virtual void setEstimate(double x, double t);
-	virtual void setEstimate(double x);
+    virtual void setEstimate(double x, double t);
+    virtual void setEstimate(double x);
 
-  virtual void getValueAt(Eigen::VectorXd &ret, double t);
+    virtual void getValueAt(Eigen::VectorXd &ret, double t);
 
-  inline virtual void setProcessModelType(ProcessTypes t) {
-    _param->setProcessModelType(t);
-  }
-  inline virtual void setGaussMarkovNoiseCov(const Eigen::MatrixXd &cov) {
-    _param->setGaussMarkovProcessNoiseCov(cov);
-  }
-  inline virtual void setGaussMarkovBeta(const Eigen::VectorXd &beta) {
+    inline virtual void setProcessModelType(ProcessTypes t) {
+      _param->setProcessModelType(t);
+    }
+    inline virtual void setRandomWalkNoiseCov(const Eigen::MatrixXd &cov) {
+      _param->setRandomWalkProcessNoiseCov(cov);
+    }
+    inline virtual void setGaussMarkovNoiseCov(const Eigen::MatrixXd &cov) {
+      _param->setGaussMarkovProcessNoiseCov(cov);
+    }
+    inline virtual void setGaussMarkovBeta(const Eigen::VectorXd &beta) {
       _param->setGaussMarkovProcessBeta(beta);
     }
 

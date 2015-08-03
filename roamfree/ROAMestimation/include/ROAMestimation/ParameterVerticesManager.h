@@ -70,6 +70,11 @@ class ParameterVerticesManager {
     /**
      * \brief set the noise covariance matrix for the GaussMarkovProcessEdge
      */
+    virtual void setRandomWalkProcessNoiseCov(const Eigen::MatrixXd &cov);
+
+    /**
+     * \brief set the noise covariance matrix for the GaussMarkovProcessEdge
+     */
     virtual void setGaussMarkovProcessNoiseCov(const Eigen::MatrixXd &cov);
 
     /**
@@ -221,6 +226,8 @@ class ParameterVerticesManager {
     // stuff for process models
     ProcessTypes _process; //!< type of the process model for the parameter
 
+    Eigen::MatrixXd _randomWalkNoiseCov;
+
     Eigen::MatrixXd _gaussMarkovNoiseCov;
     Eigen::VectorXd _gaussMarkovBeta;
 
@@ -239,7 +246,15 @@ class ParameterVerticesManager {
         const Eigen::VectorXd &x0);
 
     /**
-     * insert edges between two vertices limiting the difference between their estimate
+     * insert edges between two vertices expressing a RandomWalkProcess constraint
+     */
+    g2o::OptimizableGraph::Edge * addRandomWalkProcessEdge(
+        g2o::OptimizableGraph::Vertex *older,
+        g2o::OptimizableGraph::Vertex *newer, const Eigen::MatrixXd &noiseCov,
+        double dt);
+
+    /**
+     * insert edges between two vertices expressing a GaussMarkovProcess constraint
      */
     g2o::OptimizableGraph::Edge * addGaussMarkovProcessEdge(
         g2o::OptimizableGraph::Vertex *older,

@@ -141,10 +141,16 @@ g2o::OptimizableGraph::Vertex * ParameterVerticesManager::newVertex(
     }
 
     switch (_process) {
+    case RandomWalk:
+      addRandomWalkProcessEdge(older, newer, _randomWalkNoiseCov, dt);
+      break;
+
     case GaussMarkov:
       addGaussMarkovProcessEdge(older, newer, _gaussMarkovNoiseCov,
           _gaussMarkovBeta, dt);
+      break;
     }
+
   }
 
   return v;
@@ -152,6 +158,43 @@ g2o::OptimizableGraph::Vertex * ParameterVerticesManager::newVertex(
 
 void ParameterVerticesManager::setProcessModelType(ProcessTypes t) {
   _process = t;
+}
+
+g2o::OptimizableGraph::Edge* ParameterVerticesManager::addRandomWalkProcessEdge(
+    g2o::OptimizableGraph::Vertex* older, g2o::OptimizableGraph::Vertex* newer,
+    const Eigen::MatrixXd& noiseCov, double dt) {
+
+  g2o::OptimizableGraph::Edge * oe;
+
+  switch (_type) {
+  case Euclidean3D: {
+    Eucl3DRandomWalkProcessEdge*gmpe = new Eucl3DRandomWalkProcessEdge;
+
+    gmpe->setNoiseCov(noiseCov);
+    gmpe->init(dt);
+
+    gmpe->setCategory(_name+"_RW");
+    gmpe->setTimestamp(static_cast<GenericVertex<Eucl3DV> *>(newer)->getTimestamp());
+
+    oe = gmpe->getg2oOptGraphPointer();
+
+    break;
+  }
+  default:
+    std::cerr
+        << "[ParameterVerticesManager] Error: non implemented for this parameter type"
+        << std::endl;
+    return NULL;
+
+    break;
+  }
+
+  oe->vertices()[0] = older;
+  oe->vertices()[1] = newer;
+
+  _optimizer->addEdge(oe);
+
+  return oe;
 }
 
 g2o::OptimizableGraph::Edge* ParameterVerticesManager::addGaussMarkovProcessEdge(
@@ -189,14 +232,13 @@ g2o::OptimizableGraph::Edge* ParameterVerticesManager::addGaussMarkovProcessEdge
   _optimizer->addEdge(oe);
 
   return oe;
-
 }
 
 void ParameterVerticesManager::setGaussMarkovProcessNoiseCov(
     const Eigen::MatrixXd &cov) {
   if (_process != ProcessTypes::GaussMarkov) {
     std::cerr
-        << "[ParameterVerticesManager] Warning: setting Random Walk process noise covariance with different process type"
+        << "[ParameterVerticesManager] Warning: setting Gauss-Markov process noise covariance with different process type"
         << std::endl;
   }
 
@@ -207,12 +249,23 @@ void ParameterVerticesManager::setGaussMarkovProcessBeta(
     const Eigen::VectorXd &beta) {
   if (_process != ProcessTypes::GaussMarkov) {
     std::cerr
-        << "[ParameterVerticesManager] Warning: setting Random Walk beta with different process type"
+        << "[ParameterVerticesManager] Warning: setting Gauss-Markov beta with different process type"
         << std::endl;
   }
 
   _gaussMarkovBeta = beta;
 
+}
+
+void ParameterVerticesManager::setRandomWalkProcessNoiseCov(
+    const Eigen::MatrixXd& cov) {
+  if (_process != ProcessTypes::RandomWalk) {
+    std::cerr
+        << "[ParameterVerticesManager] Warning: setting Random-Walk process noise covariance with different process type"
+        << std::endl;
+  }
+
+  _randomWalkNoiseCov = cov;
 }
 
 GenericVertexInterface* ParameterVerticesManager::getVertexNearestTo(

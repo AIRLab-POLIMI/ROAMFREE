@@ -16,7 +16,7 @@ Contributors:
  *      Author: davide
  */
 
-#include "../include/ROAMestimation/PriorEdges/Eucl3DGaussMarkovProcessEdge.h"
+#include "PriorEdges/Eucl3DGaussMarkovProcessEdge.h"
 
 namespace ROAMestimation {
 
