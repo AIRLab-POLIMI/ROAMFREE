@@ -16,8 +16,7 @@ Contributors:
  *      Author: davide
  */
 
-#include "SpatialIndex.h"
-
+#include "../../include/ROAMestimation/SpatialIndex/SpatialIndex.h"
 #include "PoseVertexWrapperImpl.h"
 
 namespace ROAMestimation {

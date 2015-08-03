@@ -33,7 +33,7 @@ void SE3PriorEdge::afterVertexUpdate() {
   static Eigen::VectorXd w(1);
   static Eigen::Matrix<double, 6, 6> J;
 
-#include "generated/SE3Prior_TestW.cppready"
+#include "generated/PriorEdges/SE3Prior_TestW.cppready"
 
   if (w(0) < 0) {
     sign = -1.0;
@@ -41,7 +41,7 @@ void SE3PriorEdge::afterVertexUpdate() {
     sign  = 1.0;
   }
 
-#include "generated/SE3Prior_JErrNoises.cppready"
+#include "generated/PriorEdges/SE3Prior_JErrNoises.cppready"
 
   static Eigen::Matrix<double, 6,6 > tmpCov;
 
@@ -54,7 +54,7 @@ void SE3PriorEdge::computeError() {
       ROAMfunctions::SE3V> *>(_vertices[0])->estimate();
   const Eigen::VectorXd & z = _measurement;
 
-#include "generated/SE3Prior_Err.cppready"
+#include "generated/PriorEdges/SE3Prior_Err.cppready"
 }
 
 void SE3PriorEdge::linearizeOplus() {
@@ -62,7 +62,7 @@ void SE3PriorEdge::linearizeOplus() {
       ROAMfunctions::SE3V> *>(_vertices[0])->estimate();
   const Eigen::VectorXd & z = _measurement;
 
-#include "generated/SE3Prior_JErr.cppready"
+#include "generated/PriorEdges/SE3Prior_JErr.cppready"
 }
 
 std::string SE3PriorEdge::writeDebugInfo() const {
