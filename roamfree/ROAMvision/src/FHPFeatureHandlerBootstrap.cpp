@@ -19,6 +19,8 @@ Contributors:
 #include "FHPFeatureHandlerBootstrap.h"
 #include "SufficientZChange.h"
 
+#include <iostream>
+
 using namespace std;
 using namespace ROAMestimation;
 

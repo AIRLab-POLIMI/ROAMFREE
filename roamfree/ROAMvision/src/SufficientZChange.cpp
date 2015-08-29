@@ -18,6 +18,8 @@ Contributors:
 
 #include "SufficientZChange.h"
 
+#include <iostream>
+
 using namespace std;
 
 namespace ROAMvision {
