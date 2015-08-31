@@ -126,15 +126,14 @@ cd <src_dir>/_development/Matlab/PluginViewer/configs/ROAMtest
 configIMUGPSFusionTest
 ```
 
-In case you get the following error, 
+In case you have only one monitor you might get the following error, 
 ```
 Attempted to access ss(2,1); index out of bounds because size(ss)=[1,4].
 
 Error in configIMUGPSFusionTest (line 10)
 config.global.figureOuterPosition = [ss(2,1) ss(2,2) ss(2,3) ss(2,4)]; % monitor 2
 ```
-
-comment out line 9 and comment line 1. 
+just comment out line 9 and comment line 10, there run again the config script. 
 
 Then launch the viewer, again **in Matlab**, write
 
