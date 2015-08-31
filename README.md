@@ -133,9 +133,10 @@ Attempted to access ss(2,1); index out of bounds because size(ss)=[1,4].
 Error in configIMUGPSFusionTest (line 10)
 config.global.figureOuterPosition = [ss(2,1) ss(2,2) ss(2,3) ss(2,4)]; % monitor 2
 '''
-comment out line 9 and comment line 1
 
-then launch the viewer, again **in Matlab**, write
+comment out line 9 and comment line 1. 
+
+Then launch the viewer, again **in Matlab**, write
 
 ```
 cd ../..
