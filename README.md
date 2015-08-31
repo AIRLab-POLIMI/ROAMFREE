@@ -72,14 +72,14 @@ ln -s <src_path>/roamfree <catkin_workspace>/src/roamfree
 then build with
 ```
 cd <catkin_workspace>
-catkin_make -DCMAKE_BUILDTYPE=<build_type>
+catkin_make [--pkg roamros] -DCMAKE_BUILD_TYPE=<build_type>
 ```
 
 ### Installing with catkin (optional)
 
 ```
 cd <catkin_workspace>
-catkin_make_isolated --install [--install-space <install_path>]  -DCMAKE_BUILDTYPE=<build_type>
+catkin_make_isolated --install [--install-space <install_path>]  -DCMAKE_BUILD_TYPE=<build_type>
 ```
 
 TODO: verify
