@@ -40,7 +40,7 @@ Furthermore, it requires a compiler which supports C 11, (e.g. gcc 4.7 or newer)
 Under Ubuntu 15.04 you can provided the required dependencies
 with
 
-```sudo apt-get install libsuitesparse-dev libeigen3-dev```
+```sodo apt-get install libsuitesparse-dev libeigen3-dev```
 
 # Build
 
