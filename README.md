@@ -72,6 +72,7 @@ ln -s <src_path>/roamfree <catkin_workspace>/src/roamfree
 then build with
 ```
 cd <catkin_workspace>
+catkin_make [--pkg roamfree] -DCMAKE_BUILD_TYPE=<build_type>
 catkin_make [--pkg roamros] -DCMAKE_BUILD_TYPE=<build_type>
 ```
 
@@ -124,6 +125,15 @@ By default, low level logs are generated in the folder `/tmp/roamfree`. Tese log
 cd <src_dir>/_development/Matlab/PluginViewer/configs/ROAMtest
 configIMUGPSFusionTest
 ```
+
+In case you get the following error, 
+```
+Attempted to access ss(2,1); index out of bounds because size(ss)=[1,4].
+
+Error in configIMUGPSFusionTest (line 10)
+config.global.figureOuterPosition = [ss(2,1) ss(2,2) ss(2,3) ss(2,4)]; % monitor 2
+'''
+comment out line 9 and comment line 1
 
 then launch the viewer, again **in Matlab**, write
 
