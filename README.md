@@ -40,7 +40,7 @@ Furthermore, it requires a compiler which supports C 11, (e.g. gcc 4.7 or newer)
 Under Ubuntu 15.04 you can provided the required dependencies
 with
 
-```sodo apt-get install libsuitesparse-dev libeigen3-dev```
+```sudo apt-get install libsuitesparse-dev libeigen3-dev```
 
 # Build
 
@@ -72,14 +72,15 @@ ln -s <src_path>/roamfree <catkin_workspace>/src/roamfree
 then build with
 ```
 cd <catkin_workspace>
-catkin_make -DCMAKE_BUILDTYPE=<build_type>
+catkin_make [--pkg roamfree] -DCMAKE_BUILD_TYPE=<build_type>
+catkin_make [--pkg roamros] -DCMAKE_BUILD_TYPE=<build_type>
 ```
 
 ### Installing with catkin (optional)
 
 ```
 cd <catkin_workspace>
-catkin_make_isolated --install [--install-space <install_path>]  -DCMAKE_BUILDTYPE=<build_type>
+catkin_make_isolated --install [--install-space <install_path>]  -DCMAKE_BUILD_TYPE=<build_type>
 ```
 
 TODO: verify
@@ -125,7 +126,16 @@ cd <src_dir>/_development/Matlab/PluginViewer/configs/ROAMtest
 configIMUGPSFusionTest
 ```
 
-then launch the viewer, again **in Matlab**, write
+In case you have only one monitor you might get the following error, 
+```
+Attempted to access ss(2,1); index out of bounds because size(ss)=[1,4].
+
+Error in configIMUGPSFusionTest (line 10)
+config.global.figureOuterPosition = [ss(2,1) ss(2,2) ss(2,3) ss(2,4)]; % monitor 2
+```
+just comment out line 9 and comment line 10, there run again the config script. 
+
+Then launch the viewer, again **in Matlab**, write
 
 ```
 cd ../..
