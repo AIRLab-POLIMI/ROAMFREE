@@ -1,13 +1,13 @@
 /*
-Copyright (c) 2013-2016 Politecnico di Milano.
-All rights reserved. This program and the accompanying materials
-are made available under the terms of the GNU Lesser Public License v3
-which accompanies this distribution, and is available at
-https://www.gnu.org/licenses/lgpl.html
+ Copyright (c) 2013-2016 Politecnico di Milano.
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the GNU Lesser Public License v3
+ which accompanies this distribution, and is available at
+ https://www.gnu.org/licenses/lgpl.html
 
-Contributors:
-    Davide A. Cucci (davide.cucci@epfl.ch)    
-*/
+ Contributors:
+ Davide A. Cucci (davide.cucci@epfl.ch)
+ */
 
 /*
  * FactorGraphFilterImpl.cpp
@@ -38,6 +38,7 @@ Contributors:
 #include "ConstantParameter.h"
 #include "LimitedBandwithEuclideanParameter.h"
 #include "LinearlyInterpolatedEuclideanParameter.h"
+#include "ParameterBlender.h"
 #include "PoseVertexMetadata.h"
 #include "MeasurementEdgeMetadata.h"
 #include "PoseVertexWrapperImpl.h"
@@ -423,6 +424,23 @@ ParameterWrapper_Ptr FactorGraphFilter_Impl::addLinearlyInterpolatedParameter(
       spacing);
 }
 
+ParameterWrapper_Ptr FactorGraphFilter_Impl::addParameterBlender(
+    ParameterTypes type, const std::string &name,
+    ParameterWrapperVector_Ptr toblend) {
+
+  std::vector<ParameterVerticesManager *> pv;
+  for (auto pit = toblend->begin(); pit != toblend->end(); ++pit) {
+    ParameterVerticesManager *pvm = boost::static_pointer_cast<
+        ParameterWrapper_Impl>(*pit)->_param;
+    pv.push_back(pvm);
+  }
+
+  _params[name] = boost::shared_ptr<ParameterVerticesManager>(
+      new ParameterBlender(_optimizer, type, name, pv));
+
+  return ParameterWrapper_Ptr(new ParameterWrapper_Impl(_params[name].get()));
+}
+
 MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnPose(
     PoseVertexWrapper_Ptr pose, const Eigen::VectorXd& x0,
     const Eigen::MatrixXd& cov) {
@@ -452,20 +470,16 @@ MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnConstantParameter(
   ParameterVerticesManager *parameter = getParameterByName_i(name);
 
   if (parameter == NULL) {
-#   ifdef DEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES
     cerr << "[FactorGraphFilter] Error: parameter " << name
-    << " does not exist " << endl;
-#		endif
+        << " does not exist " << endl;
 
     return MeasurementEdgeWrapper_Ptr();
   }
 
   ConstantParameter *cnst_par = dynamic_cast<ConstantParameter *>(parameter);
   if (cnst_par == NULL) {
-#   ifdef DEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES
     cerr << "[FactorGraphFilter] Error: parameter " << name
-    << " is not constant. " << endl;
-#		endif
+        << " is not constant. " << endl;
 
     return MeasurementEdgeWrapper_Ptr();
   }
@@ -516,10 +530,8 @@ MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnTimeVaryingParamete
   ParameterVerticesManager *parameter = getParameterByName_i(name);
 
   if (parameter == NULL) {
-#   ifdef DEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES
     cerr << "[FactorGraphFilter] Error: parameter " << name
-    << " does not exist " << endl;
-#   endif
+        << " does not exist " << endl;
 
     return MeasurementEdgeWrapper_Ptr();
   }
@@ -535,12 +547,10 @@ MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnTimeVaryingParamete
     v = li_par->getVertexNearestTo(t)->getg2oOptGraphPointer();
   } else if ((lbw_par =
       dynamic_cast<LimitedBandwithEuclideanParameter *>(parameter)) != NULL) {
-    v = li_par->getVertexNearestTo(t)->getg2oOptGraphPointer();
+    v = lbw_par->getVertexNearestTo(t)->getg2oOptGraphPointer();
   } else {
-#   ifdef DEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES
     cerr << "[FactorGraphFilter] Error: parameter " << name
-    << " is not time varying. " << endl;
-#   endif
+        << " is not time varying. " << endl;
 
     return MeasurementEdgeWrapper_Ptr();
   }

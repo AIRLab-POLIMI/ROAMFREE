@@ -48,7 +48,7 @@ void invDiagonal(T1 & A, T2 & B) {
 # ifdef DEBUG_BUILD
     for (int r = 0; r < A.rows(); r++) {
       for (int c = 0; c < A.cols(); c++) {
-        if (A(r, c) != 0.0) {
+        if (r != c && A(r, c) != 0.0) {
           std::cerr
               << "[ROAMmath::invDiagonal] called with a non diagonal input matrix"
               << std::endl;

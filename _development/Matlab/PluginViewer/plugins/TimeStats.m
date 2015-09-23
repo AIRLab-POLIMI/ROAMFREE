@@ -10,5 +10,7 @@ plot(cumsum(x,2))
 
 legend('afterInit', 'afterOptimize', 'afterCovariance', 'afterLog');
 
+title('est time stats');
+
 end
 

@@ -26,6 +26,8 @@ namespace ROAMestimation {
 
 class ParameterWrapper_Impl: public ParameterWrapper {
 
+  friend FactorGraphFilter_Impl;
+
   protected:
     ParameterVerticesManager *_param;
 

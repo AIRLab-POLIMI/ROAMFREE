@@ -108,6 +108,11 @@ class ParameterVerticesManager {
         int freePosition = 0) const;
 
     /**
+     * \brief returns the number of vertices that are needed to compute the value of the parameter
+     */
+    virtual int getWindowSize() const = 0;
+
+    /**
      * \brief adds necessary parameter vertices in the future or in the past
      *
      * this function update the vertices in the window such that we can compute
@@ -193,10 +198,6 @@ class ParameterVerticesManager {
      */
     virtual void prepareForPoseRemoval(double mintstamp, double maxtstamp) = 0;
 
-    inline const VertexMap &getTrash() {
-      return _noLongerNeeded;
-    }
-
     /**
      * \brief empty the local trash
      *
@@ -204,29 +205,32 @@ class ParameterVerticesManager {
      */
     void emptyTrash();
 
+    inline const VertexMap &getTrash() {
+      return _noLongerNeeded;
+    }
+
     /**
      * \brief set the fixed flag for all the vertices
      */
-    void setFixed(bool fixed);
+    virtual void setFixed(bool fixed);
 
     /**
      * \brief true => these nodes are considered fixed during optimization
      */
-    inline bool fixed() const {
+    inline virtual bool fixed() const {
       return _isFixed;
     }
 
     /**
      * \brief return the dimension of the internal representation of a parameter
      */
-    inline int parameterEstimateDimension() const {
+    inline virtual int parameterEstimateDimension() const {
       return _v.begin()->second->estimateDimension();
     }
 
-    /**
-     * \brief returns the number of vertices that are needed to compute the value of the parameter
-     */
-    virtual int getWindowSize() const = 0;
+    inline ParameterTypes getType() const {
+      return _type;
+    }
 
   protected:
 
@@ -277,7 +281,7 @@ class ParameterVerticesManager {
     /**
      * returns the vertex in the set which is nearest to tstamp
      */
-    GenericVertexInterface *getVertexNearestTo(double tstamp);
+    virtual GenericVertexInterface *getVertexNearestTo(double tstamp);
 
     friend class FactorGraphFilter_Impl;
     // TODO: only for debugging purposes

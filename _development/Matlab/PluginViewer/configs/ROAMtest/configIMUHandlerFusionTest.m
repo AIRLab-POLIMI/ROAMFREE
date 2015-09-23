@@ -27,8 +27,8 @@ config.pluginConfig{end+1}.sensorName = 'IMUintegralDeltaQ';
 config.pluginConfig{end}.errorSize = 4;
 config.pluginConfig{end}.measureSize = 16;
 
-config.pluginConfig{end+1}.parameterName = 'IMUintegralDeltaP_Ba';
+config.pluginConfig{end+1}.parameterName = 'IMUintegralDeltaP_Ba_GM';
 config.pluginConfig{end}.parameterSize = 3;
 
-config.pluginConfig{end+1}.parameterName = 'IMUintegralDeltaP_Bw';
+config.pluginConfig{end+1}.parameterName = 'IMUintegralDeltaP_Ba_RC';
 config.pluginConfig{end}.parameterSize = 3;

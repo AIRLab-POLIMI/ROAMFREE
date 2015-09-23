@@ -1,13 +1,13 @@
 /*
-Copyright (c) 2013-2016 Politecnico di Milano.
-All rights reserved. This program and the accompanying materials
-are made available under the terms of the GNU Lesser Public License v3
-which accompanies this distribution, and is available at
-https://www.gnu.org/licenses/lgpl.html
+ Copyright (c) 2013-2016 Politecnico di Milano.
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the GNU Lesser Public License v3
+ which accompanies this distribution, and is available at
+ https://www.gnu.org/licenses/lgpl.html
 
-Contributors:
-    Davide A. Cucci (davide.cucci@epfl.ch)    
-*/
+ Contributors:
+ Davide A. Cucci (davide.cucci@epfl.ch)
+ */
 
 /*
  * FactorGraphFilter.h
@@ -224,6 +224,23 @@ class FactorGraphFilter {
         bool isFixed, double spacing) = 0;
     virtual ParameterWrapper_Ptr addLinearlyInterpolatedParameter(
         const std::string &name, double x0, bool isFixed, double spacing) = 0;
+
+    /**
+     *
+     * \brief add a parameter blender
+     *
+     * A parameter blender is a parameter whose value is the sum of the
+     * ones passed in constructor. It is a virtual parameter, in the sense that
+     * no extra vertices are cretaed and it inherits the properties of the
+     * existing parameters it blends.
+     *
+     * @param type the type of the parameter, must match each one in toblend
+     * @param name the name of this parameter.
+     * @oaram toblend vector of parameters to be blended.
+     */
+
+    virtual ParameterWrapper_Ptr addParameterBlender(ParameterTypes type,
+        const std::string &name, ParameterWrapperVector_Ptr toblend) = 0;
 
     /**
      *   \brief parameter getter

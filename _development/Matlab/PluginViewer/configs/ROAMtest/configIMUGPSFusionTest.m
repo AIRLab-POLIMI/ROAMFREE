@@ -10,7 +10,7 @@ config.global.layout = 'horizontal';
 config.global.figureOuterPosition = [ss(2,1) ss(2,2) ss(2,3) ss(2,4)]; % monitor 2
 config.global.logPath = '/tmp/roamfree/';
 
-config.global.plugins = {'Trajectory', 'GenericEdge', 'GenericEdge', 'GenericEdge', 'LinearlyInterpolatedEuclideanParameter'};
+config.global.plugins = {'Trajectory', 'GenericEdge', 'GenericEdge', 'GenericEdge', 'LinearlyInterpolatedEuclideanParameter', 'LinearlyInterpolatedEuclideanParameter'};
 
 config.pluginConfig{1}.axesLenght = 0.5;
 config.pluginConfig{end}.sensorName = 'GPS'; %display also measures from an AbsolutePosition sensor
@@ -24,8 +24,11 @@ config.pluginConfig{end}.errorSize = 3;
 config.pluginConfig{end}.measureSize = 3;
 
 config.pluginConfig{end+1}.sensorName = 'Gyroscope';
-config.pluginConfig{end}.errorSize = 4;
+config.pluginConfig{end}.errorSize = 3;
 config.pluginConfig{end}.measureSize = 3;
 
 config.pluginConfig{end+1}.parameterName = 'Accelerometer_B';
+config.pluginConfig{end}.parameterSize = 3;
+
+config.pluginConfig{end+1}.parameterName = 'Gyroscope_B';
 config.pluginConfig{end}.parameterSize = 3;

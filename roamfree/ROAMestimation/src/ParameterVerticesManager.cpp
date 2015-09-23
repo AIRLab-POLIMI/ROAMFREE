@@ -182,7 +182,7 @@ g2o::OptimizableGraph::Edge* ParameterVerticesManager::addRandomWalkProcessEdge(
     gmpe->setNoiseCov(noiseCov);
     gmpe->init(dt);
 
-    gmpe->setCategory(_name+"_RW");
+    gmpe->setCategory(_name+"_proc");
     gmpe->setTimestamp(static_cast<GenericVertex<Eucl3DV> *>(newer)->getTimestamp());
 
     oe = gmpe->getg2oOptGraphPointer();
@@ -219,7 +219,7 @@ g2o::OptimizableGraph::Edge* ParameterVerticesManager::addGaussMarkovProcessEdge
     gmpe->setNoiseCov(noiseCov);
     gmpe->init(beta, dt);
 
-    gmpe->setCategory(_name+"_GM");
+    gmpe->setCategory(_name+"_proc");
     gmpe->setTimestamp(static_cast<GenericVertex<Eucl3DV> *>(newer)->getTimestamp());
 
     oe = gmpe->getg2oOptGraphPointer();

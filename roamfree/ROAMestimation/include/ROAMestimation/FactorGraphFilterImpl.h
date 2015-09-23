@@ -1,13 +1,13 @@
 /*
-Copyright (c) 2013-2016 Politecnico di Milano.
-All rights reserved. This program and the accompanying materials
-are made available under the terms of the GNU Lesser Public License v3
-which accompanies this distribution, and is available at
-https://www.gnu.org/licenses/lgpl.html
+ Copyright (c) 2013-2016 Politecnico di Milano.
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the GNU Lesser Public License v3
+ which accompanies this distribution, and is available at
+ https://www.gnu.org/licenses/lgpl.html
 
-Contributors:
-    Davide A. Cucci (davide.cucci@epfl.ch)    
-*/
+ Contributors:
+ Davide A. Cucci (davide.cucci@epfl.ch)
+ */
 
 /* FactorGraphFilterImpl.h
  *
@@ -110,6 +110,9 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
         double spacing);
     ParameterWrapper_Ptr addLinearlyInterpolatedParameter(
         const std::string &name, double x0, bool isFixed, double spacing);
+
+    ParameterWrapper_Ptr addParameterBlender(ParameterTypes type,
+        const std::string &name, ParameterWrapperVector_Ptr toblend);
 
     ParameterWrapper_Ptr getParameterByName(const std::string &name);
 

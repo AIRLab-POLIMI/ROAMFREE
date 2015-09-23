@@ -32,9 +32,11 @@ typedef boost::shared_ptr<ParameterWrapper> ParameterWrapper_Ptr;
 typedef boost::shared_ptr<PoseVertexWrapper> PoseVertexWrapper_Ptr;
 typedef boost::shared_ptr<MeasurementEdgeWrapper> MeasurementEdgeWrapper_Ptr;
 
+typedef std::vector<ParameterWrapper_Ptr> ParameterWrapperVector;
 typedef std::vector<PoseVertexWrapper_Ptr> PoseVertexWrapperVector;
 typedef std::vector<MeasurementEdgeWrapper_Ptr> MeasurementEdgeWrapperVector;
 
+typedef boost::shared_ptr<ParameterWrapperVector> ParameterWrapperVector_Ptr;
 typedef boost::shared_ptr<PoseVertexWrapperVector> PoseVertexWrapperVector_Ptr;
 typedef boost::shared_ptr<MeasurementEdgeWrapperVector> MeasurementEdgeWrapperVector_Ptr;
 

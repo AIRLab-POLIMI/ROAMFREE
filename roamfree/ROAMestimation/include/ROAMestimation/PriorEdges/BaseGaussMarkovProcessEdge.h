@@ -84,6 +84,7 @@ class BaseGaussMarkovProcessEdge: public BaseBinaryProcessEdge<D, VertexXi> {
         _information(i, i) /= 1.0 / (2.0 * _beta(i))
             * (1.0 - exp(-2.0 * _beta(i) * _dt));
       }
+      //
 
     }
 

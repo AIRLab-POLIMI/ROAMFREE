@@ -1,13 +1,13 @@
 /*
-Copyright (c) 2013-2016 Politecnico di Milano.
-All rights reserved. This program and the accompanying materials
-are made available under the terms of the GNU Lesser Public License v3
-which accompanies this distribution, and is available at
-https://www.gnu.org/licenses/lgpl.html
+ Copyright (c) 2013-2016 Politecnico di Milano.
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the GNU Lesser Public License v3
+ which accompanies this distribution, and is available at
+ https://www.gnu.org/licenses/lgpl.html
 
-Contributors:
-    Davide A. Cucci (davide.cucci@epfl.ch)    
-*/
+ Contributors:
+ Davide A. Cucci (davide.cucci@epfl.ch)
+ */
 
 /*
  * IMUHandlerFusionTest.cpp
@@ -56,34 +56,32 @@ void add_gaussian_noise(double *to, unsigned int size, double mean,
   }
 }
 
-int main(int argc, char *argv[]) {
+const static int _OFF = -1;
 
-  /* syntetic measurement parameters
-   *
-   * in this test accelerometer and gyroscope readings are generated
-   * for a uniformly accelerated circular motion according to the
-   * following parameters (center of motion x = 0, y = 1)
-   *
-  */
+int main(int argc, char *argv[]) {
 
   double imuRate = 100; // Hz rate of the IMU readings
   double poseRate = 10; // Hz rate at which pose vertices have to be maintained
-  int gpsDivisor = 10; // how many IMU constraint (hndl.step(...) == true) for each GPS?
+  int gpsDivisor = 5; // how many IMU constraint (hndl.step(...) == true) for each GPS?
 
-  // motion parameters
-  double r = 1.0; // meters
-  double alpha = 0.01; // radians / s^2
-  double w0 = 0.0; //initial angular speed
-  double theta0 = -M_PI / 2.0;
+  double leverArm = 0.25; // translation from R to GPS along y;
 
   // parameters of the IMU biases
   double ba_x = 0.0; //biases on the accelerometer measurements
   double ba_y = 0.0;
-  double ba_z = 0.0;
+  double ba_z = 0.3;
 
   double ba_dx = 0.0; // increments on the accelerometer biases in m/s^3
   double ba_dy = 0.0;
   double ba_dz = 0.0;
+
+  double ba_fx = 0.05; // frequency of the sinusoidal bias on the accelerometer
+  double ba_fy = 0.025;
+  double ba_fz = 0.0125;
+
+  double ba_Ax = 0.100; // amplitude of the sinusoidal bias on the accelerometer
+  double ba_Ay = 0.2000;
+  double ba_Az = 0.0000;
 
   double bw_x = 0.0; // biases on the gyroscope measurements
   double bw_y = 0.0;
@@ -93,13 +91,13 @@ int main(int argc, char *argv[]) {
   double bw_dy = 0.00;
   double bw_dz = 0.00;
 
-  double ba_fx = 0.1; // frequency of the sinusoidal bias on the accelerometer
-  double ba_fy = 0.05;
-  double ba_fz = 0.025;
+  double bw_fx = 0.0; // frequency of the sinusoidal bias on the gyroscope
+  double bw_fy = 0.00;
+  double bw_fz = 0.000;
 
-  double ba_Ax = 0.25; // amplitude of the sinusoidal bias on the accelerometer
-  double ba_Ay = 0.5;
-  double ba_Az = 0.75;
+  double bw_Ax = 0.000; // amplitude of the sinusoidal bias on the gyroscope
+  double bw_Ay = 0.000;
+  double bw_Az = 0.000;
 
   /* ---------------------- Set solver properties ---------------------- */
 
@@ -112,7 +110,7 @@ int main(int argc, char *argv[]) {
 
   /* ---------------------- Configure sensors ---------------------- */
 
-  bool isbafixed = false, isbwfixed = true;
+  bool isbarcfixed = false, isbagmfixed = false, isbwfixed = true;
 
   // we have to initialize the IMUIntegralHandler
   IMUIntegralHandler hndl(round(imuRate / poseRate), 1.0 / imuRate,
@@ -121,21 +119,52 @@ int main(int argc, char *argv[]) {
   Eigen::Matrix<double, 6, 6> & sensorNoises = hndl.getSensorNoises();
   sensorNoises.diagonal() << 0.0016, 0.0016, 0.0016, 1.15172e-05, 1.15172e-05, 1.15172e-05;
 
-  Eigen::VectorXd accBias(3);  // Accelerometer and Gyroscope giases
-  accBias << 0.0, 0.0, 0.0;
-  Eigen::VectorXd gyroBias(3);
-  gyroBias << 0.0, 0.0, 0.0;
+  // accelerometer bias
 
-  ParameterWrapper_Ptr ba_par = f->addLinearlyInterpolatedParameter(Euclidean3D,
-      "IMUintegralDeltaP_Ba", accBias, isbafixed, 1.0);
+  Eigen::VectorXd accBias0(3);  // Accelerometer and Gyroscope giases
+  accBias0 << 0.0, 0.0, 0.0;
 
-  ba_par->setProcessModelType(GaussMarkov);
-  ba_par->setFixed(isbafixed);
-  ba_par->setGaussMarkovNoiseCov(10 * Eigen::MatrixXd::Identity(3, 3));
-  ba_par->setGaussMarkovBeta(Eigen::VectorXd::Zero(3));
+  ParameterWrapper_Ptr ba_par_gm = f->addLinearlyInterpolatedParameter(
+      Euclidean3D, "IMUintegralDeltaP_Ba_GM", accBias0, isbagmfixed, 1.0);
 
-  ParameterWrapper_Ptr bw_par = f->addConstantParameter(Euclidean3D,
-      "IMUintegralDeltaP_Bw", gyroBias, isbwfixed);
+  ba_par_gm->setProcessModelType(RandomWalk);
+  ba_par_gm->setFixed(isbagmfixed);
+  ba_par_gm->setRandomWalkNoiseCov(10 * Eigen::MatrixXd::Identity(3, 3));
+
+  Eigen::Matrix3d accBiasGM0Cov = 1e-4 * Eigen::MatrixXd::Identity(3, 3);
+
+  ParameterWrapper_Ptr ba_par_rc = f->addConstantParameter(Euclidean3D,
+      "IMUintegralDeltaP_Ba_RC", accBias0, isbarcfixed);
+  ba_par_rc->setFixed(isbarcfixed);
+
+  ParameterWrapperVector_Ptr toblend(new ParameterWrapperVector);
+  toblend->push_back(ba_par_gm);
+  toblend->push_back(ba_par_rc);
+
+  ParameterWrapper_Ptr ba_par = f->addParameterBlender(Euclidean3D,
+      "IMUintegralDeltaP_Ba", toblend);
+
+  // gyroscope bias
+
+  Eigen::VectorXd gyroBias0(3);
+  gyroBias0 << 0.0, 0.0, 0.0;
+
+  Eigen::Matrix3d gyroBias0Cov = 1e-4 * Eigen::MatrixXd::Identity(3, 3);
+
+  /*
+   ParameterWrapper_Ptr bw_par = f->addConstantParameter(Euclidean3D,
+   "IMUintegralDeltaP_Bw", gyroBias0, isbwfixed);
+
+   f->addPriorOnConstantParameter(Euclidean3DPrior, "IMUintegralDeltaP_Bw", gyroBias0, gyroBias0Cov);
+   //*/
+
+  //
+  ParameterWrapper_Ptr bw_par = f->addLinearlyInterpolatedParameter(Euclidean3D,
+      "IMUintegralDeltaP_Bw", gyroBias0, isbwfixed, 1.0);
+
+  bw_par->setProcessModelType(RandomWalk);
+  bw_par->setRandomWalkNoiseCov(10 * Eigen::MatrixXd::Identity(3, 3));
+  //*/
 
   bw_par->setFixed(isbwfixed);
 
@@ -144,36 +173,36 @@ int main(int argc, char *argv[]) {
 
   // GPS Sensor
 
-  Eigen::VectorXd R_OS_GPS(7); // Transformation between Odometer and robot frame
-  R_OS_GPS << 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0;
+  Eigen::VectorXd T_OS_GPS(7); // Transformation between Odometer and robot frame
+  T_OS_GPS << 0.0, leverArm, 0.0, 1.0, 0.0, 0.0, 0.0;
 
   f->addSensor("GPS", AbsolutePosition, false, true); // master sensor, sequential sensor
-  f->setSensorFrame("GPS", R_OS_GPS);
+  f->setSensorFrame("GPS", T_OS_GPS);
 
   Eigen::MatrixXd GPSCov(3, 3);
   GPSCov = pow(2.5 / 3.0, 2) * Eigen::MatrixXd::Identity(3, 3);
-
-  // POSE Sensor
-
-  Eigen::VectorXd R_OS_POSE(7); // Transformation between Odometer and robot frame
-  R_OS_POSE << 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0;
-
-  f->addSensor("POSE", AbsolutePose, false, true); // master sensor, sequential sensor
-  f->setSensorFrame("POSE", R_OS_POSE);
-
-  Eigen::MatrixXd POSECov(6, 6);
-  POSECov.diagonal() << 0.0001, 0.0001, 0.0001, 0.000289, 0.000289, 0.000289;
+  //GPSCov = pow(0.001 / 3.0, 2) * Eigen::MatrixXd::Identity(3, 3);
 
   /* ---------------------- Initialize ---------------------- */
 
-  Eigen::VectorXd x0(7); //initial pose
-  x0 << 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0;
+  Eigen::VectorXd x0(7), x1(7);
 
-  // gyro bias is fixed since there is no other orientation input (enable the pose sensor for that)
-  hndl.init(f, "IMUintegral", T_OS_IMU, accBias, false, gyroBias, true, x0,
-      0.0);
+  {
+#   include "../generated/Otto_x0.cppready"
+  }
+  {
+#   include "../generated/Otto_x1.cppready"
+  }
 
-  f->getOldestPose()->setFixed(true);
+  hndl.init(f, "IMUintegral", T_OS_IMU, accBias0, isbagmfixed, gyroBias0,
+      isbwfixed, x0, 0.0);
+
+  f->addPriorOnTimeVaryingParameter(Euclidean3DPrior, "IMUintegralDeltaP_Ba_GM", 0,
+      accBias0, accBiasGM0Cov);
+
+  // put the prior in case of no lever arm
+  // f->addPriorOnTimeVaryingParameter(Euclidean3DPrior, "IMUintegralDeltaP_Bw",
+  //    0.0, gyroBias0, gyroBias0Cov);
 
   /* ---------------------- Main loop ---------------------- */
 
@@ -183,102 +212,70 @@ int main(int argc, char *argv[]) {
   bool keepOn = true;
   int cnt = 0;
 
-  while (t <= 200.0) {
+  while (t <= 600.0) {
 
-    // generate accelerometer and gyroscope readings
-    double w = w0 + alpha * t;
+    // generate synthetic accelerometer and gyroscope reading
 
-    // motion in which the x axis is always tangent to the trajectory
-    double za[] = { alpha * r + ba_x + ba_dx * t + ba_Ax*sin(2*M_PI*ba_fx*t), std::pow(w, 2) * r + ba_y
-        + ba_dy * t + ba_Ay*sin(2*M_PI*ba_fy*t), 9.80665 + ba_z + ba_dz * t + ba_Az*sin(2*M_PI*ba_fz*t)};
-    double zw[] = { 0.0 + bw_x + bw_dx * t, bw_y + bw_dy * t, w + bw_z
-        + bw_dz * t };
-    //*/
+    Eigen::VectorXd za(3), zw(3);
 
-    /* motion in which the robot orientation wrt world is the identity
-     double theta = theta0 + w0 * t + alpha*std::pow(t,2)/2.0;
-     double za[] = {
-     std::cos(theta+M_PI/2.0)*alpha*r + std::cos(theta+M_PI)*std::pow(w,2)*r + ba_x + ba_dx * t,
-     std::sin(theta+M_PI/2.0)*alpha*r + std::sin(theta+M_PI)*std::pow(w,2)*r + ba_y + ba_dy * t,
-     9.80665 + ba_z + ba_dz * t
-     };
-     double zw[] = { 0.0, 0.0, 0.0 };
-     //*/
+    {
+#     include "../generated/Otto_w.cppready"
 
-    /* corrupt measurement with some gaussian noise
-     add_gaussian_noise(za, 3, 0.0, std::sqrt(sensorNoises(0, 0)));
-     add_gaussian_noise(zw, 3, 0.0, std::sqrt(sensorNoises(3, 3)));
-     //*/
+      zw(0) += bw_x + bw_dx * t + bw_Ax * sin(2 * M_PI * bw_fx * t);
+      zw(1) += bw_y + bw_dy * t + bw_Ay * sin(2 * M_PI * bw_fy * t);
+      zw(2) += bw_z + bw_dz * t + bw_Az * sin(2 * M_PI * bw_fz * t);
+    }
+
+    {
+#     include "../generated/Otto_a.cppready"
+
+      za(0) += ba_x + ba_dx * t + ba_Ax * sin(2 * M_PI * ba_fx * t);
+      za(1) += ba_y + ba_dy * t + ba_Ay * sin(2 * M_PI * ba_fy * t);
+      za(2) += ba_z + ba_dz * t + ba_Az * sin(2 * M_PI * ba_fz * t);
+    }
 
     // make an integration step
-    if (hndl.step(za, zw)) { // if we have finished:
+    if (hndl.step(za.data(), zw.data())) { // if we have finished:
 
-      // --- insert the edge in the graph
+      if (cntImu == 0) {
+        PoseVertexWrapper_Ptr first = f->getNthOldestPose(0);
+        PoseVertexWrapper_Ptr second = f->getNthOldestPose(1);
 
-      /* add a pose measurement on x1
+        first->setEstimate(x0);
+        first->setFixed(true);
 
-       Eigen::VectorXd z_pose(7);
+        second->setEstimate(x1);
+        second->setFixed(true);
 
-       PoseVertexWrapper_Ptr x1 = f->getNearestPoseByTimestamp(
-       f->getNewestPose()->getTimestamp() - 1.0 / poseRate);
+        cerr << "t0: " << first->getTimestamp() << " t1: "
+            << second->getTimestamp() << endl;
 
-       double x1_theta_circle = theta0 + w0 * x1->getTimestamp()
-       + 0.5 * alpha * std::pow(x1->getTimestamp(), 2);
-
-       z_pose << r * std::cos(x1_theta_circle), 1
-       + r * std::sin(x1_theta_circle), 0, std::cos(
-       (x1_theta_circle - theta0) / 2.0), 0.0, 0.0, std::sin(
-       (x1_theta_circle - theta0) / 2.0);
-
-       // corrupt measurement with some gaussian noise
-       add_gaussian_noise(z_pose.data(), 3, 0.0, std::sqrt(POSECov(0, 0)));
-
-       if (cntImu % gpsDivisor == 0) {
-       f->addMeasurement("POSE", x1->getTimestamp(), z_pose, POSECov, x1);
-       cntGps++;
-       }
-       //*/
-
-      // add a GPS measurement
-      Eigen::VectorXd z_gps(3);
-
-      PoseVertexWrapper_Ptr x1 = f->getNearestPoseByTimestamp(
-          f->getNewestPose()->getTimestamp() - 1.0 / poseRate);
-
-      double x1_theta_circle = theta0 + w0 * x1->getTimestamp()
-          + 0.5 * alpha * std::pow(x1->getTimestamp(), 2);
-
-      z_gps << r * std::cos(x1_theta_circle), 1 + r * std::sin(x1_theta_circle), 0;
-
-      /* corrupt measurement with some gaussian noise
-       add_gaussian_noise(z_pose.data(), 3, 0.0, std::sqrt(POSECov(0, 0)));
-       //*/
+      }
 
       if (cntImu % gpsDivisor == 0) {
-        f->addMeasurement("GPS", x1->getTimestamp(), z_gps, GPSCov, x1);
+
+        // add a GPS measurement
+        Eigen::VectorXd zgps(3);
+
+        PoseVertexWrapper_Ptr x1 = f->getNearestPoseByTimestamp(
+            f->getNewestPose()->getTimestamp() - 1.0 / poseRate);
+
+        {
+          double t = x1->getTimestamp(); // shadows global t
+
+#         include "../generated/Otto_gps.cppready"
+        }
+
+        f->addMeasurement("GPS", x1->getTimestamp(), zgps, GPSCov, x1);
         cntGps++;
       }
-      //*/
-
-      /* initialize pose with ground truth
-       Eigen::VectorXd x1_pose(7);
-       x1_pose << r * std::cos(x1_theta), 1 + r * std::sin(x1_theta), 0, std::cos(
-       (x1_theta + M_PI / 2.0) / 2.0), 0, 0, std::sin(
-       (x1_theta + M_PI / 2.0) / 2.0);
-       x1->setEstimate(x1_pose);
-       //*/
 
       // do the estimation
       cntImu++;
 
-      if (t > 2.0) { // after 2s of data, then each time
+      if (t > 1.0 && cntImu % ((int) gpsDivisor) == 0) { // after 5s of data, then each gps
 
-        if (cnt == 0) {
-          f->getNthOldestPose(0)->setFixed(true);
-          f->getNthOldestPose(1)->setFixed(true);
-        }
-
-        keepOn = f->estimate(5);
+        keepOn = f->estimate(10);
 
         if (!keepOn) {
           return 1;
@@ -286,7 +283,7 @@ int main(int argc, char *argv[]) {
 
         cnt++;
 
-        f->marginalizeOldNodes(3);
+        //f->marginalizeOldNodes(10);
 
       }
 

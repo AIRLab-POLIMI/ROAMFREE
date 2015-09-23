@@ -9,7 +9,7 @@ for i = 1:size(L,1)
     end   
 end
 
-%% spawn figures
+%% spawn figures 
 
 close all
 figure(1)
@@ -20,7 +20,7 @@ set(1,'OuterPosition', config.global.figureOuterPosition)
 global stopAll
 
 stopAll = 1;
-pause(1);
+pause(1);   
 stopAll = 0;
 
 watchFile(config);
