@@ -15,5 +15,16 @@ install(TARGETS ROAMutils
 )
 
 else()
-# Non-catkin installation TODO
+# Non-catkin installation
+# Install libraries
+install(TARGETS ROAMutils 
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+  LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+  RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+)
+# Install headers
+install(DIRECTORY include/ROAMutils
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/include/roamfree
+  PATTERN ".svn" EXCLUDE
+)
 endif()
