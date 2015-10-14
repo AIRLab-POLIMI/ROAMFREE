@@ -1,0 +1,17 @@
+tmp0 = q2(1);
+tmp1 = q2(2);
+tmp2 = q2(3);
+tmp3 = q2(4);
+tmp4 = q1(3);
+tmp5 = q1(4);
+tmp6 = q1(1);
+tmp7 = q1(2);
+tmp8 = (tmp0)^(2);
+tmp9 = (tmp1)^(2);
+tmp10 = (tmp2)^(2);
+tmp11 = (tmp3)^(2);
+tmp12 = tmp8 + tmp9 + tmp10 + tmp11;
+tmp13 = 1/tmp12;
+w(1) = 2*(tmp7*tmp0 - tmp6*tmp1 - tmp5*tmp2 + tmp4*tmp3)*tmp13;
+w(2) = 2*(tmp4*tmp0 + tmp5*tmp1 - tmp6*tmp2 - tmp7*tmp3)*tmp13;
+w(3) = 2*(tmp5*tmp0 - tmp4*tmp1 + tmp7*tmp2 - tmp6*tmp3)*tmp13;

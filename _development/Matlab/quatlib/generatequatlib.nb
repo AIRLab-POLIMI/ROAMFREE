@@ -1,0 +1,247 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 10.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[      8048,        238]
+NotebookOptionsPosition[      7224,        207]
+NotebookOutlinePosition[      7580,        223]
+CellTagsIndexPosition[      7537,        220]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[
+ RowBox[{"Clear", "[", "\"\<Global`*\>\"", "]"}]], "Input",
+ CellChangeTimes->{{3.5951624068865957`*^9, 3.595162434106801*^9}}],
+
+Cell[BoxData[{
+ RowBox[{"Import", "[", 
+  RowBox[{
+   RowBox[{"NotebookDirectory", "[", "]"}], " ", "<>", " ", 
+   "\"\<../../Mathematica/models/SimplifyFunctions.m\>\""}], 
+  "]"}], "\[IndentingNewLine]", 
+ RowBox[{"Import", "[", 
+  RowBox[{
+   RowBox[{"NotebookDirectory", "[", "]"}], " ", "<>", " ", 
+   "\"\<../../Mathematica/models/QuaternionAlgebra.m\>\""}], "]"}]}], "Input",\
+
+ CellChangeTimes->{{3.595163228510494*^9, 3.595163230854044*^9}, {
+   3.6175174204357758`*^9, 3.617517424343709*^9}, {3.632487617988913*^9, 
+   3.632487633951275*^9}, {3.632808573804429*^9, 3.632808580572144*^9}, {
+   3.653465577414126*^9, 3.653465581712212*^9}, {3.653465807119741*^9, 
+   3.6534658467754602`*^9}, 3.6534659562829723`*^9}],
+
+Cell["Output Functions", "Subtitle",
+ InitializationCell->True,
+ CellChangeTimes->{{3.563606408899285*^9, 3.563606413402224*^9}, {
+  3.572951250149337*^9, 3.572951255936389*^9}, {3.65346587833149*^9, 
+  3.653465879052071*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"ToGoodC", "[", "exp_", "]"}], ":=", 
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", "oexp", "}"}], ",", " ", 
+    RowBox[{
+     RowBox[{"oexp", "=", 
+      RowBox[{"Experimental`OptimizeExpression", "[", "exp", "]"}]}], ";", 
+     "\[IndentingNewLine]", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{
+         RowBox[{"Dimensions", " ", "[", 
+          RowBox[{
+           RowBox[{"StringPosition", "[", 
+            RowBox[{
+             RowBox[{"ToString", "[", 
+              RowBox[{"InputForm", "[", "oexp", "]"}], "]"}], ",", 
+             "\"\<Compile\>\""}], "]"}], ",", "1"}], "]"}], "[", 
+         RowBox[{"[", "1", "]"}], "]"}], ">", "0"}], ",", 
+       RowBox[{"Block", "[", 
+        RowBox[{
+         RowBox[{"{", " ", 
+          RowBox[{"locals", ",", " ", "code"}], "}"}], ",", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{"locals", ",", "code"}], "}"}], "=", 
+           RowBox[{"ReleaseHold", "[", 
+            RowBox[{
+             RowBox[{"(", 
+              RowBox[{"Hold", "@@", "oexp"}], ")"}], "/.", 
+             RowBox[{
+              RowBox[{
+               RowBox[{"Verbatim", "[", "Block", "]"}], "[", 
+               RowBox[{"vars_", ",", "seq_"}], "]"}], "\[RuleDelayed]", 
+              RowBox[{"{", 
+               RowBox[{"vars", ",", 
+                RowBox[{"Hold", "[", "seq", "]"}]}], "}"}]}]}], "]"}]}], ";", 
+          
+          RowBox[{"ToString", "[", 
+           RowBox[{"CForm", "[", "code", "]"}], "]"}]}]}], "]"}], 
+       "\[IndentingNewLine]", ",", " ", 
+       RowBox[{"ToString", "[", 
+        RowBox[{"CForm", "[", "exp", "]"}], "]"}]}], "]"}]}]}], 
+   "]"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"MyStringWrite", "[", 
+   RowBox[{"str_", ",", "file_"}], "]"}], ":=", 
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", "stream", "}"}], ",", 
+    RowBox[{
+     RowBox[{"stream", "=", 
+      RowBox[{"OpenWrite", "[", "file", "]"}]}], ";", 
+     RowBox[{"WriteString", "[", 
+      RowBox[{"stream", ",", "str"}], "]"}], ";", 
+     RowBox[{"Close", "[", "stream", "]"}], ";"}]}], "]"}]}]}], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{
+  3.568440350374321*^9, {3.56844481385726*^9, 3.56844481884285*^9}, {
+   3.568446816971497*^9, 3.568446831371454*^9}, {3.56844689667688*^9, 
+   3.568446897039928*^9}, {3.571133081827365*^9, 3.571133085326789*^9}}],
+
+Cell["Stuff", "Subtitle",
+ InitializationCell->True,
+ CellChangeTimes->{{3.563606408899285*^9, 3.563606413402224*^9}, {
+  3.572951250149337*^9, 3.572951255936389*^9}, {3.63280859888146*^9, 
+  3.632808599479208*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"Q1", "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"q1", "[", "1", "]"}], ",", 
+     RowBox[{"q1", "[", "2", "]"}], ",", 
+     RowBox[{"q1", "[", "3", "]"}], ",", 
+     RowBox[{"q1", "[", "4", "]"}]}], "}"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Q2", "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"q2", "[", "1", "]"}], ",", 
+     RowBox[{"q2", "[", "2", "]"}], ",", 
+     RowBox[{"q2", "[", "3", "]"}], ",", 
+     RowBox[{"q2", "[", "4", "]"}]}], "}"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"wleft", "=", 
+   RowBox[{"QuatBoxMinusLeft", "[", 
+    RowBox[{"Q1", ",", "Q2"}], "]"}]}], ";"}], "\[IndentingNewLine]", GridBox[{
+   {
+    RowBox[{
+     RowBox[{"wright", "=", 
+      RowBox[{"QuatBoxMinusRight", "[", 
+       RowBox[{"Q1", ",", "Q2"}], "]"}]}], ";"}]},
+   {"\[Placeholder]"}
+  }]}], "Input",
+ CellChangeTimes->{{3.653465600788995*^9, 3.6534656470700617`*^9}, {
+  3.65346571591733*^9, 3.653465724198748*^9}, {3.6534658826565437`*^9, 
+  3.653465885233477*^9}, {3.6534673121515512`*^9, 3.653467354210594*^9}, {
+  3.653467794328693*^9, 3.6534677952805977`*^9}}],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"{", "Null", "}"}], ",", 
+   RowBox[{"{", "\[Placeholder]", "}"}]}], "}"}]], "Output",
+ CellChangeTimes->{3.6534678222852383`*^9}]
+}, Open  ]],
+
+Cell["Output", "Subtitle",
+ InitializationCell->True,
+ CellChangeTimes->{{3.563606408899285*^9, 3.563606413402224*^9}, {
+  3.572951250149337*^9, 3.572951255936389*^9}, {3.63280859888146*^9, 
+  3.632808599479208*^9}, {3.653465900147368*^9, 3.653465900883556*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"SetDirectory", "[", 
+   RowBox[{"NotebookDirectory", "[", "]"}], "]"}], ";"}]], "Input"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"MyStringWrite", "[", 
+   RowBox[{
+    RowBox[{"ToGoodC", "[", "wleft", "]"}], ",", 
+    "\"\<quatboxminusleftraw.mthout\>\""}], "]"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"MyStringWrite", "[", 
+   RowBox[{
+    RowBox[{"ToGoodC", "[", "wright", "]"}], ",", 
+    "\"\<quatboxminusrightraw.mthout\>\""}], "]"}], ";"}]}], "Input",
+ CellChangeTimes->{{3.653465694577174*^9, 3.653465707700138*^9}, {
+  3.65346589454697*^9, 3.653465908121687*^9}, {3.653465959624598*^9, 
+  3.653465995125039*^9}, {3.653466030275868*^9, 3.653466037331389*^9}, {
+  3.6534678033494387`*^9, 3.653467805106063*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+  "Run", "[", 
+   "\"\<python ../../Mathematica/fixMathematicaOutput_v2.py \
+quatboxminusleftraw.mthout w 1 1\>\"", "]"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+  "Run", "[", 
+   "\"\<python ../../Mathematica/fixMathematicaOutput_v2.py \
+quatboxminusrightraw.mthout w 1 1\>\"", "]"}], ";"}]}], "Input",
+ CellChangeTimes->{{3.653467809600728*^9, 3.653467812273484*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Run", "[", "\"\<rm *.mthout\>\"", "]"}], ";"}]], "Input"]
+},
+CellGrouping->Manual,
+WindowSize->{2560, 1362},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+FrontEndVersion->"10.0 for Linux x86 (64-bit) (June 27, 2014)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 141, 2, 54, "Input"],
+Cell[702, 24, 724, 15, 90, "Input"],
+Cell[1429, 41, 226, 4, 89, "Subtitle",
+ InitializationCell->True],
+Cell[1658, 47, 2431, 64, 300, "Input",
+ InitializationCell->True],
+Cell[4092, 113, 215, 4, 89, "Subtitle",
+ InitializationCell->True],
+Cell[CellGroupData[{
+Cell[4332, 121, 1142, 31, 189, "Input"],
+Cell[5477, 154, 181, 5, 79, "Output"]
+}, Open  ]],
+Cell[5673, 162, 262, 4, 89, "Subtitle",
+ InitializationCell->True],
+Cell[5938, 168, 123, 3, 54, "Input"],
+Cell[6064, 173, 640, 15, 90, "Input"],
+Cell[6707, 190, 418, 11, 90, "Input"],
+Cell[7128, 203, 92, 2, 87, "Input"]
+}
+]
+*)
+
+(* End of internal cache information *)
