@@ -72,6 +72,7 @@ def names(i):
 
 def fixMathFunctions(l):
 	l = re.sub('Power\(', 'std::pow(', l)		
+	l = re.sub('Abs\(', 'std::fabs(', l)		
 	l = re.sub('ArcCos\(', 'std::acos(', l)
 	l = re.sub('ArcSin\(', 'std::asin(', l)
 	l = re.sub('ArcTan\(', 'std::atan2(', l)
@@ -131,6 +132,44 @@ def arrays(i):
 		sndindex = ',{0}+_OFF'.format(i.group(4))
 		
 	return '{0}({1}+_OFF{2})'.format(i.group(1), i.group(2),sndindex)
+
+
+def reshapeTwoArgsFunction(C, str, op):
+	
+	start = 0	
+	nC = ''
+	while True:
+		pos = C.find(str,start);		
+
+		if pos == -1:
+			nC = nC+C[start:]
+			break
+
+		nC = nC+C[start:pos]
+
+		# scan until we find , 
+		pos1 = pos+4
+		k = pos1
+		cnt = 0
+		while True:
+			if C[k] == '(':
+				cnt = cnt + 1
+			if C[k] == ')':
+				cnt = cnt - 1
+
+				if cnt == -1:
+					pos3 = k
+					break
+			if C[k] == ',' and cnt == 0:
+				pos2 = k
+
+			k = k+1
+
+		nC = nC+'('+reshapeTwoArgsFunction(C[pos1:pos2],str, op) +')'+op+'('+reshapeTwoArgsFunction(C[pos2+1:pos3], str, op)+')'
+
+		start = pos3+1
+
+	return nC
 			
 endname = string.find(sys.argv[1], '.');
 
@@ -219,6 +258,9 @@ if sys.argv[3]=='1':
 	C = re.sub('double ', '', C)
 	C = re.sub('\+_OFF', '', C)
 	C = re.sub('std::', '', C)
+
+	# and we want pow(a,b) substituted with (a)^(b)
+	C = reshapeTwoArgsFunction(C,'pow','^')
 	
 if sys.argv[4]=='1':
 	# we are working with sparse assignments, strip away everything which is = 0;	
