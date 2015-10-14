@@ -22,5 +22,16 @@ install(DIRECTORY include/ROAMestimation
 )
 
 else()
-# Non-catkin installation TODO
+# Non-catkin installation
+# Install libraries
+install(TARGETS ROAMestimation 
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+  LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+  RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+)
+# Install headers
+install(DIRECTORY include/ROAMestimation
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/include/roamfree
+  PATTERN ".svn" EXCLUDE
+)
 endif()

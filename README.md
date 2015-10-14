@@ -40,7 +40,7 @@ Furthermore, it requires a compiler which supports C 11, (e.g. gcc 4.7 or newer)
 Under Ubuntu 15.04 you can provided the required dependencies
 with
 
-```sudo apt-get install libsuitesparse-dev libeigen3-dev```
+```sudo apt-get install libsuitesparse-dev libeigen3-dev libboost-all-dev
 
 # Build
 
@@ -87,7 +87,25 @@ TODO: verify
 
 ## Standalone build (non-ROS)
 
-TODO.
+Having cloned the git repository with you have to set up the building environment
+
+```
+git clone https://github.com/AIRLab-POLIMI/ROAMFREE.git
+mkdir build
+cd build
+cmake ../roamfree/
+```
+
+Once the building environment has beed created it is possible to compile and install the romafree library
+
+```
+make && sudo make install
+```
+
+In case you want to change the instal path you can change the cmake command as
+```
+cmake ../roamfree/ -DCMAKE_INSTALL_PREFIX=<your_install_path>
+```
 
 ## Build the documentation (Doxygen)
 
