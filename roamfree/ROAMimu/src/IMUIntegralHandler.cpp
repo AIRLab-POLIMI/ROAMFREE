@@ -1,13 +1,13 @@
 /*
-Copyright (c) 2013-2016 Politecnico di Milano.
-All rights reserved. This program and the accompanying materials
-are made available under the terms of the GNU Lesser Public License v3
-which accompanies this distribution, and is available at
-https://www.gnu.org/licenses/lgpl.html
+ Copyright (c) 2013-2016 Politecnico di Milano.
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the GNU Lesser Public License v3
+ which accompanies this distribution, and is available at
+ https://www.gnu.org/licenses/lgpl.html
 
-Contributors:
-    Davide A. Cucci (davide.cucci@epfl.ch)    
-*/
+ Contributors:
+ Davide A. Cucci (davide.cucci@epfl.ch)
+ */
 
 /*
  * IMUIntegralHandler.cpp
@@ -27,74 +27,38 @@ using namespace ROAMestimation;
 
 namespace ROAMimu {
 
-IMUIntegralHandler::IMUIntegralHandler(int N, double dt, ParameterTypes parType) :
-    _filter(NULL), _sensorNameDeltaP("undefined"), _parType(parType), _N(N), _dt(
-        dt), _cnt(0), _z12(new Eigen::VectorXd(27)), _z01(
-        new Eigen::VectorXd(27)), _z12Cov(new Eigen::MatrixXd(3, 3)), _z01Cov(
-        new Eigen::MatrixXd(3, 3)), _zGyro(16), _zGyroCov(3, 3), isFirst(true), _predictorEnabled(
-        true) {
-}
-IMUIntegralHandler::~IMUIntegralHandler() {
-  delete _z12, _z01, _z12Cov, _z01Cov;
-}
+IMUIntegralHandler::IMUIntegralHandler(ROAMestimation::FactorGraphFilter* f,
+    const std::string& name, int N, double dt,
+    ROAMestimation::ParameterWrapper_Ptr ba_par,
+    ROAMestimation::ParameterWrapper_Ptr bw_par, const Eigen::VectorXd &T_OS) :
+    _filter(f), _sensorNameDeltaP(name + "DeltaP"), _ba_par(ba_par), _bw_par(
+        bw_par), _sensorNameDeltaQ(name + "DeltaQ"), _N(N), _dt(dt), _cnt(0), _z12(
+        new Eigen::VectorXd(27)), _z01(new Eigen::VectorXd(27)), _z12Cov(
+        new Eigen::MatrixXd(3, 3)), _z01Cov(new Eigen::MatrixXd(3, 3)), _zGyro(
+        16), _zGyroCov(3, 3), isFirst(true), _predictorEnabled(true) {
 
-void IMUIntegralHandler::init(FactorGraphFilter* f, const std::string& name,
-    const Eigen::VectorXd &T_OS, const Eigen::VectorXd &ba0, bool isbafixed,
-    const Eigen::VectorXd &bw0, bool isbwfixed, const Eigen::VectorXd &pose0,
-    double t0) {
-
-  // initialize internal variables
-  _filter = f;
-  _sensorNameDeltaP = name + "DeltaP";
-  _sensorNameDeltaQ = name + "DeltaQ";
+  assert(f != NULL);
 
   // add the DeltaP sensor
   f->addSensor(_sensorNameDeltaP, IMUintegralDeltaP, false, false); // non master, non sequential
 
   // set transformation between sensor and odometric center
-  f->setSensorFrame(_sensorNameDeltaP, T_OS);
+  if (T_OS.rows() == 0) {
+    Eigen::VectorXd T_OS_null(7);
+    T_OS_null << 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0;
 
-  // add bias parameters
-
-  switch (_parType) {
-  case DoNotConfigureParameters:
-#   ifdef DEBUG_PRINT_INFO_MESSAGES
-    std::cerr << "[IMUIntegralHandler] Info: " << _sensorNameDeltaP << "_Ba"
-    << " and " << _sensorNameDeltaP << "_Bw parameteers configured by user" << std::endl;
-#   endif
-
-    _ba_par = f->getParameterByName(_sensorNameDeltaP + "_Ba");
-    _bw_par = f->getParameterByName(_sensorNameDeltaP + "_Bw");
-
-    assert(_ba_par && _bw_par);
-
-    break;
-  case ConfigureConstantParameters:
-    _ba_par = f->addConstantParameter(Euclidean3D, _sensorNameDeltaP + "_Ba",
-        ba0, isbafixed);
-    _bw_par = f->addConstantParameter(Euclidean3D, _sensorNameDeltaP + "_Bw",
-        bw0, isbwfixed);
-    break;
-  case ConfigureLinearlyInterpolatedParameters:
-    //TODO: add some way to configure spacing
-    _ba_par = f->addLinearlyInterpolatedParameter(Euclidean3D,
-        _sensorNameDeltaP + "_Ba", ba0, isbafixed, 10.0*_N*_dt);
-    _bw_par = f->addLinearlyInterpolatedParameter(Euclidean3D,
-        _sensorNameDeltaP + "_Bw", bw0, isbwfixed, 10.0*_N*_dt);
-    break;
-  case ConfigureLimitedBandwidthParameters:
-    //TODO: add some way to configure bandwidth and a
-    _ba_par = f->addLimitedBandwithParameter(Euclidean3D,
-        _sensorNameDeltaP + "_Ba", ba0, isbafixed, 0.1, 2);
-    _bw_par = f->addLimitedBandwithParameter(Euclidean3D,
-        _sensorNameDeltaP + "_Bw", bw0, isbwfixed, 0.1, 2);
-    break;
+    f->setSensorFrame(_sensorNameDeltaP, T_OS_null);
+  } else {
+    f->setSensorFrame(_sensorNameDeltaP, T_OS);
   }
 
   // add the DeltaQ sensor
   f->addSensor(_sensorNameDeltaQ, IMUintegralDeltaQ, false, false); // non master, non sequential
 
   f->shareSensorFrame(_sensorNameDeltaP, _sensorNameDeltaQ);
+
+  // add bridges for the parameters
+  // TODO: compleately drop the dependency on <sensorname>_Ba and <sensorname>_Bw names
 
   f->shareParameter(_sensorNameDeltaP + "_Bw", _sensorNameDeltaQ + "_Bw");
 
@@ -104,10 +68,32 @@ void IMUIntegralHandler::init(FactorGraphFilter* f, const std::string& name,
 
   _z12Cov->setZero();
   _z01Cov->setZero();
+}
+IMUIntegralHandler::~IMUIntegralHandler() {
+  delete _z12, _z01, _z12Cov, _z01Cov;
+}
 
-  // initialize the filter
-  _x0 = _filter->setInitialPose(pose0, t0);
+void IMUIntegralHandler::init(bool isMaster, double t0,
+    const Eigen::VectorXd &x0) {
 
+  _isMaster = isMaster;
+
+  if (_isMaster == true) {
+
+    // initialize the filter
+    if (x0.rows() == 0) {
+      Eigen::VectorXd x0_null(7);
+      x0_null << 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0;
+
+      _x0 = _filter->setInitialPose(x0_null, t0);
+    } else {
+      _x0 = _filter->setInitialPose(x0, t0);
+    }
+  } else {
+    _x0 = _filter->getNearestPoseByTimestamp(t0);
+
+    assert(_x0);
+  }
 }
 
 // TODO: have this method return the vecotr of edges that have been added
@@ -141,9 +127,9 @@ bool IMUIntegralHandler::step(double* za, double* zw) {
     //*/
 
     /* instead of acquiring, do the integral always with zero biase
-    memset(ba_ptr_z2, 0, 3 * sizeof(double));
-    memset(bw_ptr_z2, 0, 3 * sizeof(double));
-    //*/
+     memset(ba_ptr_z2, 0, 3 * sizeof(double));
+     memset(bw_ptr_z2, 0, 3 * sizeof(double));
+     //*/
 
 #		ifdef DEBUG_PRINT_INFO_MESSAGES
     std::cerr
@@ -222,15 +208,22 @@ bool IMUIntegralHandler::step(double* za, double* zw) {
     // at the end of the first integral, first _z12 is not ready, we have to wait
     if (isFirst == false) {
 
-      /* output some debug
-       std::cerr << "[IntegratedIMUEdgeGenerator] delta P"
-       << _z12->head(3).transpose().format(CleanFmt) << std::endl;
-       std::cerr << "[IntegratedIMUEdgeGenerator] noise " << std::endl
-       << _z12Cov->format(CleanFmt) << std::endl;
-       //*/
-
       // move the pose window ahead and add the new pose
-      _x2 = _filter->addPose(_x1->getTimestamp() + _dt * _N);
+      if (_isMaster) {
+        _x2 = _filter->addPose(_x1->getTimestamp() + _dt * _N);
+      } else {
+        _x2 = _filter->getNearestPoseByTimestamp(
+            _x1->getTimestamp() + _dt * _N);
+
+        double dt01 = _x1->getTimestamp() - _x0->getTimestamp();
+        double dt12 = _x2->getTimestamp() - _x1->getTimestamp();
+
+        if (abs(dt01 - dt12) > 1e-6) {
+          std::cerr
+              << "[IMUIntegralHandler] Warning: non master, mismatch in existing poses dt of more that 1us"
+              << std::endl;
+        }
+      }
 
       if (_predictorEnabled) {
         // ----- do the prediction -------------------
@@ -288,7 +281,11 @@ bool IMUIntegralHandler::step(double* za, double* zw) {
       ret = true;
     } else {
 
-      _x1 = _filter->addPose(_x0->getTimestamp() + _dt * _N);
+      if (_isMaster == true) {
+        _x1 = _filter->addPose(_x0->getTimestamp() + _dt * _N);
+      } else {
+        _x1 = _filter->getNearestPoseByTimestamp(_x0->getTimestamp() + _dt * _N);
+      }
 
       if (_predictorEnabled) {
         // ----- do the prediction -------------------
@@ -334,13 +331,6 @@ bool IMUIntegralHandler::step(double* za, double* zw) {
     }
 
     // whatever it was the first or not, now we have to add the gyro
-
-    /* output some debug
-     std::cerr << "[IntegratedIMUEdgeGenerator] delta Q "
-     << _zGyro.head(4).transpose().format(CleanFmt) << std::endl;
-     std::cerr << "[IntegratedIMUEdgeGenerator] noise " << std::endl
-     << _zGyroCov.format(CleanFmt) << std::endl;
-     //*/
 
     // add the DeltaQ measurement
     _filter->addMeasurement(_sensorNameDeltaQ, _x1->getTimestamp(), _zGyro,
