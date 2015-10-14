@@ -112,13 +112,6 @@ int main(int argc, char *argv[]) {
 
   bool isbarcfixed = false, isbagmfixed = false, isbwfixed = true;
 
-  // we have to initialize the IMUIntegralHandler
-  IMUIntegralHandler hndl(round(imuRate / poseRate), 1.0 / imuRate,
-      IMUIntegralHandler::DoNotConfigureParameters);
-
-  Eigen::Matrix<double, 6, 6> & sensorNoises = hndl.getSensorNoises();
-  sensorNoises.diagonal() << 0.0016, 0.0016, 0.0016, 1.15172e-05, 1.15172e-05, 1.15172e-05;
-
   // accelerometer bias
 
   Eigen::VectorXd accBias0(3);  // Accelerometer and Gyroscope giases
@@ -171,6 +164,13 @@ int main(int argc, char *argv[]) {
   Eigen::VectorXd T_OS_IMU(7); // Transformation between Odometer and robot frame
   T_OS_IMU << 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0;
 
+  // we have to initialize the IMUIntegralHandler
+  IMUIntegralHandler hndl(f, "IMUintegral", round(imuRate / poseRate),
+      1.0 / imuRate, ba_par, bw_par, T_OS_IMU);
+
+  Eigen::Matrix<double, 6, 6> & sensorNoises = hndl.getSensorNoises();
+  sensorNoises.diagonal() << 0.0016, 0.0016, 0.0016, 1.15172e-05, 1.15172e-05, 1.15172e-05;
+
   // GPS Sensor
 
   Eigen::VectorXd T_OS_GPS(7); // Transformation between Odometer and robot frame
@@ -194,11 +194,10 @@ int main(int argc, char *argv[]) {
 #   include "../generated/Otto_x1.cppready"
   }
 
-  hndl.init(f, "IMUintegral", T_OS_IMU, accBias0, isbagmfixed, gyroBias0,
-      isbwfixed, x0, 0.0);
+  hndl.init(true, 0.0, x0);
 
-  f->addPriorOnTimeVaryingParameter(Euclidean3DPrior, "IMUintegralDeltaP_Ba_GM", 0,
-      accBias0, accBiasGM0Cov);
+  f->addPriorOnTimeVaryingParameter(Euclidean3DPrior, "IMUintegralDeltaP_Ba_GM",
+      0, accBias0, accBiasGM0Cov);
 
   // put the prior in case of no lever arm
   // f->addPriorOnTimeVaryingParameter(Euclidean3DPrior, "IMUintegralDeltaP_Bw",

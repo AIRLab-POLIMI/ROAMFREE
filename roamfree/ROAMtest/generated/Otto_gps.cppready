@@ -1,0 +1,5 @@
+double tmp0 = std::pow(t,2);
+double tmp1 = 0.0025*tmp0;
+zgps(1+_OFF) = 1.75*std::cos(tmp1);
+zgps(2+_OFF) = 1.75*std::sin(tmp1);
+zgps(3+_OFF) = 0.;

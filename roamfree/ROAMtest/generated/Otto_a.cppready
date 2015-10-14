@@ -1,0 +1,13 @@
+double tmp0 = std::pow(t,2);
+double tmp1 = 0.0025*tmp0;
+double tmp2 = std::sin(tmp1);
+double tmp3 = std::cos(tmp1);
+double tmp4 = -1.*tmp0*tmp3;
+double tmp5 = -200.*tmp2;
+double tmp6 = tmp4 + tmp5;
+double tmp7 = 200.*tmp3;
+double tmp8 = -1.*tmp0*tmp2;
+double tmp9 = tmp7 + tmp8;
+za(1+_OFF) = 0. - 0.00005*tmp6*tmp2 + 0.00005*tmp3*tmp9;
+za(2+_OFF) = 0. - 0.00005*tmp3*tmp6 - 0.00005*tmp2*tmp9;
+za(3+_OFF) = 9.8;
