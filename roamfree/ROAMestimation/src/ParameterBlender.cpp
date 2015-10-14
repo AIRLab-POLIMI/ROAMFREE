@@ -74,6 +74,12 @@ void ParameterBlender::setFixed(bool isfixed) {
   }
 }
 
+void ParameterBlender::setComputeCovariance(bool computeCovariance) {
+  for (auto pit = _toblend.begin(); pit != _toblend.end(); ++pit) {
+    (*pit)->setComputeCovariance(computeCovariance);
+  }
+}
+
 bool ParameterBlender::fixed() const {
   for (auto pit = _toblend.begin(); pit != _toblend.end(); ++pit) {
     if ((*pit)->fixed() == false) {
@@ -85,5 +91,4 @@ bool ParameterBlender::fixed() const {
 }
 
 } /* namespace ROAMestimation */
-
 

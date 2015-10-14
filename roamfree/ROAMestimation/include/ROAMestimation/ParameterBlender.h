@@ -35,6 +35,8 @@ class ParameterBlender: public ParameterVerticesManager {
 
     virtual void setFixed(bool isfixed);
 
+    virtual void setComputeCovariance(bool computeCovariance);
+
     /**
      * \brief returns true if ALL the blended parameters are fixed
      */

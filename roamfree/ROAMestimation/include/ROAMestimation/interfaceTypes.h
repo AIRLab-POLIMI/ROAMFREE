@@ -24,6 +24,8 @@ Contributors:
 
 namespace ROAMestimation {
 
+class FactorGraphFilter;
+
 class PoseVertexWrapper;
 class MeasurementEdgeWrapper;
 class ParameterWrapper;

@@ -222,6 +222,20 @@ class ParameterVerticesManager {
     }
 
     /**
+     * \brief toggles if covariances have to be computed for this parameter
+     */
+    inline virtual void setComputeCovariance(bool computeCovariance) {
+      _computeCovariance = computeCovariance;
+    }
+
+    /**
+     * \brief true => covariance are computer after estimation for each vertex
+     */
+    inline virtual bool computeCovariance() const {
+      return _computeCovariance;
+    }
+
+    /**
      * \brief return the dimension of the internal representation of a parameter
      */
     inline virtual int parameterEstimateDimension() const {
@@ -239,6 +253,8 @@ class ParameterVerticesManager {
     std::string _name;
     ParameterTypes _type;
     bool _isFixed;
+
+    bool _computeCovariance;
 
     // stuff for process models
     ProcessTypes _process; //!< type of the process model for the parameter

@@ -42,6 +42,14 @@ class ParameterWrapper_Impl: public ParameterWrapper {
       _param->setFixed(isFixed);
     }
 
+    inline virtual bool getComputeCovariance() const {
+      return _param->computeCovariance();
+    }
+
+    inline virtual void setComputeCovariance(bool computeCovariance) {
+      _param->setComputeCovariance(computeCovariance);
+    }
+
     virtual const Eigen::VectorXd &getEstimate() const;
     virtual const Eigen::VectorXd &getEstimate(double t) const;
 

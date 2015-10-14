@@ -36,6 +36,9 @@ public:
 	virtual bool getFixed() const = 0; //!< returns if the parameter is fixed or not during the estimation
 	virtual void setFixed(bool isFixed) = 0; //!< sets if the parameter is fixed or not during the estimation
 
+  virtual bool getComputeCovariance() const = 0; //!< returns if the covariance is computed after estimation or not
+  virtual void setComputeCovariance(bool computeCovariance) = 0; //!< sets if the covariance is computed after estimation or not
+
 	virtual const Eigen::VectorXd &getEstimate(double t) const = 0; //!< get a const reference to the vertex nearest to t
 	virtual const Eigen::VectorXd &getEstimate() const = 0; //!< get a const reference to the estimate of the vertex with t = 0.0
 

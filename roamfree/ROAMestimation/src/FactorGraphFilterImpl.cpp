@@ -1919,7 +1919,7 @@ bool FactorGraphFilter_Impl::testExistance(const PoseVertex* v) const {
 
 void FactorGraphFilter_Impl::computeCovariances() {
 
-// iterate through the poses and collect the vertices for which I have to evaluate covariance
+  // iterate through the poses and collect the vertices for which I have to evaluate covariance
 
   list<PoseVertex *> active;
   for (PoseMapIterator it = _poses.begin(); it != _poses.end(); ++it) {
@@ -1933,7 +1933,7 @@ void FactorGraphFilter_Impl::computeCovariances() {
     }
   }
 
-// iterate through the vertices and collect their tempIndex
+  // iterate through the vertices and collect their tempIndex
 
   vector<pair<int, int> > blockIndices;
   for (list<PoseVertex *>::iterator it = active.begin(); it != active.end();
@@ -1942,7 +1942,25 @@ void FactorGraphFilter_Impl::computeCovariances() {
         pair<int, int>((*it)->tempIndex(), (*it)->tempIndex()));
   }
 
+  // iterate trough parameters and collect vertices for which covariances have
+  // to be calculated
+
   set<g2o::OptimizableGraph::Vertex *> otherVertices;
+
+  for (auto p_it = _params.begin(); p_it != _params.end(); ++p_it) {
+    boost::shared_ptr<ParameterVerticesManager> p = p_it->second;
+    if (p->fixed() == false && p->computeCovariance()) {
+      for (auto v_it = p->_v.begin(); v_it != p->_v.end(); ++v_it) {
+        g2o::OptimizableGraph::Vertex *v = v_it->second;
+        if (v->tempIndex() >= 0) { //there might be parameters not involved in current estimation
+          otherVertices.insert(v);
+
+          blockIndices.push_back(
+              pair<int, int>(v->tempIndex(), v->tempIndex()));
+        }
+      }
+    }
+  }
 
   /* ----------------------- TMP
    // Always compute covariance for parameters that are not fixed
@@ -2135,7 +2153,7 @@ string FactorGraphFilter_Impl::writeFactorGraph() {
   return s.str();
 }
 
-string FactorGraphFilter_Impl::writeEdge(g2o::HyperGraph::Edge* e) {
+string FactorGraphFilter_Impl::writeEdge(g2o::HyperGraph::Edge * e) {
   stringstream s;
 
   GenericEdgeInterface *gei;
@@ -2213,8 +2231,8 @@ void FactorGraphFilter_Impl::setLowLevelLogging(bool lowLevelLogging,
 }
 
 FactorGraphFilter_Impl::MisalignmentGuard::MisalignmentGuard(
-    GenericVertex<Eucl1DV>* v1, GenericVertex<Eucl1DV>* v2,
-    GenericVertex<Eucl1DV>* v3) :
+    GenericVertex<Eucl1DV> *v1, GenericVertex<Eucl1DV> *v2,
+    GenericVertex<Eucl1DV> *v3) :
     _v1(v1), _v2(v2), _v3(v3) {
 }
 

@@ -72,6 +72,11 @@ enum ProcessTypes {
   GaussMarkov
 };
 
+enum InterpolationTypes {
+  Linear,
+  Lanczos
+};
+
 enum AugStateComponents {
   POSITION,
   ORIENTATION,

@@ -28,7 +28,8 @@ namespace ROAMestimation {
 ParameterVerticesManager::ParameterVerticesManager(
     g2o::AutoIDSparseOptimizer *opt, ParameterTypes typ,
     const std::string& name) :
-    _optimizer(opt), _name(name), _type(typ), _isFixed(true), _process(None) {
+    _optimizer(opt), _name(name), _type(typ), _isFixed(true), _process(None), _computeCovariance(
+        false) {
 }
 
 ParameterVerticesManager::~ParameterVerticesManager() {
@@ -158,10 +159,11 @@ g2o::OptimizableGraph::Vertex * ParameterVerticesManager::newVertex(
 
 void ParameterVerticesManager::getVerticesPointers(double tstamp,
     std::vector<g2o::HyperGraph::Vertex *>& to, int freePosition) const {
-  std::map<double, g2o::OptimizableGraph::Vertex *>::const_iterator first = getVertices(tstamp);
+  std::map<double, g2o::OptimizableGraph::Vertex *>::const_iterator first =
+      getVertices(tstamp);
 
   for (int i = 0; i < getWindowSize(); ++i, ++first) {
-    to[i+freePosition] = first->second;
+    to[i + freePosition] = first->second;
   }
 }
 
@@ -182,8 +184,9 @@ g2o::OptimizableGraph::Edge* ParameterVerticesManager::addRandomWalkProcessEdge(
     gmpe->setNoiseCov(noiseCov);
     gmpe->init(dt);
 
-    gmpe->setCategory(_name+"_proc");
-    gmpe->setTimestamp(static_cast<GenericVertex<Eucl3DV> *>(newer)->getTimestamp());
+    gmpe->setCategory(_name + "_proc");
+    gmpe->setTimestamp(
+        static_cast<GenericVertex<Eucl3DV> *>(newer)->getTimestamp());
 
     oe = gmpe->getg2oOptGraphPointer();
 
@@ -219,8 +222,9 @@ g2o::OptimizableGraph::Edge* ParameterVerticesManager::addGaussMarkovProcessEdge
     gmpe->setNoiseCov(noiseCov);
     gmpe->init(beta, dt);
 
-    gmpe->setCategory(_name+"_proc");
-    gmpe->setTimestamp(static_cast<GenericVertex<Eucl3DV> *>(newer)->getTimestamp());
+    gmpe->setCategory(_name + "_proc");
+    gmpe->setTimestamp(
+        static_cast<GenericVertex<Eucl3DV> *>(newer)->getTimestamp());
 
     oe = gmpe->getg2oOptGraphPointer();
 
