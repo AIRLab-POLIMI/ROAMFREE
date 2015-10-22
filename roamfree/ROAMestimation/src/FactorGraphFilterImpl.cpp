@@ -122,7 +122,11 @@ PoseVertexWrapper_Ptr FactorGraphFilter_Impl::setInitialPose(
 
   for (map<string, struct Sensor>::iterator it = _sensors.begin();
       it != _sensors.end(); ++it) {
-    it->second.last = v;
+
+    // only for order 1 and 2, otherwise a measurement for the first pose will be discarded
+    if (it->second.order != 0) {
+      it->second.last = v;
+    }
   }
 
   return PoseVertexWrapper_Ptr(new PoseVertexWrapper_Impl(v));
