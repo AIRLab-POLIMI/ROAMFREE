@@ -10,14 +10,14 @@ if strcmp(config.global.layout,'vertical')
 else
     A = [base(1:end-1) repmat(0,N,1) repmat([1/N 1],N,1)];
 end
-
+  
 %%
 
 clf
 
 for i = 1:N
     f = str2func(config.global.plugins{i});    
-    f(A(i, :),config.global, config.pluginConfig{i});    
+    f(squeezeArea(A(i, :),0.05),config.global, config.pluginConfig{i});    
 end
 
 end
