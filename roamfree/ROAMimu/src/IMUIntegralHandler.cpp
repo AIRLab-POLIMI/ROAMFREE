@@ -155,6 +155,9 @@ bool IMUIntegralHandler::step(double* za, double* zw) {
 
   // if we have done all the steps, collect the results
   if (_cnt == _N) {
+#   ifdef DEBUG_PRINT_INFO_MESSAGES
+      std::cerr << "[IMUIntegralHandler] Completed integration, adding poses and low level measurements ..." << std::endl;
+#   endif
 
     // -------------------- STEP 1: z1 = z1 + delta  ---------------------- //
     //  sum the positive part of the integral to z1
