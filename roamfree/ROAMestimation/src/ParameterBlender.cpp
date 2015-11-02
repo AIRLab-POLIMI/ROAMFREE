@@ -63,6 +63,7 @@ bool ParameterBlender::getJacobianAt(double tstamp, int j,
   int which = 0;
   while (j >= _toblend[which]->getWindowSize()) {
     j -= _toblend[which]->getWindowSize();
+    which++;
   }
 
   return _toblend[which]->getJacobianAt(tstamp, j, ret);

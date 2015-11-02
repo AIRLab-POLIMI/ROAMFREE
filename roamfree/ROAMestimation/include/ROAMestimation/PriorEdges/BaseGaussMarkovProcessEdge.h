@@ -81,12 +81,8 @@ class BaseGaussMarkovProcessEdge: public BaseBinaryProcessEdge<D, VertexXi> {
       // obtain the discrete time covariance matrix as a function
       // of beta and dt
       for (int i = 0; i < D; i++) {
-
-          // TODO: there are still concerns about which is the correct one
-          _information(i,i) /= _dt * (1.0 - exp(-2.0 * _beta(i) * _dt));
-
-//        _information(i, i) /= 1.0 / (2.0 * _beta(i))
-//            * (1.0 - exp(-2.0 * _beta(i) * _dt));
+        _information(i, i) /= 1.0 / (2.0 * _beta(i))
+            * (1.0 - exp(-2.0 * _beta(i) * _dt));
       }
       //
 

@@ -55,8 +55,13 @@ bool LinearlyInterpolatedEuclideanParameter::updateVertexSet(double mintstamp,
     g2o::OptimizableGraph::Vertex *newv = newVertex(newt, last_estimate);
 
 #   ifdef DEBUG_PRINT_INFO_MESSAGES
-    std::cerr << "[LinearlyInterpolatedEuclideanParameter] Info: adding vertex at t=" << ROAMutils::StringUtils::writeNiceTimestamp(newt)
-    << " for " << _name << " initial guess: " << last_estimate.transpose() << std::endl;
+    std::cerr
+        << "[LinearlyInterpolatedEuclideanParameter] Info: adding vertex at t="
+        << ROAMutils::StringUtils::writeNiceTimestamp(newt) << " for " << _name
+        << " initial guess: " << last_estimate.transpose() << ", pose window: ["
+        << std::fixed << ROAMutils::StringUtils::writeNiceTimestamp(mintstamp)
+        << ", " << ROAMutils::StringUtils::writeNiceTimestamp(maxtstamp) << "]"
+        << std::endl;
 #   endif
   }
 

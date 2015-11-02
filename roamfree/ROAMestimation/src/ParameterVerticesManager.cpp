@@ -128,7 +128,6 @@ g2o::OptimizableGraph::Vertex * ParameterVerticesManager::newVertex(
 
       older = it->second;
       dt -= it->first;
-
     } else {
       older = it->second;
       dt -= it->first;
