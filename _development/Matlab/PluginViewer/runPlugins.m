@@ -17,7 +17,7 @@ clf
 
 for i = 1:N
     f = str2func(config.global.plugins{i});    
-    f(squeezeArea(A(i, :),0.05),config.global, config.pluginConfig{i});    
+    f(A(i, :),config.global, config.pluginConfig{i});    
 end
 
 end

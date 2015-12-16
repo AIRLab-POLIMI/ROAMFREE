@@ -10,7 +10,9 @@ if size(gT,1) == 0
     end
     
     if isfield(pluginConfig, 'gtFile')
-        gT = load(pluginConfig.gtFile);
+        if exist(pluginConfig.gtFile, 'file')        
+            gT = load(pluginConfig.gtFile);
+        end
     end
 end
 
@@ -32,7 +34,7 @@ if flag == 1
     z0 = 0;
     
     if isfield(pluginConfig, 'plotPositionRelativeToFirst')
-        if pluginConfig.plotPositionRelativeToFirst == true
+        if pluginConfig.plotPositionRelativeToFirst == true            
            x0 = x(i(1),3);
            y0 = x(i(1),4);
            z0 = x(i(1),5);        
@@ -48,7 +50,7 @@ if flag == 1
     
     %% plot
 
-    subplot('Position', area)
+    subplot('Position', squeezeArea(area,0.02))
     hold on       
 
     plot3(x(i,3)-x0,x(i,4)-y0,x(i,5)-z0,'m');
@@ -66,25 +68,28 @@ if flag == 1
     end
     
     if isfield(pluginConfig, 'sensorName')
+        
         edgef = sprintf('%s%s.log',globalConfig.logPath, pluginConfig.sensorName);
-        [e, flag] = stubbornLoad(edgef);
+        
+        
+        if exist(edgef, 'file')        
+            [e, flag] = stubbornLoad(edgef);
 
-        if flag == 1
-            plot3(e(:,23)-x0, e(:,24)-y0, e(:,25)-z0,'rx');
-            
-            %plot predicted
-            plot3(e(:,23)+e(:,26)-x0, e(:,24)+e(:,27)-y0, e(:,25)+e(:,28)-z0,'bo');
-            
-            
-%             t0 = x(1,1);
-%             for i=1:length(e)                
-%                 text(e(i,23)-x0, e(i,24)-y0, e(i,25)-z0, sprintf('%.1f',e(i,1)-t0));
-%             end
-            
-%             for i=1:length(x)                
-%                 text(x(i,3)-x0, x(i,4)-y0, x(i,5)-z0, sprintf('%.1f',x(i,1)-t0), 'Color', 'red');
-%             end
-            
+            if flag == 1
+                plot3(e(:,23)-x0, e(:,24)-y0, e(:,25)-z0,'rx');
+
+                %plot predicted
+                plot3(e(:,23)+e(:,26)-x0, e(:,24)+e(:,27)-y0, e(:,25)+e(:,28)-z0,'bo');
+
+%                 t0 = x(1,1);
+%                 for i=1:length(e)                
+%                     text(e(i,23)-x0, e(i,24)-y0, e(i,25)-z0, sprintf('%.1f',e(i,1)-t0));
+%                 end
+% 
+%                 for i=1:length(x)                
+%                     text(x(i,3)-x0, x(i,4)-y0, x(i,5)-z0, sprintf('%.1f',x(i,1)-t0), 'Color', 'red');
+%                 end
+            end
         end
     end
 
