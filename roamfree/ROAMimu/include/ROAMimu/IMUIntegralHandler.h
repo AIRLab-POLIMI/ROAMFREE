@@ -19,6 +19,8 @@
 #ifndef IMUINTEGRALHANDLER_H_
 #define IMUINTEGRALHANDLER_H_
 
+#include <list>
+
 #include "ROAMestimation/ROAMestimation.h"
 
 #include "IMUIntegrator.h"
@@ -130,6 +132,12 @@ class IMUIntegralHandler {
     Eigen::MatrixXd _zGyroCov;
 
     bool _predictorEnabled;
+
+    // storage to keep accelerations for the backward integral
+    std::list<double *> _history;
+
+    // storage for the initial values for the biases
+    double ba_ptr_z1[3], bw_ptr_z1[3], ba_ptr_z2[3], bw_ptr_z2[3];
 
   public:
 

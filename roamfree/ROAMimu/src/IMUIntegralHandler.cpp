@@ -20,7 +20,6 @@
 
 #include <cstring>
 
-#include <list>
 #include <algorithm>
 
 using namespace ROAMestimation;
@@ -100,12 +99,6 @@ void IMUIntegralHandler::init(bool isMaster, double t0,
 bool IMUIntegralHandler::step(double* za, double* zw) {
 
   static Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
-
-  // storage to keep accelerations for the backward integral
-  static std::list<double *> _history;
-
-  // storage for the initial values for the biases
-  static double ba_ptr_z1[3], bw_ptr_z1[3], ba_ptr_z2[3], bw_ptr_z2[3];
 
   bool ret = false;
 
