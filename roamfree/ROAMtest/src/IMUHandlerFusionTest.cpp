@@ -38,6 +38,7 @@
 #include <iostream>
 
 #include "ROAMestimation/ROAMestimation.h"
+#include "ROAMestimation/StochasticProcessFactory.h"
 #include "ROAMimu/IMUIntegralHandler.h"
 
 using namespace std;
@@ -62,14 +63,13 @@ int main(int argc, char *argv[]) {
 
   double imuRate = 100; // Hz rate of the IMU readings
   double poseRate = 10; // Hz rate at which pose vertices have to be maintained
-  int gpsDivisor = 5; // how many IMU constraint (hndl.step(...) == true) for each GPS?
+  int gpsDivisor = 10; // how many IMU constraint (hndl.step(...) == true) for each GPS?
 
-  double leverArm = 0.25; // translation from R to GPS along y;
+  // parameters for the generation of deterministic errors on the IMU readings
 
-  // parameters of the IMU biases
-  double ba_x = 0.0; //biases on the accelerometer measurements
+  double ba_x = 0.0; // biases on the accelerometer measurements
   double ba_y = 0.0;
-  double ba_z = 0.3;
+  double ba_z = 0.0;
 
   double ba_dx = 0.0; // increments on the accelerometer biases in m/s^3
   double ba_dy = 0.0;
@@ -79,9 +79,9 @@ int main(int argc, char *argv[]) {
   double ba_fy = 0.025;
   double ba_fz = 0.0125;
 
-  double ba_Ax = 0.100; // amplitude of the sinusoidal bias on the accelerometer
-  double ba_Ay = 0.2000;
-  double ba_Az = 0.0000;
+  double ba_Ax = 0.010; // amplitude of the sinusoidal bias on the accelerometer
+  double ba_Ay = 0.0200;
+  double ba_Az = 0.0300;
 
   double bw_x = 0.0; // biases on the gyroscope measurements
   double bw_y = 0.0;
@@ -110,78 +110,61 @@ int main(int argc, char *argv[]) {
 
   /* ---------------------- Configure sensors ---------------------- */
 
-  bool isbarcfixed = false, isbagmfixed = false, isbwfixed = true;
-
-  // accelerometer bias
-
-  Eigen::VectorXd accBias0(3);  // Accelerometer and Gyroscope giases
+  // -- accelerometer bias
+  Eigen::VectorXd accBias0(3);  // initial value
   accBias0 << 0.0, 0.0, 0.0;
 
-  ParameterWrapper_Ptr ba_par_gm = f->addLinearlyInterpolatedParameter(
-      Euclidean3D, "IMUintegralDeltaP_Ba_GM", accBias0, isbagmfixed, 1.0);
+  Eigen::MatrixXd randomWalkNoiseVar = 10 * Eigen::MatrixXd::Identity(3, 3);
 
-  ba_par_gm->setProcessModelType(RandomWalk);
-  ba_par_gm->setFixed(isbagmfixed);
-  ba_par_gm->setRandomWalkNoiseCov(10 * Eigen::MatrixXd::Identity(3, 3));
+  ParameterWrapper_Ptr ba_par = StochasticProcessFactory::addEucl3DRandomWalk(f,
+      "IMUintegralDeltaP_Ba", accBias0, randomWalkNoiseVar, 1.0); // 1.0 -> keep one sample every 1.0s
 
-  Eigen::Matrix3d accBiasGM0Cov = 1e-4 * Eigen::MatrixXd::Identity(3, 3);
+  // -- gyroscope bias
 
-  ParameterWrapper_Ptr ba_par_rc = f->addConstantParameter(Euclidean3D,
-      "IMUintegralDeltaP_Ba_RC", accBias0, isbarcfixed);
-  ba_par_rc->setFixed(isbarcfixed);
+  Eigen::VectorXd gyroBias0_RC(3); // initial values for the RC and GM processes
+  gyroBias0_RC << 0.0, 0.0, 0.0;
+  Eigen::VectorXd gyroBias0_GM(3);
+  gyroBias0_GM << 0.0, 0.0, 0.0;
 
-  ParameterWrapperVector_Ptr toblend(new ParameterWrapperVector);
-  toblend->push_back(ba_par_gm);
-  toblend->push_back(ba_par_rc);
+  Eigen::MatrixXd gaussMarkovNoiseVar = 1e-4 * Eigen::MatrixXd::Identity(3, 3);
+  Eigen::VectorXd gaussMarkovBeta = 1 / 30.0 * Eigen::VectorXd::Ones(3);
 
-  ParameterWrapper_Ptr ba_par = f->addParameterBlender(Euclidean3D,
-      "IMUintegralDeltaP_Ba", toblend);
+  ParameterWrapper_Ptr bw_par =
+      StochasticProcessFactory::addEucl3DGaussMarkovPlusRandomConstant(f,
+          "IMUintegralDeltaP_Bw", gyroBias0_RC, gyroBias0_GM, gaussMarkovBeta,
+          gaussMarkovNoiseVar, 1.0); // 1.0 -> keep one sample every 1.0s
 
-  // gyroscope bias
+//  ParameterWrapper_Ptr bw_par =
+//      StochasticProcessFactory::addEucl3DRandomConstant(f,
+//          "IMUintegralDeltaP_Bw", gyroBias0_RC);
 
-  Eigen::VectorXd gyroBias0(3);
-  gyroBias0 << 0.0, 0.0, 0.0;
+//  bw_par->setFixed(true);
+//  ba_par->setFixed(true);
 
-  Eigen::Matrix3d gyroBias0Cov = 1e-4 * Eigen::MatrixXd::Identity(3, 3);
-
-  /*
-   ParameterWrapper_Ptr bw_par = f->addConstantParameter(Euclidean3D,
-   "IMUintegralDeltaP_Bw", gyroBias0, isbwfixed);
-
-   f->addPriorOnConstantParameter(Euclidean3DPrior, "IMUintegralDeltaP_Bw", gyroBias0, gyroBias0Cov);
-   //*/
-
-  //
-  ParameterWrapper_Ptr bw_par = f->addLinearlyInterpolatedParameter(Euclidean3D,
-      "IMUintegralDeltaP_Bw", gyroBias0, isbwfixed, 1.0);
-
-  bw_par->setProcessModelType(RandomWalk);
-  bw_par->setRandomWalkNoiseCov(10 * Eigen::MatrixXd::Identity(3, 3));
-  //*/
-
-  bw_par->setFixed(isbwfixed);
-
-  Eigen::VectorXd T_OS_IMU(7); // Transformation between Odometer and robot frame
+  Eigen::VectorXd T_OS_IMU(7); // Transformation between IMU and robot frame
   T_OS_IMU << 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0;
 
-  // we have to initialize the IMUIntegralHandler
+  // -- IMU integral handler construction
+
   IMUIntegralHandler hndl(f, "IMUintegral", round(imuRate / poseRate),
       1.0 / imuRate, ba_par, bw_par, T_OS_IMU);
+
+  // -- white noise on accelerometer and gyro
 
   Eigen::Matrix<double, 6, 6> & sensorNoises = hndl.getSensorNoises();
   sensorNoises.diagonal() << 0.0016, 0.0016, 0.0016, 1.15172e-05, 1.15172e-05, 1.15172e-05;
 
-  // GPS Sensor
+  // -- GPS Sensor
 
-  Eigen::VectorXd T_OS_GPS(7); // Transformation between Odometer and robot frame
-  T_OS_GPS << 0.0, leverArm, 0.0, 1.0, 0.0, 0.0, 0.0;
+  Eigen::VectorXd T_OS_GPS(7); // Transformation between GPS and robot frame
+  T_OS_GPS << 0.0, 0.25, 0.0, 1.0, 0.0, 0.0, 0.0;
 
-  f->addSensor("GPS", AbsolutePosition, false, true); // master sensor, sequential sensor
+  f->addSensor("GPS", AbsolutePosition, false, true); // non master sensor, sequential sensor
   f->setSensorFrame("GPS", T_OS_GPS);
 
   Eigen::MatrixXd GPSCov(3, 3);
-  GPSCov = pow(2.5 / 3.0, 2) * Eigen::MatrixXd::Identity(3, 3);
-  //GPSCov = pow(0.001 / 3.0, 2) * Eigen::MatrixXd::Identity(3, 3);
+  GPSCov = pow(2.5 / 3.0, 2) * Eigen::MatrixXd::Identity(3, 3); // standalone noise
+//  GPSCov = pow(0.05, 2) * Eigen::MatrixXd::Identity(3, 3); // carrier phase differential nosise
 
   /* ---------------------- Initialize ---------------------- */
 
@@ -190,18 +173,27 @@ int main(int argc, char *argv[]) {
   {
 #   include "../generated/Otto_x0.cppready"
   }
-  {
-#   include "../generated/Otto_x1.cppready"
-  }
 
   hndl.init(true, 0.0, x0);
 
-  f->addPriorOnTimeVaryingParameter(Euclidean3DPrior, "IMUintegralDeltaP_Ba_GM",
-      0, accBias0, accBiasGM0Cov);
+  // -- In case, priors can be set for initial values of the stochastic processes, e.g.
 
-  // put the prior in case of no lever arm
-  // f->addPriorOnTimeVaryingParameter(Euclidean3DPrior, "IMUintegralDeltaP_Bw",
-  //    0.0, gyroBias0, gyroBias0Cov);
+  /* on the accelerometer random walk process
+  f->addPriorOnTimeVaryingParameter(Euclidean3DPrior, "IMUintegralDeltaP_Ba",
+      f->getOldestPose()->getTimestamp(), accBias0,
+      1e-4 * Eigen::MatrixXd::Identity(3, 3));
+  //*/
+
+  // on the gyro gauss markov process
+  f->addPriorOnTimeVaryingParameter(Euclidean3DPrior, "IMUintegralDeltaP_Bw_GM",
+      f->getOldestPose()->getTimestamp(), gyroBias0_GM,
+      1e-6 * Eigen::MatrixXd::Identity(3, 3));
+  //*/
+
+  /* on the gyro random constant process
+  f->addPriorOnConstantParameter(Euclidean3DPrior, "IMUintegralDeltaP_Bw_RC",
+      gyroBias0_RC, 1.0 * Eigen::MatrixXd::Identity(3, 3));
+  //*/
 
   /* ---------------------- Main loop ---------------------- */
 
@@ -236,28 +228,12 @@ int main(int argc, char *argv[]) {
     // make an integration step
     if (hndl.step(za.data(), zw.data())) { // if we have finished:
 
-      if (cntImu == 0) {
-        PoseVertexWrapper_Ptr first = f->getNthOldestPose(0);
-        PoseVertexWrapper_Ptr second = f->getNthOldestPose(1);
-
-        first->setEstimate(x0);
-        first->setFixed(true);
-
-        second->setEstimate(x1);
-        second->setFixed(true);
-
-        cerr << "t0: " << first->getTimestamp() << " t1: "
-            << second->getTimestamp() << endl;
-
-      }
-
       if (cntImu % gpsDivisor == 0) {
 
         // add a GPS measurement
         Eigen::VectorXd zgps(3);
 
-        PoseVertexWrapper_Ptr x1 = f->getNearestPoseByTimestamp(
-            f->getNewestPose()->getTimestamp() - 1.0 / poseRate);
+        PoseVertexWrapper_Ptr x1 = f->getNewestPose();
 
         {
           double t = x1->getTimestamp(); // shadows global t
@@ -272,7 +248,7 @@ int main(int argc, char *argv[]) {
       // do the estimation
       cntImu++;
 
-      if (t > 1.0 && cntImu % ((int) gpsDivisor) == 0) { // after 5s of data, then each gps
+      if (t > 10.0 && cntImu % ((int) gpsDivisor) == 0) { // after 5s of data, then each gps
 
         keepOn = f->estimate(10);
 
