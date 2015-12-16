@@ -1,0 +1,11 @@
+tmp0 = q1(2);
+tmp1 = q1(1);
+tmp2 = w(1);
+tmp3 = q1(4);
+tmp4 = w(2);
+tmp5 = q1(3);
+tmp6 = w(3);
+q2(1) = tmp1 + (-(tmp0*tmp2) - tmp5*tmp4 - tmp3*tmp6)/2.;
+q2(2) = tmp0 + (tmp1*tmp2 + tmp3*tmp4 - tmp5*tmp6)/2.;
+q2(3) = tmp5 + (-(tmp3*tmp2) + tmp1*tmp4 + tmp0*tmp6)/2.;
+q2(4) = tmp3 + (tmp5*tmp2 - tmp0*tmp4 + tmp1*tmp6)/2.;

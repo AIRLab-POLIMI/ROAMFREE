@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[      8048,        238]
-NotebookOptionsPosition[      7224,        207]
-NotebookOutlinePosition[      7580,        223]
-CellTagsIndexPosition[      7537,        220]
+NotebookDataLength[      9348,        269]
+NotebookOptionsPosition[      8555,        240]
+NotebookOutlinePosition[      8911,        256]
+CellTagsIndexPosition[      8868,        253]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -117,8 +117,6 @@ Cell["Stuff", "Subtitle",
   3.572951250149337*^9, 3.572951255936389*^9}, {3.63280859888146*^9, 
   3.632808599479208*^9}}],
 
-Cell[CellGroupData[{
-
 Cell[BoxData[{
  RowBox[{
   RowBox[{"Q1", "=", 
@@ -137,28 +135,36 @@ Cell[BoxData[{
      RowBox[{"q2", "[", "3", "]"}], ",", 
      RowBox[{"q2", "[", "4", "]"}]}], "}"}]}], ";"}], "\[IndentingNewLine]", 
  RowBox[{
-  RowBox[{"wleft", "=", 
-   RowBox[{"QuatBoxMinusLeft", "[", 
-    RowBox[{"Q1", ",", "Q2"}], "]"}]}], ";"}], "\[IndentingNewLine]", GridBox[{
-   {
+  RowBox[{"W", "=", 
+   RowBox[{"{", 
     RowBox[{
-     RowBox[{"wright", "=", 
-      RowBox[{"QuatBoxMinusRight", "[", 
-       RowBox[{"Q1", ",", "Q2"}], "]"}]}], ";"}]},
-   {"\[Placeholder]"}
-  }]}], "Input",
- CellChangeTimes->{{3.653465600788995*^9, 3.6534656470700617`*^9}, {
-  3.65346571591733*^9, 3.653465724198748*^9}, {3.6534658826565437`*^9, 
-  3.653465885233477*^9}, {3.6534673121515512`*^9, 3.653467354210594*^9}, {
-  3.653467794328693*^9, 3.6534677952805977`*^9}}],
-
-Cell[BoxData[
- RowBox[{"{", 
+     RowBox[{"w", "[", "1", "]"}], ",", 
+     RowBox[{"w", "[", "2", "]"}], ",", 
+     RowBox[{"w", "[", "3", "]"}]}], "}"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"wlefthat", "=", 
+   RowBox[{"QuatBoxMinusLeft", "[", 
+    RowBox[{"Q1", ",", "Q2"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
   RowBox[{
-   RowBox[{"{", "Null", "}"}], ",", 
-   RowBox[{"{", "\[Placeholder]", "}"}]}], "}"}]], "Output",
- CellChangeTimes->{3.6534678222852383`*^9}]
-}, Open  ]],
+   RowBox[{"wrighthat", "=", 
+    RowBox[{"QuatBoxMinusRight", "[", 
+     RowBox[{"Q1", ",", "Q2"}], "]"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Q2righthat", "=", 
+   RowBox[{"QuatBoxPlusRight", "[", 
+    RowBox[{"Q1", ",", "W"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Q2lefthat", "=", 
+   RowBox[{"QuatBoxPlusLeft", "[", 
+    RowBox[{"Q1", ",", "W"}], "]"}]}], ";"}]}], "Input",
+ CellChangeTimes->{{3.653465600788995*^9, 3.6534656470700617`*^9}, {
+   3.65346571591733*^9, 3.653465724198748*^9}, {3.6534658826565437`*^9, 
+   3.653465885233477*^9}, {3.6534673121515512`*^9, 3.653467354210594*^9}, {
+   3.653467794328693*^9, 3.6534677952805977`*^9}, {3.655458312049263*^9, 
+   3.655458382407201*^9}, 3.6554584264513397`*^9, {3.655458525520294*^9, 
+   3.655458528102713*^9}}],
 
 Cell["Output", "Subtitle",
  InitializationCell->True,
@@ -175,18 +181,31 @@ Cell[BoxData[{
  RowBox[{
   RowBox[{"MyStringWrite", "[", 
    RowBox[{
-    RowBox[{"ToGoodC", "[", "wleft", "]"}], ",", 
+    RowBox[{"ToGoodC", "[", "wlefthat", "]"}], ",", 
     "\"\<quatboxminusleftraw.mthout\>\""}], "]"}], 
   ";"}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{"MyStringWrite", "[", 
    RowBox[{
-    RowBox[{"ToGoodC", "[", "wright", "]"}], ",", 
-    "\"\<quatboxminusrightraw.mthout\>\""}], "]"}], ";"}]}], "Input",
+    RowBox[{"ToGoodC", "[", "wrighthat", "]"}], ",", 
+    "\"\<quatboxminusrightraw.mthout\>\""}], "]"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"MyStringWrite", "[", 
+   RowBox[{
+    RowBox[{"ToGoodC", "[", "Q2righthat", "]"}], ",", 
+    "\"\<quatboxplusrightraw.mthout\>\""}], "]"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"MyStringWrite", "[", 
+   RowBox[{
+    RowBox[{"ToGoodC", "[", "Q2lefthat", "]"}], ",", 
+    "\"\<quatboxplusleftraw.mthout\>\""}], "]"}], ";"}]}], "Input",
  CellChangeTimes->{{3.653465694577174*^9, 3.653465707700138*^9}, {
   3.65346589454697*^9, 3.653465908121687*^9}, {3.653465959624598*^9, 
   3.653465995125039*^9}, {3.653466030275868*^9, 3.653466037331389*^9}, {
-  3.6534678033494387`*^9, 3.653467805106063*^9}}],
+  3.6534678033494387`*^9, 3.653467805106063*^9}, {3.6554583534076843`*^9, 
+  3.655458407086668*^9}}],
 
 Cell[BoxData[{
  RowBox[{
@@ -200,6 +219,20 @@ quatboxminusleftraw.mthout w 1 1\>\"", "]"}], ";"}], "\[IndentingNewLine]",
    "\"\<python ../../Mathematica/fixMathematicaOutput_v2.py \
 quatboxminusrightraw.mthout w 1 1\>\"", "]"}], ";"}]}], "Input",
  CellChangeTimes->{{3.653467809600728*^9, 3.653467812273484*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+  "Run", "[", 
+   "\"\<python ../../Mathematica/fixMathematicaOutput_v2.py \
+quatboxplusrightraw.mthout q2 1 1\>\"", "]"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+  "Run", "[", 
+   "\"\<python ../../Mathematica/fixMathematicaOutput_v2.py \
+quatboxplusleftraw.mthout q2 1 1\>\"", "]"}], ";"}]}], "Input",
+ CellChangeTimes->{{3.6554584139792547`*^9, 3.655458415940387*^9}, {
+  3.655458536538617*^9, 3.655458538102025*^9}}],
 
 Cell[BoxData[
  RowBox[{
@@ -230,16 +263,14 @@ Cell[1658, 47, 2431, 64, 300, "Input",
  InitializationCell->True],
 Cell[4092, 113, 215, 4, 89, "Subtitle",
  InitializationCell->True],
-Cell[CellGroupData[{
-Cell[4332, 121, 1142, 31, 189, "Input"],
-Cell[5477, 154, 181, 5, 79, "Output"]
-}, Open  ]],
-Cell[5673, 162, 262, 4, 89, "Subtitle",
+Cell[4310, 119, 1774, 47, 300, "Input"],
+Cell[6087, 168, 262, 4, 89, "Subtitle",
  InitializationCell->True],
-Cell[5938, 168, 123, 3, 54, "Input"],
-Cell[6064, 173, 640, 15, 90, "Input"],
-Cell[6707, 190, 418, 11, 90, "Input"],
-Cell[7128, 203, 92, 2, 87, "Input"]
+Cell[6352, 174, 123, 3, 54, "Input"],
+Cell[6478, 179, 1085, 28, 160, "Input"],
+Cell[7566, 209, 418, 11, 90, "Input"],
+Cell[7987, 222, 469, 12, 90, "Input"],
+Cell[8459, 236, 92, 2, 87, "Input"]
 }
 ]
 *)
