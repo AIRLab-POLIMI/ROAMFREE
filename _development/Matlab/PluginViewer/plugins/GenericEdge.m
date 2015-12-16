@@ -10,7 +10,7 @@ if exist(edgef, 'file')
         
         %% 
         if ~isfield(pluginConfig, 'errorOnly')
-            pluginConfig.errorOnly = false
+            pluginConfig.errorOnly = false;
         end
         
         edge = sortByT(edge);        

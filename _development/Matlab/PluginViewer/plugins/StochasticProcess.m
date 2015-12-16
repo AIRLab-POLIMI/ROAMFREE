@@ -57,15 +57,17 @@ for i=1:length(toPlotRaw)
     end
 end
 
-if findstr(pluginConfig.parameterName, 'Bw')
-    y = y /pi*180.0*3600;
-elseif findstr(pluginConfig.parameterName, 'Ba')
-    y = y /9.8*1e6;
-end
-
 % plot
 subplot('Position', squeezeArea(area,0.02))   
 hold on
+
+if findstr(pluginConfig.parameterName, 'Bw')
+    y = y /pi*180.0*3600;
+    ylabel('deg/h');
+elseif findstr(pluginConfig.parameterName, 'Ba')
+    y = y /9.8*1e6;
+    ylabel('ug');
+end
 
 CO = get(gcf,'DefaultAxesColorOrder');
 
