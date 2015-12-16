@@ -22,11 +22,18 @@ if exist(edgef, 'file')
             subplot('Position', squeezeArea(area,0.02))
         end
 
-        plot(edge(:,1) - edge(1,1),edge(:,(23+pluginConfig.measureSize):(23+pluginConfig.measureSize+pluginConfig.errorSize-1)))
-
-        title([pluginConfig.sensorName ' residual']);
+        err = edge(:,(23+pluginConfig.measureSize):(23+pluginConfig.measureSize+pluginConfig.errorSize-1));
+                
+        plot(edge(:,1) - edge(1,1),err);
         
-        axis tight
+        yl = max(std(err));
+        
+        title([pluginConfig.sensorName ' residual']);        
+        
+        xlim([0, edge(end,1)-edge(1,1)])
+        ylim([-3*yl 3*yl]);        
+        
+        %axis tight
 
         %% plot measure
         if (pluginConfig.measureSize > 0 && ~pluginConfig.errorOnly)         
