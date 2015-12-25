@@ -22,6 +22,8 @@
 
 #include <algorithm>
 
+#include <iostream>
+
 using namespace ROAMestimation;
 
 namespace ROAMimu {
