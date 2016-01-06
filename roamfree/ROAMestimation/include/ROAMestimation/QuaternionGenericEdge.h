@@ -6,7 +6,7 @@ which accompanies this distribution, and is available at
 https://www.gnu.org/licenses/lgpl.html
 
 Contributors:
-    Davide A. Cucci (davide.cucci@epfl.ch)    
+    Davide A. Cucci (davide.cucci@epfl.ch)
 */
 
 /*
@@ -137,13 +137,15 @@ public:
 	void collect(GenericVertex<ROAMfunctions::SE3V> *xtm2,
 			GenericVertex<ROAMfunctions::SE3V> *xtm1,
 			GenericVertex<ROAMfunctions::SE3V> *xt, double tstamp,
-			GenericVertex<ROAMfunctions::Eucl1DV> *dt1,
-			GenericVertex<ROAMfunctions::Eucl1DV> *dt2, const std::string &name,
+			double dt1, double dt2, const std::string &name,
 			std::map<std::string, boost::shared_ptr<ParameterVerticesManager> > &params) {
 
 		// --- set name and timestamp
 		_name = name;
 		_tstamp = tstamp;
+
+		_Dt12 = dt2;
+		_Dt01 = dt1;
 
 		// required vertices: x(t-1), x(t), x(t+1), dt1, dt2, s(O)[0], s(O)[1], s(O)[2], qOS[0], qOS[1], qOS[2]
 		// here the displacement and misalignment parameters are divided in their components so that
@@ -191,22 +193,21 @@ public:
 		}
 
 		// resize this edge so that it can hold the parameter vertices
-		resize(2 * MT::_ORDER + 1 + vertexCount);
+		resize(MT::_ORDER + 1 + vertexCount);
 
 		// --- add the parameter vertices at the proper positions in the _vertices vector
 
-		if (MT::_ORDER == 2) {
-			_vertices[3] = dt1;
-			_vertices[4] = xtm2;
-		}
-		if (MT::_ORDER > 0) {
-			_vertices[1] = dt2;
-			_vertices[2] = xtm1;
-		}
-
 		_vertices[0] = xt;
 
-		int freeVertexPosition = 2 * MT::_ORDER + 1;
+    if (MT::_ORDER > 0) {
+      _vertices[1] = xtm1;
+    }
+
+		if (MT::_ORDER == 2) {
+			_vertices[2] = xtm2;
+		}
+
+		int freeVertexPosition = MT::_ORDER + 1;
 
 		for (std::vector<ParameterTemporaries>::const_iterator it = _params.begin();
 				it != _params.end(); ++it) {
@@ -277,19 +278,16 @@ public:
 			case 1:
 			{
 				const Eigen::VectorXd &x2 = static_cast<GenericVertex<ROAMfunctions::SE3V> *>(_vertices[0])->estimate();
-				const Eigen::VectorXd &x1 = static_cast<GenericVertex<ROAMfunctions::SE3V> *>(_vertices[2])->estimate();
-				const double &Dt12 = static_cast<GenericVertex<ROAMfunctions::Eucl1DV> *>(_vertices[1])->estimate()(0);
-				augmentedState.calculate(x1, x2, Dt12);
+				const Eigen::VectorXd &x1 = static_cast<GenericVertex<ROAMfunctions::SE3V> *>(_vertices[1])->estimate();
+				augmentedState.calculate(x1, x2, _Dt12);
 				break;
 			}
 			case 2:
 			{
 				const Eigen::VectorXd &x2 = static_cast<GenericVertex<ROAMfunctions::SE3V> *>(_vertices[0])->estimate();
-				const Eigen::VectorXd &x1 = static_cast<GenericVertex<ROAMfunctions::SE3V> *>(_vertices[2])->estimate();
-				const Eigen::VectorXd &x0 = static_cast<GenericVertex<ROAMfunctions::SE3V> *>(_vertices[4])->estimate();
-				const double &Dt12 = static_cast<GenericVertex<ROAMfunctions::Eucl1DV> *>(_vertices[1])->estimate()(0);
-				const double &Dt01 = static_cast<GenericVertex<ROAMfunctions::Eucl1DV> *>(_vertices[3])->estimate()(0);
-				augmentedState.calculate(x0, x1, x2, Dt01, Dt12);
+				const Eigen::VectorXd &x1 = static_cast<GenericVertex<ROAMfunctions::SE3V> *>(_vertices[1])->estimate();
+				const Eigen::VectorXd &x0 = static_cast<GenericVertex<ROAMfunctions::SE3V> *>(_vertices[2])->estimate();
+				augmentedState.calculate(x0, x1, x2, _Dt01, _Dt12);
 				break;
 			}
 		}
@@ -351,10 +349,10 @@ public:
 		// now we have to evaluate sum_i( J_err/augState_i * J_augState_i/vertex_j ) for each j not fixed
 		// which contributes to the augmented state computation
 
-		// for vertices 0-(2*MT::_ORDER+1 + 6) (the ones from which we compute the augmented state) compute their jacobian
+		// for vertices 0-(MT::_ORDER+1 + 6) (the ones from which we compute the augmented state) compute their jacobian
 		// remember that we assume that S(O) and qOS are time-invariant parameters
 
-		for (int v = 0; v < 2 * MT::_ORDER + 1 + 6; v++) {
+		for (int v = 0; v < MT::_ORDER + 1 + 6; v++) {
 
 			g2o::OptimizableGraph::Vertex *ov =
 			static_cast<g2o::OptimizableGraph::Vertex *>(_vertices[v]);
@@ -412,7 +410,7 @@ public:
 
 		// here we come to the non default parameters of the function
 
-		int cur_vertex = 2 * MT::_ORDER + 1 + 6;
+		int cur_vertex = MT::_ORDER + 1 + 6;
 
 		for (int k = 6; k < _params.size(); k++) {
 			for (int h = 0; h < _params[k].p->getWindowSize(); h++, cur_vertex++) {
@@ -513,15 +511,11 @@ public:
 		// call the predict method
 
 		const Eigen::VectorXd &x1 =
-		static_cast<GenericVertex<ROAMfunctions::SE3V> *>(_vertices[2])->estimate();
+		static_cast<GenericVertex<ROAMfunctions::SE3V> *>(_vertices[1])->estimate();
 		Eigen::VectorXd &x2 =
 		static_cast<GenericVertex<ROAMfunctions::SE3V> *>(_vertices[0])->estimate();
 
-		const double &Dt12 =
-		static_cast<GenericVertex<ROAMfunctions::Eucl1DV> *>(_vertices[1])->estimate()(
-				0);
-
-		assert(_F.predict(x1, _paramsPtrs, _measurement, Dt12, x2));
+		assert(_F.predict(x1, _paramsPtrs, _measurement, _Dt12, x2));
 	}
 
 	inline
@@ -541,7 +535,7 @@ public:
 	 * a lot of files are empty or near empty
 	 *
 	 * @param y is the row [x,q,v,omega,a,alpha,dispx,dispq,imuintdp,imuintdq], y in 0-9
-	 * @param x is the col, i.e. the vertex, [x(t), dt12, x(t-1), dt01, x(t-2), SOx, SOy, SOz, qOSx, qOSy, qOSz]
+	 * @param x is the col, i.e. the vertex, [x(t), _Dt12, x(t-1), _Dt01, x(t-2), SOx, SOy, SOz, qOSx, qOSy, qOSz]
 	 *          note that depending on the MT::_ORDER of the edge, older poses and dt may be missing.
 	 */
 
@@ -561,19 +555,16 @@ public:
 			case 1:
 			{
 				const Eigen::VectorXd &x2 = static_cast<GenericVertex<ROAMfunctions::SE3V> *>(_vertices[0])->estimate();
-				const Eigen::VectorXd &x1 = static_cast<GenericVertex<ROAMfunctions::SE3V> *>(_vertices[2])->estimate();
-				const double &Dt12 = static_cast<GenericVertex<ROAMfunctions::Eucl1DV> *>(_vertices[1])->estimate()(0);
-				calculated = jacobianBlock.calculate(x1, x2, Dt12);
+				const Eigen::VectorXd &x1 = static_cast<GenericVertex<ROAMfunctions::SE3V> *>(_vertices[1])->estimate();
+				calculated = jacobianBlock.calculate(x1, x2, _Dt12);
 				break;
 			}
 			case 2:
 			{
 				const Eigen::VectorXd &x2 = static_cast<GenericVertex<ROAMfunctions::SE3V> *>(_vertices[0])->estimate();
-				const Eigen::VectorXd &x1 = static_cast<GenericVertex<ROAMfunctions::SE3V> *>(_vertices[2])->estimate();
-				const Eigen::VectorXd &x0 = static_cast<GenericVertex<ROAMfunctions::SE3V> *>(_vertices[4])->estimate();
-				const double &Dt12 = static_cast<GenericVertex<ROAMfunctions::Eucl1DV> *>(_vertices[1])->estimate()(0);
-				const double &Dt01 = static_cast<GenericVertex<ROAMfunctions::Eucl1DV> *>(_vertices[3])->estimate()(0);
-				calculated = jacobianBlock.calculate(x0, x1, x2, Dt01, Dt12);
+				const Eigen::VectorXd &x1 = static_cast<GenericVertex<ROAMfunctions::SE3V> *>(_vertices[1])->estimate();
+				const Eigen::VectorXd &x0 = static_cast<GenericVertex<ROAMfunctions::SE3V> *>(_vertices[2])->estimate();
+				calculated = jacobianBlock.calculate(x0, x1, x2, _Dt01, _Dt12);
 				break;
 			}
 		}
@@ -598,12 +589,12 @@ public:
 		s << _name << "{" << _frameCounter << "}[" << ROAMutils::StringUtils::writeNiceTimestamp(_tstamp) << "](" << x0->id();
 
 		if (MT::_ORDER > 0) {
-			x1 = static_cast<g2o::OptimizableGraph::Vertex *>(_vertices[2]);
+			x1 = static_cast<g2o::OptimizableGraph::Vertex *>(_vertices[1]);
 			s << "," << x1->id();
 		}
 
 		if (MT::_ORDER > 1) {
-			x2 = static_cast<g2o::OptimizableGraph::Vertex *>(_vertices[4]);
+			x2 = static_cast<g2o::OptimizableGraph::Vertex *>(_vertices[2]);
 			s << "," << x2->id();
 		}
 

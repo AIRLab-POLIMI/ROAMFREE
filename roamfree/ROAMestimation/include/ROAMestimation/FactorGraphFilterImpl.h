@@ -244,8 +244,6 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
     /* --------------------------- STUFF FOR POSES AND MEASUREMENTS ------------------- */
 
     // these are some internal methods which do not return wrappers
-    GenericVertex<Eucl1DV> * addDt(const GenericVertex<SE3V> *v1,
-        const GenericVertex<SE3V> *v2); //!< adds a dt vertex such that dt = v1.timestamp() - v2.timestamp()
 
     PoseVertex *addPose_i(double t);
 

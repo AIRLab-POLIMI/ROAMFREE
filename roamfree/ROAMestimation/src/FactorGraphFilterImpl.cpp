@@ -894,43 +894,6 @@ bool FactorGraphFilter_Impl::marginalizeNodes_i(
 
   _optimizer->addEdge(edge);
 
-// 4 - search the falling edges for the dt vertices and remove them
-
-  for (set<g2o::HyperGraph::Edge *>::iterator it = fallingEdges.begin();
-      it != fallingEdges.end(); ++it) {
-
-    // only GenericEdges may have dt vertices
-    GenericEdgeInterface *ge = dynamic_cast<GenericEdgeInterface *>(*it);
-    if (ge != NULL && ge->getOrder() >= 0) { // it returns -1 for edges for which order is not meaningful and thus no dt
-
-      if (ge->getOrder() >= 1) {
-        DtVertex *dt12 = NULL;
-
-#				ifdef DEBUG_BUILD
-        dt12 = dynamic_cast<DtVertex *>( (*it)->vertices()[1] );
-        assert(dt12 != NULL);
-#				else
-        dt12 = static_cast<DtVertex *>((*it)->vertices()[1]);
-#				endif
-
-        _optimizer->removeVertex(dt12);
-      }
-
-      if (ge->getOrder() == 2) {
-        DtVertex *dt01 = NULL;
-
-#				ifdef DEBUG_BUILD
-        dt01 = dynamic_cast<DtVertex *>( (*it)->vertices()[3] );
-        assert(dt01 != NULL);
-#				else
-        dt01 = static_cast<DtVertex *>((*it)->vertices()[3]);
-#				endif
-
-        _optimizer->removeVertex(dt01);
-      }
-    }
-  }
-
 // 5 - search falling nodes in sensor descriptors
 
   for (auto s_it = _sensors.begin(); s_it != _sensors.end(); ++s_it) {
@@ -1003,43 +966,6 @@ bool FactorGraphFilter_Impl::forgetNodes_i(
 
   GenericLinearConstraintFactory::getMarkovBlanket(nodeSet, markovBlanket,
       fallingEdges);
-
-// 2 - search the falling edges for the dt vertices and remove them
-
-  for (set<g2o::HyperGraph::Edge *>::iterator it = fallingEdges.begin();
-      it != fallingEdges.end(); ++it) {
-
-    // only GenericEdges may have dt vertices
-    GenericEdgeInterface *ge = dynamic_cast<GenericEdgeInterface *>(*it);
-    if (ge != NULL && ge->getOrder() >= 0) { // it returns -1 for edges for which order is not meaningful and thus no dt
-
-      if (ge->getOrder() >= 1) {
-        DtVertex *dt12 = NULL;
-
-#				ifdef DEBUG_BUILD
-        dt12 = dynamic_cast<DtVertex *>( (*it)->vertices()[1] );
-        assert(dt12 != NULL);
-#				else
-        dt12 = static_cast<DtVertex *>((*it)->vertices()[1]);
-#				endif
-
-        _optimizer->removeVertex(dt12);
-      }
-
-      if (ge->getOrder() == 2) {
-        DtVertex *dt01 = NULL;
-
-#				ifdef DEBUG_BUILD
-        dt01 = dynamic_cast<DtVertex *>( (*it)->vertices()[3] );
-        assert(dt01 != NULL);
-#				else
-        dt01 = static_cast<DtVertex *>((*it)->vertices()[3]);
-#				endif
-
-        _optimizer->removeVertex(dt01);
-      }
-    }
-  }
 
 // 3 - search falling nodes in sensor descriptors
 
@@ -1315,15 +1241,14 @@ GenericEdgeInterface *FactorGraphFilter_Impl::addMeasurement_i(
   }
 # endif
 
-// add dt vertices (the needed ones)
-  DtVertex *dt12 = NULL;
-  if (sensor.order > 0) {
-    dt12 = addDt(v2, v1);
+  double dt01 = 0, dt12 = 0;
+
+  if (sensor.order > 1) {
+    dt12 = v2->getTimestamp() - v1->getTimestamp();
   }
 
-  DtVertex *dt01 = NULL;
-  if (sensor.order > 1) {
-    dt01 = addDt(v1, v0);
+  if (sensor.order == 2) {
+    dt01 = v1->getTimestamp() - v0->getTimestamp();
   }
 
 // call the collect method, which substantially loads the vertices into the edge
@@ -1504,29 +1429,6 @@ PoseVertex *FactorGraphFilter_Impl::getNthOldestPose_i(int n) {
   }
 
   return pose;
-}
-
-GenericVertex<Eucl1DV>* FactorGraphFilter_Impl::addDt(const PoseVertex *v1,
-    const PoseVertex *v2) {
-  GenericVertex<Eucl1DV> *dt_v = new GenericVertex<Eucl1DV>;
-
-// initialize the dt vertex
-  dt_v->estimate()(0) = v1->getTimestamp() - v2->getTimestamp();
-  dt_v->setFixed(true);
-  dt_v->setCategory("Poses_dt");
-
-  dt_v->setTimestamp(v1->getTimestamp());
-
-  _optimizer->addVertex(dt_v);
-
-# ifdef DEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES
-  cerr << "[FactorGraphFilter] Info: adding dt vertex between " << v2->id()
-  << " and " << v1->id() << ", Delta: "
-  << ROAMutils::StringUtils::writeNiceTimestamp(dt_v->estimate()(0))
-  << " with id=" << dt_v->id() << endl;
-# endif
-
-  return dt_v;
 }
 
 bool FactorGraphFilter_Impl::estimate(int nIterations) {
