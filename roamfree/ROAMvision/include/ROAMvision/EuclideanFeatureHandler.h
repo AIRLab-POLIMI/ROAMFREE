@@ -1,13 +1,13 @@
 /*
-Copyright (c) 2013-2016 Politecnico di Milano.
-All rights reserved. This program and the accompanying materials
-are made available under the terms of the GNU Lesser Public License v3
-which accompanies this distribution, and is available at
-https://www.gnu.org/licenses/lgpl.html
+ Copyright (c) 2013-2016 Politecnico di Milano.
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the GNU Lesser Public License v3
+ which accompanies this distribution, and is available at
+ https://www.gnu.org/licenses/lgpl.html
 
-Contributors:
-    Davide A. Cucci (davide.cucci@epfl.ch)    
-*/
+ Contributors:
+ Davide A. Cucci (davide.cucci@epfl.ch)
+ */
 
 /*
  * EuclideanFeatureHandler.h
@@ -20,6 +20,9 @@ Contributors:
 #define EUCLIDEANFEATUREHANDLER_H_
 
 #include <map>
+#include <vector>
+
+#include <opencv/cv.h>
 
 #include "ImageFeatureHandler.h"
 
@@ -29,40 +32,53 @@ namespace ROAMvision {
 
 class EuclideanFeatureHandler: public ImageFeatureHandler {
 
-public:
-	EuclideanFeatureHandler();
+  public:
+    EuclideanFeatureHandler();
 
-	virtual bool init(ROAMestimation::FactorGraphFilter* f,
-			const std::string &name, const Eigen::VectorXd & T_OS,
-			const Eigen::VectorXd & K);
-	virtual bool addFeatureObservation(long int id, double t,
-			const Eigen::VectorXd &z, const Eigen::MatrixXd &cov);
+    virtual bool init(ROAMestimation::FactorGraphFilter* f,
+        const std::string &name, const Eigen::VectorXd & T_OS,
+        const Eigen::VectorXd & K);
+    virtual bool addFeatureObservation(long int id, double t,
+        const Eigen::VectorXd &z, const Eigen::MatrixXd &cov);
 
-	virtual bool getFeaturePositionInWorldFrame(long int id,
-				Eigen::VectorXd &lw) const;
-	virtual bool getFeaturesIds(std::vector<long int> &to) const;
-	virtual long int getNActiveFeatures() const;
+    virtual bool getFeaturePositionInWorldFrame(long int id,
+        Eigen::VectorXd &lw) const;
+    virtual bool getFeaturesIds(std::vector<long int> &to) const;
+    virtual long int getNActiveFeatures() const;
 
-	virtual void setTimestampOffsetTreshold(double dt);
+    virtual void setTimestampOffsetTreshold(double dt);
 
-	virtual void fixOlderPosesWRTVisibleFeatures();
+    virtual void fixOlderPosesWRTVisibleFeatures();
 
-protected:
+  protected:
 
-	std::string getFeatureSensor(long int id) const;
+    std::string getFeatureSensor(long int id) const;
 
-	inline const ObservationDescriptor &getNewestObservation(long int id) const {
-		assert(_features.count(id) == 1);
+    inline const ObservationDescriptor &getNewestObservation(
+        long int id) const {
+      assert(_features.count(id) == 1);
 
-		return _features.find(id)->second.zHistory.rbegin()->second;
-	}
+      return _features.find(id)->second.zHistory.rbegin()->second;
+    }
 
-	typedef std::map<long int, EuclideanTrackDescriptor> FeatureMap;
+    typedef std::map<long int, EuclideanTrackDescriptor> FeatureMap;
 
-	double _initialDepth;
+    FeatureMap _features;
 
-	FeatureMap _features;
+    // methods for track initialization
+    // TODO: these are based on opencv, this dependency should be dropped
+    bool initialize(const EuclideanTrackDescriptor &track,
+        const Eigen::VectorXd &K, Eigen::VectorXd &Lw);
+    int GaussNewton(const std::vector<cv::Mat> &cameras,
+        const std::vector<cv::Point2f> &points, cv::Point3d init3Dpoint,
+        cv::Point3d &optimizedPoint);
+    int point2D3DJacobian(const std::vector<cv::Mat> &cameras,
+        const cv::Mat &cur3Dpoint, cv::Mat &J, cv::Mat &hessian);
 
+    void buildProjectionMatrix(const Eigen::VectorXd &T_WS, const cv::Mat &K,
+        cv::Mat &projMat);
+
+    ROAMestimation::ParameterWrapper_Ptr K_par;
 };
 
 } /* namespace ROAMvision */

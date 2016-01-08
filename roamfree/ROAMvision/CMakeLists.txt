@@ -6,6 +6,10 @@ add_library(ROAMvision SHARED
 	${sources}
 )
 
+target_link_libraries(ROAMvision
+    ${OpenCV_LIBS}
+)
+
 if(catkin_FOUND)
 # Install libraries
 install(TARGETS ROAMvision 
