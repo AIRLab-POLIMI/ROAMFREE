@@ -54,9 +54,9 @@ int main(int argc, char *argv[]) {
   double ba_dy = 0.0;
   double ba_dz = 0.0;
 
-  double ba_fx = 0.05; // frequency of the sinusoidal bias on the accelerometer
-  double ba_fy = 0.025;
-  double ba_fz = 0.0125;
+  double ba_fx = 0.00; // frequency of the sinusoidal bias on the accelerometer
+  double ba_fy = 0.000;
+  double ba_fz = 0.0000;
 
   double ba_Ax = 0.000; // amplitude of the sinusoidal bias on the accelerometer
   double ba_Ay = 0.0000;
@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
 
   /* ---------------------- Configure sensors ---------------------- */
 
-  bool isbafixed = true, isbwfixed = true;
+  bool isbafixed = false, isbwfixed = true;
 
   // Accelerometer sensor
   Eigen::VectorXd R_OS_ACC(7); // Transformation between Accelerometer and robot frame
@@ -166,11 +166,19 @@ int main(int argc, char *argv[]) {
 
   Eigen::VectorXd x0(7), x1(7);
 
+
+  // compute the ground truth for the first two poses
   {
-#   include "../generated/Otto_x0.cppready"
+    Eigen::VectorXd &x = x0;
+    double t = 0.0;
+
+#   include "../generated/Otto_GT.cppready"
   }
   {
-#   include "../generated/Otto_x1.cppready"
+    Eigen::VectorXd &x = x1;
+    double t = 1 / imuRate;
+
+#   include "../generated/Otto_GT.cppready"
   }
 
   double t = 0.0;
@@ -251,7 +259,7 @@ int main(int argc, char *argv[]) {
 #       include "../generated/Otto_gps.cppready"
       }
 
-//      f->addSequentialMeasurement("GPS", t, zgps, GPSCov);
+      f->addSequentialMeasurement("GPS", t, zgps, GPSCov);
 
       cntGps++;
     }
@@ -262,7 +270,7 @@ int main(int argc, char *argv[]) {
 
     // do the estimation
 
-    if (t > 1 && cntImu % ( (int) imuRate) == 0) { // after 1s of data, then each time
+    if (t > 0.25 && cntImu % ( (int) imuRate) == 0) { // after 1s of data, then each time
       keepOn = f->estimate(10);
 
       if (!keepOn) {
