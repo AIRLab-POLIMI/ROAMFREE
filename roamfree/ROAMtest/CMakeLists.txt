@@ -18,3 +18,13 @@ add_executable(IMUHandlerFusionTest
 target_link_libraries(IMUHandlerFusionTest
     ROAMestimation ROAMimu 
 )
+
+# ----------- CameraIMUTest
+
+add_executable(CameraIMUTest
+    src/CameraIMUTest.cpp
+)
+
+target_link_libraries(CameraIMUTest
+    ROAMestimation ROAMimu ROAMvision
+)
