@@ -13,7 +13,7 @@ config.global.logPath = '/tmp/roamfree/';
 config.global.plugins = {'Trajectory', 'GenericEdge', 'GenericEdge', 'GenericEdge', 'LinearlyInterpolatedEuclideanParameter', 'LinearlyInterpolatedEuclideanParameter'};
 
 config.pluginConfig{1}.axesLenght = 0.5;
-config.pluginConfig{end}.sensorName = 'GPS'; %display also measures from an AbsolutePosition sensor
+config.pluginConfig{end}.absolutePositionSensor = 'GPS'; %display also measures from an AbsolutePosition sensor
 
 config.pluginConfig{end+1}.sensorName = 'GPS';
 config.pluginConfig{end}.errorSize = 3;
