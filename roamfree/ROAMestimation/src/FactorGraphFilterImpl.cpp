@@ -1243,7 +1243,7 @@ GenericEdgeInterface *FactorGraphFilter_Impl::addMeasurement_i(
 
   double dt01 = 0, dt12 = 0;
 
-  if (sensor.order > 1) {
+  if (sensor.order >= 1) {
     dt12 = v2->getTimestamp() - v1->getTimestamp();
   }
 
