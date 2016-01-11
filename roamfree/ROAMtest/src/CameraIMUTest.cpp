@@ -67,8 +67,8 @@ int main(int argc, char *argv[]) {
   f->setDeadReckoning(false); // first pose is fixed
   f->setSolverMethod(GaussNewton);
 
-  system("mkdir /tmp/roamfree");
-  system("rm /tmp/roamfree/*");
+  int ret = system("mkdir /tmp/roamfree");
+  ret = system("rm /tmp/roamfree/*");
 
   f->setLowLevelLogging(true); // default log folder
 
@@ -245,8 +245,8 @@ int main(int argc, char *argv[]) {
         if (zcam(0) >= 0.0 && zcam(0) <= im_width && zcam(1) >= 0
             && zcam(1) < im_height) {
           if (testz(0) >= 0) {
-//            camera.addFeatureObservation(n, curx_ptr->getTimestamp(), zcam,
-//                CAMCov);
+            camera.addFeatureObservation(n, curx_ptr->getTimestamp(), zcam,
+                CAMCov);
           }
         }
       }
