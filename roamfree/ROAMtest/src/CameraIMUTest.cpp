@@ -151,7 +151,7 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  Eigen::MatrixXd CAMCov = Eigen::MatrixXd::Identity(2, 2);
+  Eigen::MatrixXd CAMCov = 1e-4*Eigen::MatrixXd::Identity(2, 2);
 
   /* ---------------------- Initialize ---------------------- */
 
@@ -257,6 +257,21 @@ int main(int argc, char *argv[]) {
       if (t > 10.0 && cntImu % ((int) gpsDivisor) == 0) { // after 5s of data, then each gps
 
         f->getOldestPose()->setFixed(true);
+
+        /* initialize second pose with ground truth
+        {
+          PoseVertexWrapper_Ptr x_ptr = f->getNthOldestPose(1);
+
+          double t = x_ptr->getTimestamp();
+          Eigen::VectorXd x(7);
+
+#         include "../generated/Otto_GT.cppready"
+
+          x_ptr->setEstimate(x);
+          x_ptr->setFixed(true);
+        }
+        //*/
+
         keepOn = f->estimate(10);
 
         if (!keepOn) {
