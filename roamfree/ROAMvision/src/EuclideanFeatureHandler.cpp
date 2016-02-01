@@ -89,49 +89,52 @@ bool EuclideanFeatureHandler::addFeatureObservation(long int id, double t,
     // TODO: if initialization is succesful
     Eigen::VectorXd Lw(3);
 
-    if (d.zHistory.size() > 5 && initialize(d, K_par->getEstimate(), Lw)) {
+    if (d.zHistory.size() > 4) {
 
-      _filter->addSensor(sensor, ImagePlaneProjection, false, true);
+      if (initialize(d, K_par->getEstimate(), Lw)) {
 
-      // it does not work, there is no sensor called _sensorName + "_Cam"
-      // we have to share manually the parameters
-      // _filter->shareSensorFrame(_sensorName + "_Cam", sensor);
+        _filter->addSensor(sensor, ImagePlaneProjection, false, true);
 
-      const string suffixes[] =
-          { "_SOx", "_SOy", "_SOz", "_qOSx", "_qOSy", "_qOSz" };
-      for (int k = 0; k < 6; k++) {
-        _filter->shareParameter(_sensorName + "_Cam" + suffixes[k], sensor + suffixes[k]);
-      }
+        // it does not work, there is no sensor called _sensorName + "_Cam"
+        // we have to share manually the parameters
+        // _filter->shareSensorFrame(_sensorName + "_Cam", sensor);
 
+        const string suffixes[] = { "_SOx", "_SOy", "_SOz", "_qOSx", "_qOSy",
+            "_qOSz" };
+        for (int k = 0; k < 6; k++) {
+          _filter->shareParameter(_sensorName + "_Cam" + suffixes[k],
+              sensor + suffixes[k]);
+        }
 
-      // do we want the robust kernel by default?
-      // _filter->setRobustKernel(sensor, true, 3.0);
+        // do we want the robust kernel by default?
+        // _filter->setRobustKernel(sensor, true, 3.0);
 
-      // add parameter vertices
+        // add parameter vertices
 
-      _filter->shareParameter(_sensorName + "_Cam_CM", sensor + "_CM");
-      _filter->addConstantParameter(Euclidean3D, sensor + "_Lw",
-          d.zHistory.begin()->first, Lw, false);
+        _filter->shareParameter(_sensorName + "_Cam_CM", sensor + "_CM");
+        _filter->addConstantParameter(Euclidean3D, sensor + "_Lw",
+            d.zHistory.begin()->first, Lw, false);
 
-      // add all the edges
+        // add all the edges
 
-      for (auto it = d.zHistory.begin(); it != d.zHistory.end(); ++it) {
-        const ObservationDescriptor &obs = it->second;
+        for (auto it = d.zHistory.begin(); it != d.zHistory.end(); ++it) {
+          const ObservationDescriptor &obs = it->second;
 
-        MeasurementEdgeWrapper_Ptr ret = _filter->addMeasurement(sensor, obs.t,
-            obs.z, cov, obs.pose);
+          MeasurementEdgeWrapper_Ptr ret = _filter->addMeasurement(sensor,
+              obs.t, obs.z, cov, obs.pose);
 
-        assert(ret);
-      }
+          assert(ret);
+        }
 
-      // done
-      d.zHistory.clear();
-      d.isInitialized = true;
+        // done
+        d.zHistory.clear();
+        d.isInitialized = true;
 
 #			ifdef DEBUG_PRINT_VISION_INFO_MESSAGES
-      cerr << "[EuclideanFeatureHandler] Ready to estimate depth for track " << id
-      << endl;
+        cerr << "[EuclideanFeatureHandler] Ready to estimate depth for track " << id
+        << endl;
 #			endif
+      }
     }
 
   } else { // it has already been initialized, just add the measurement
@@ -304,47 +307,50 @@ void EuclideanFeatureHandler::buildProjectionMatrix(const Eigen::VectorXd &T_WS,
   double tmp1 = T_WS(5);
   double tmp2 = T_WS(3);
   double tmp3 = T_WS(6);
-  double tmp4 = tmp0*tmp1;
-  double tmp5 = tmp2*tmp3;
+  double tmp4 = tmp0 * tmp1;
+  double tmp5 = tmp2 * tmp3;
   double tmp6 = tmp4 + tmp5;
-  double tmp7 = -(tmp2*tmp1);
-  double tmp8 = tmp0*tmp3;
+  double tmp7 = -(tmp2 * tmp1);
+  double tmp8 = tmp0 * tmp3;
   double tmp9 = tmp7 + tmp8;
-  double tmp10 = pow(tmp2,2);
-  double tmp11 = pow(tmp0,2);
-  double tmp12 = pow(tmp1,2);
+  double tmp10 = pow(tmp2, 2);
+  double tmp11 = pow(tmp0, 2);
+  double tmp12 = pow(tmp1, 2);
   double tmp13 = -tmp12;
-  double tmp14 = pow(tmp3,2);
+  double tmp14 = pow(tmp3, 2);
   double tmp15 = -tmp14;
   double tmp16 = tmp10 + tmp11 + tmp13 + tmp15;
   double tmp17 = T_WS(0);
-  double tmp18 = -(tmp2*tmp3);
+  double tmp18 = -(tmp2 * tmp3);
   double tmp19 = tmp4 + tmp18;
   double tmp20 = T_WS(2);
-  double tmp21 = tmp2*tmp0;
-  double tmp22 = tmp1*tmp3;
+  double tmp21 = tmp2 * tmp0;
+  double tmp22 = tmp1 * tmp3;
   double tmp23 = tmp21 + tmp22;
   double tmp24 = T_WS(1);
   double tmp25 = -tmp11;
   double tmp26 = tmp10 + tmp25 + tmp12 + tmp15;
-  double tmp27 = tmp2*tmp1;
+  double tmp27 = tmp2 * tmp1;
   double tmp28 = tmp27 + tmp8;
-  double tmp29 = -(tmp2*tmp0);
+  double tmp29 = -(tmp2 * tmp0);
   double tmp30 = tmp29 + tmp22;
   double tmp31 = tmp10 + tmp25 + tmp13 + tmp14;
 
-  T_SW_cv.at<double>(0,0) = tmp16;
-  T_SW_cv.at<double>(0,1) = 2*tmp6;
-  T_SW_cv.at<double>(0,2) = 2*tmp9;
-  T_SW_cv.at<double>(0,3) = -2*tmp24*tmp6 - 2*tmp20*tmp9 - tmp17*tmp16;
-  T_SW_cv.at<double>(1,0) = 2*tmp19;
-  T_SW_cv.at<double>(1,1) = tmp26;
-  T_SW_cv.at<double>(1,2) = 2*tmp23;
-  T_SW_cv.at<double>(1,3) = -2*tmp17*tmp19 - 2*tmp20*tmp23 - tmp24*tmp26;
-  T_SW_cv.at<double>(2,0) = 2*tmp28;
-  T_SW_cv.at<double>(2,1) = 2*tmp30;
-  T_SW_cv.at<double>(2,2) = tmp31;
-  T_SW_cv.at<double>(2,3) = -2*tmp17*tmp28 - 2*tmp24*tmp30 - tmp20*tmp31;
+  T_SW_cv.at<double>(0, 0) = tmp16;
+  T_SW_cv.at<double>(0, 1) = 2 * tmp6;
+  T_SW_cv.at<double>(0, 2) = 2 * tmp9;
+  T_SW_cv.at<double>(0, 3) = -2 * tmp24 * tmp6 - 2 * tmp20 * tmp9
+      - tmp17 * tmp16;
+  T_SW_cv.at<double>(1, 0) = 2 * tmp19;
+  T_SW_cv.at<double>(1, 1) = tmp26;
+  T_SW_cv.at<double>(1, 2) = 2 * tmp23;
+  T_SW_cv.at<double>(1, 3) = -2 * tmp17 * tmp19 - 2 * tmp20 * tmp23
+      - tmp24 * tmp26;
+  T_SW_cv.at<double>(2, 0) = 2 * tmp28;
+  T_SW_cv.at<double>(2, 1) = 2 * tmp30;
+  T_SW_cv.at<double>(2, 2) = tmp31;
+  T_SW_cv.at<double>(2, 3) = -2 * tmp17 * tmp28 - 2 * tmp24 * tmp30
+      - tmp20 * tmp31;
 
   projMat = K * T_SW_cv;
 }
@@ -425,7 +431,7 @@ int EuclideanFeatureHandler::GaussNewton(const vector<cv::Mat> &cameras,
     printf("%d %f\n", i, last_mse);
 #endif
   }
-  if (last_mse < 9/*3 pixels*/) {
+  if (last_mse < 1e4/*100 pixels*/) {
     optimizedPoint.x = curEstimate3DPoint.at<double>(0, 0);
     optimizedPoint.y = curEstimate3DPoint.at<double>(1, 0);
     optimizedPoint.z = curEstimate3DPoint.at<double>(2, 0);
