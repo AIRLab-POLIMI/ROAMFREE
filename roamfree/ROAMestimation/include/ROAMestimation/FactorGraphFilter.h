@@ -79,6 +79,21 @@ class FactorGraphFilter {
         "/tmp/roamfree") = 0;
 
     /**
+     *  \brief writes factor graph to a text file
+     *
+     * Produces a human-readable representation of the graph structure. Useful in debug.
+     */
+    virtual void setWriteGraph(bool writeGraph) = 0;
+
+    /**
+     *  \brief writes Hessian id map
+     *
+     * Writes the structure of the hessian matrix in a file, namely, vertex ids
+     * and corresponding columns. Useful in debug
+     */
+    virtual void setWriteHessianStructure(bool writeHessianStructure) = 0;
+
+    /**
      *  \brief gets the current window length
      *
      * returns the difference between the timestamp of the newest pose and the one of the oldest

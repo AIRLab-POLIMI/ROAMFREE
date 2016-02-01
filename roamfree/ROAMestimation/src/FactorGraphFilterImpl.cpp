@@ -90,6 +90,9 @@ void FactorGraphFilter_Impl::initSolver() {
 
   // no logging by default
   _lowLevelLogging = false;
+  _writeGraph = false;
+  _writeHessianStructure = false;
+
   _logger = NULL;
 
   // init the spatial index
@@ -1569,7 +1572,7 @@ bool FactorGraphFilter_Impl::estimate_i(g2o::HyperGraph::EdgeSet &eset,
   double tStart = g2o::get_time();
 
 // if logging is enabled, write the current factor graph to a file
-  if (_lowLevelLogging == true) {
+  if (_writeGraph == true) {
     ofstream f("/tmp/roamfree/graph.txt"); // TODO: put the same folder as for _logger
     assert(f.is_open());
     f << writeFactorGraph();
@@ -1586,7 +1589,7 @@ bool FactorGraphFilter_Impl::estimate_i(g2o::HyperGraph::EdgeSet &eset,
 
   _optimizer->initializeOptimization(eset);
 
-  if (_lowLevelLogging == true) {
+  if (_writeHessianStructure == true) {
     ofstream fid("debug/Hstruct.txt"); // TODO: put the same folder as for _logger
 
     if (fid.is_open()) {
@@ -2134,6 +2137,14 @@ void FactorGraphFilter_Impl::setLowLevelLogging(bool lowLevelLogging,
   }
 
   _lowLevelLogging = lowLevelLogging;
+}
+
+void FactorGraphFilter_Impl::setWriteGraph(bool writeGraph) {
+  _writeGraph = writeGraph;
+}
+
+void FactorGraphFilter_Impl::setWriteHessianStructure(bool writeHessianStructure) {
+  _writeHessianStructure = writeHessianStructure;
 }
 
 FactorGraphFilter_Impl::MisalignmentGuard::MisalignmentGuard(

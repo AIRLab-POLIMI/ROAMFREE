@@ -248,7 +248,7 @@ int main(int argc, char *argv[]) {
       // do the estimation
       cntImu++;
 
-      if (t > 10.0 && cntImu % ((int) gpsDivisor) == 0) { // after 5s of data, then each gps
+      if (t > 20.0 && cntImu % gpsDivisor == 0) { // after 5s of data, then each gps
 
         keepOn = f->estimate(10);
 
