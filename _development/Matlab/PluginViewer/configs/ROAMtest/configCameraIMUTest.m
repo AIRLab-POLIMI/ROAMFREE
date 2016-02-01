@@ -17,21 +17,24 @@ config.global.plugins{end+1} = 'Trajectory';
 config.pluginConfig{end+1}.axesLenght = 0.5;
 config.pluginConfig{end}.absolutePositionSensor = 'GPS'; %display also measures from an AbsolutePosition sensor
 config.pluginConfig{end}.euclideanFeatureSensors = 'Camera'; %display also euclidean 3D features.
- 
-config.global.plugins{end+1} = 'GenericEdge';
-config.pluginConfig{end+1}.sensorName = 'GPS';
-config.pluginConfig{end}.errorSize = 3;
-config.pluginConfig{end}.measureSize = 3;
 
-config.global.plugins{end+1} = 'GenericEdge';
-config.pluginConfig{end+1}.sensorName = 'IMUintegralDeltaP';
-config.pluginConfig{end}.errorSize = 3;
-config.pluginConfig{end}.measureSize = 27;
+config.global.plugins{end+1} = 'EuclideanFeatures';
+config.pluginConfig{end+1}.sensorName = 'Camera';
 
-config.global.plugins{end+1} = 'GenericEdge';
-config.pluginConfig{end+1}.sensorName = 'IMUintegralDeltaQ';
-config.pluginConfig{end}.errorSize = 4;
-config.pluginConfig{end}.measureSize = 16;
+% config.global.plugins{end+1} = 'GenericEdge';
+% config.pluginConfig{end+1}.sensorName = 'GPS';
+% config.pluginConfig{end}.errorSize = 3;
+% config.pluginConfig{end}.measureSize = 3;
+% 
+% config.global.plugins{end+1} = 'GenericEdge';
+% config.pluginConfig{end+1}.sensorName = 'IMUintegralDeltaP';
+% config.pluginConfig{end}.errorSize = 3;
+% config.pluginConfig{end}.measureSize = 27;
+% 
+% config.global.plugins{end+1} = 'GenericEdge';
+% config.pluginConfig{end+1}.sensorName = 'IMUintegralDeltaQ';
+% config.pluginConfig{end}.errorSize = 4;
+% config.pluginConfig{end}.measureSize = 16;
 % 
 % config.global.plugins{end+1} = 'StochasticProcess';
 % config.pluginConfig{end+1}.parameterName = 'IMUintegralDeltaP_Ba';
