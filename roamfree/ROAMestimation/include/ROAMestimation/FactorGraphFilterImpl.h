@@ -68,6 +68,8 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
 
     void setLowLevelLogging(bool lowLevelLogging, std::string folder =
         "/tmp/roamfree");
+    void setWriteGraph(bool writeGraph);
+    void setWriteHessianStructure(bool writeHessianStructure);
 
     double getWindowLenght();
 
@@ -211,7 +213,7 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
 
     bool _initialPoseSet; //<! if the initial pose has been set or not
 
-    bool _lowLevelLogging;
+    bool _lowLevelLogging, _writeGraph, _writeHessianStructure;
     ROAMlog::GraphLogger *_logger; //!< the object which handles low level logging
 
     SpatialIndex *_spatialIndex; //!< the object which maintains spatial informations about poses.
