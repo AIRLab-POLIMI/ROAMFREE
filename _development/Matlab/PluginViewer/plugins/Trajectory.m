@@ -96,8 +96,8 @@ if flag == 1
                 [p, flag] = stubbornLoad([globalConfig.logPath parf]);
                 
                 if flag == 1 && size(p,1) > 0 % sometimes I got an empty p
-                    plot3(p(1,3),p(1,4),p(1,5),'bo');
-                    text(p(1,3),p(1,4),p(1,5),sprintf('%d',n));
+                    plot3(p(1,3),p(1,4),p(1,5),'b.');
+                    %text(p(1,3),p(1,4),p(1,5),sprintf('%d',n));
                 end
                 
             end            

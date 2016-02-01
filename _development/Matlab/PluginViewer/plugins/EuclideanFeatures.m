@@ -25,7 +25,7 @@ for i = 1:length(F)
             
             err = edge(:,(23+measureSize):(23+measureSize+errorSize-1));
                 
-            plot(edge(:,1) - edge(1,1),err);
+            plot(edge(:,1) - edge(1,1),err, '.');
         end
 
     end            
