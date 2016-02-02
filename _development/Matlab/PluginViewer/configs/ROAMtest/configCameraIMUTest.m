@@ -16,10 +16,11 @@ config.pluginConfig = {};
 config.global.plugins{end+1} = 'Trajectory';
 config.pluginConfig{end+1}.axesLenght = 0.5;
 config.pluginConfig{end}.absolutePositionSensor = 'GPS'; %display also measures from an AbsolutePosition sensor
-config.pluginConfig{end}.euclideanFeatureSensors = 'Camera'; %display also euclidean 3D features.
+% config.pluginConfig{end}.euclideanFeatureSensors = 'Camera'; %display also euclidean 3D features.
+config.pluginConfig{end}.FHPFeatureSensors = 'Camera'; %display also FHP 3D features.
 
-config.global.plugins{end+1} = 'EuclideanFeatures';
-config.pluginConfig{end+1}.sensorName = 'Camera';
+% config.global.plugins{end+1} = 'EuclideanFeatures';
+% config.pluginConfig{end+1}.sensorName = 'Camera';
 
 % config.global.plugins{end+1} = 'GenericEdge';
 % config.pluginConfig{end+1}.sensorName = 'GPS';

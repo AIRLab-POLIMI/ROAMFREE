@@ -87,7 +87,6 @@ if flag == 1
         
         for i = 1:length(F)            
             % assume it is a _Lw log, get feature id
-            F(i).name(length(pluginConfig.euclideanFeatureSensors)+6:end);            
             n = sscanf(F(i).name(length(pluginConfig.euclideanFeatureSensors)+6:end), '%d');
             
             parf = sprintf('%s_feat%d_Lw.log', pluginConfig.euclideanFeatureSensors, n);          
@@ -96,14 +95,44 @@ if flag == 1
                 [p, flag] = stubbornLoad([globalConfig.logPath parf]);
                 
                 if flag == 1 && size(p,1) > 0 % sometimes I got an empty p
-                    plot3(p(1,3),p(1,4),p(1,5),'b.');
-                    %text(p(1,3),p(1,4),p(1,5),sprintf('%d',n));
-                end
-                
+                    plot3(p(1,3)-x0,p(1,4)-y0,p(1,5)-z0,'b.');
+                    text(p(1,3)-x0,p(1,4)-y0,p(1,5)-z0,sprintf('%d',n));
+                end                
             end            
         end
     end
 
+    if isfield(pluginConfig, 'FHPFeatureSensors')
+        F = dir(globalConfig.logPath);
+        
+        for i = 1:length(F)            
+            % assume it is a _HP log, get feature id
+            n = sscanf(F(i).name(length(pluginConfig.FHPFeatureSensors)+2:end), '%d');
+            
+            parf = sprintf('%s_%d_HP.log', pluginConfig.FHPFeatureSensors, n);          
+            
+            if (strcmp(F(i).name, parf)== true)                 
+                [HP, flag] = stubbornLoad([globalConfig.logPath parf]);
+                
+                if flag == 1 && size(HP,1) > 0 % sometimes I got an empty p
+                    
+                    % get the anchor frame                    
+                    ai = find(x(:,1) == HP(1,1),1);
+                    A = x(ai,:);
+
+                    hold on
+                    plot3(A(1,3), A(1,4), A(1,5), 'ro')
+                    text(A(1,3), A(1,4), sprintf('AP%d', n));
+        
+                    % compute 3d point
+                    LW = A(3:5)'+1/HP(5)*quatrot(A(6:9))*[HP(3) HP(4) 1]';
+
+                    plot3(LW(1)-x0, LW(2)-y0, LW(3)-z0, 'b.')
+                    text(LW(1)-x0, LW(2)-y0, LW(3)-z0, sprintf('%d', n));
+                end                
+            end            
+        end
+    end
      
 %     mx = min(x(i,3));
 %     Mx = max(x(i,3));    
