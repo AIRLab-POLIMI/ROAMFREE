@@ -25,6 +25,7 @@
 #include "ROAMimu/IMUIntegralHandler.h"
 
 #include "ROAMvision/EuclideanFeatureHandler.h"
+#include "ROAMvision/FHPFeatureHandler.h"
 
 using namespace std;
 using namespace ROAMestimation;
@@ -126,7 +127,14 @@ int main(int argc, char *argv[]) {
   cm << 1454.5, 0.0, 1024.0, 0.0, 1454.5, 1024.0, 0.0, 0.0, 1.0; // ideal Ximea MQ042MG 4Mp camera with 8mm lens
   double im_width = 2048, im_height = 2048;
 
+  /* With euclidean features
   EuclideanFeatureHandler camera;
+  //*/
+
+  /* .. or with FHP */
+  FHPFeatureHandler camera(10.0);
+  //*/
+
   camera.init(f, "Camera", T_OS_CAM, cm);
 
   // generate 3D features on a sphere
