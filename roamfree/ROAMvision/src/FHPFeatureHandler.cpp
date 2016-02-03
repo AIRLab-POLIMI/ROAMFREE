@@ -41,16 +41,16 @@ bool FHPFeatureHandler::init(FactorGraphFilter* f, const string &name,
   // TODO: currently FHP works only if system is camera-centric, i.e., T_OS = I
   assert(T_OS.head(3).norm() == 0.0 && T_OS.tail(3).norm() == 0.0);
 
-  _filter->addConstantParameter("Camera_Cam_SOx", 0.000, true);
-  _filter->addConstantParameter("Camera_Cam_SOy", 0.000, true);
-  _filter->addConstantParameter("Camera_Cam_SOz", 0.000, true);
+  _filter->addConstantParameter(_sensorName + "_Cam_SOx", T_OS(0), true);
+  _filter->addConstantParameter(_sensorName + "_Cam_SOy", T_OS(1), true);
+  _filter->addConstantParameter(_sensorName + "_Cam_SOz", T_OS(2), true);
 
-  // camera centric
-  _filter->addConstantParameter("Camera_Cam_qOSx", 0.0, true);
-  _filter->addConstantParameter("Camera_Cam_qOSy", 0.0, true);
-  _filter->addConstantParameter("Camera_Cam_qOSz", 0.0, true);
+  _filter->addConstantParameter(_sensorName + "_Cam_qOSx", T_OS(4), true);
+  _filter->addConstantParameter(_sensorName + "_Cam_qOSy", T_OS(5), true);
+  _filter->addConstantParameter(_sensorName + "_Cam_qOSz", T_OS(6), true);
 
-  _filter->addConstantParameter(Matrix3D, "Camera_CamCM", K, true);
+  _K_par = _filter->addConstantParameter(Matrix3D, _sensorName + "_Cam_CM", K,
+      true);
 }
 
 bool FHPFeatureHandler::addFeatureObservation(long int id, double t,
@@ -114,10 +114,8 @@ bool FHPFeatureHandler::addFeatureObservation(long int id, double t,
 
       // add prior on the viewing ray
 
-      ParameterWrapper_Ptr K_par = _filter->getParameterByName("Camera_CamCM");
-      assert(K_par);
-      double fx = K_par->getEstimate()(0);
-      double fy = K_par->getEstimate()(4);
+      double fx = _K_par->getEstimate()(0);
+      double fy = _K_par->getEstimate()(4);
 
       //TODO: let user decide this
       const double sigma_pixel = 1.0;
@@ -189,10 +187,7 @@ bool FHPFeatureHandler::initFeature(const std::string& sensor,
         sensor + suffixes[k]);
   }
 
-  _filter->shareParameter("Camera_CamCM", sensor + "_CM");
-
-  ParameterWrapper_Ptr K_par = _filter->getParameterByName("Camera_CamCM");
-  assert(K_par);
+  _filter->shareParameter(_sensorName + "_Cam_CM", sensor + "_CM");
 
   //add to current track list
   FHPTrackDescriptor &d = _features[id];
@@ -203,7 +198,7 @@ bool FHPFeatureHandler::initFeature(const std::string& sensor,
    K_par->getEstimate().data());
    //*/
   d.initStrategy = new SufficientZChange(10.0, 10.0, d.zHistory,
-      K_par->getEstimate().data());
+      _K_par->getEstimate().data());
 
   d.anchorFrame = pv;
 
