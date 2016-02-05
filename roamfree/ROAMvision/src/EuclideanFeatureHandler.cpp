@@ -107,7 +107,7 @@ bool EuclideanFeatureHandler::addFeatureObservation(long int id, double t,
         }
 
         // do we want the robust kernel by default?
-        // _filter->setRobustKernel(sensor, true, 3.0);
+         _filter->setRobustKernel(sensor, true, 3.0);
 
         // add parameter vertices
 
@@ -431,7 +431,8 @@ int EuclideanFeatureHandler::GaussNewton(const vector<cv::Mat> &cameras,
     printf("%d %f\n", i, last_mse);
 #endif
   }
-  if (last_mse < 1e4/*100 pixels*/) {
+//  if (last_mse < 1e4/*100 pixels*/) {
+  if (true) {
     optimizedPoint.x = curEstimate3DPoint.at<double>(0, 0);
     optimizedPoint.y = curEstimate3DPoint.at<double>(1, 0);
     optimizedPoint.z = curEstimate3DPoint.at<double>(2, 0);
