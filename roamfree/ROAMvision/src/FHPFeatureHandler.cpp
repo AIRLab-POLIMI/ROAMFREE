@@ -122,7 +122,8 @@ bool FHPFeatureHandler::addFeatureObservation(long int id, double t,
 
       // prior on viewing ray only
       Eigen::MatrixXd prior_cov(2, 2);
-      prior_cov << sigma_pixel / pow(fx, 2), 0, 0, sigma_pixel / pow(fy, 2);
+      prior_cov << pow(sigma_pixel, 2) / pow(fx, 2), 0, 0, pow(sigma_pixel, 2)
+          / pow(fy, 2);
 
       Eigen::VectorXd prior_mean(2);
       prior_mean = HP.head(2);
@@ -202,7 +203,7 @@ bool FHPFeatureHandler::initFeature(const std::string& sensor,
 
   d.anchorFrame = pv;
 
-  _filter->setRobustKernel(sensor, true, 3.0);
+  // _filter->setRobustKernel(sensor, true, 3.0);
 
 # ifdef DEBUG_PRINT_VISION_INFO_MESSAGES
   cerr << "[FHPFeatureHandler] New feature, id " << id << endl;

@@ -89,7 +89,7 @@ bool EuclideanFeatureHandler::addFeatureObservation(long int id, double t,
     // TODO: if initialization is succesful
     Eigen::VectorXd Lw(3);
 
-    if (d.zHistory.size() > 4) {
+    if (d.zHistory.size() >= 3) {
 
       if (initialize(d, K_par->getEstimate(), Lw)) {
 
@@ -107,7 +107,7 @@ bool EuclideanFeatureHandler::addFeatureObservation(long int id, double t,
         }
 
         // do we want the robust kernel by default?
-         _filter->setRobustKernel(sensor, true, 3.0);
+        // _filter->setRobustKernel(sensor, true, 3.0);
 
         // add parameter vertices
 
