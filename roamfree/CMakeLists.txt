@@ -87,7 +87,7 @@ if(CMAKE_BUILD_TYPE MATCHES Debug)
 	add_definitions( -DDEBUG_G2O_OPTIMIZER_VERBOSE=1 )
 
 	# disable OpenMP in g2o TODO check message
-	set( G2O_USE_OPENMP OFF CACHE BOOL "Build g2o with OpenMP support (EXPERIMENTAL)")
+	set( G2O_USE_OPENMP OFF CACHE BOOL "Build g2o with OpenMP support (EXPERIMENTAL)" FORCE)
 	
 	set(BUILD_TYPE_MSG "Debug") 
 
@@ -97,7 +97,7 @@ else()
 	add_definitions( -DDEBUG_PRINT_VISION_INFO_MESSAGES)
 	
 	#enable OpenMP in g2o
-	set( G2O_USE_OPENMP ON CACHE BOOL "Build g2o with OpenMP support (EXPERIMENTAL)")
+	set( G2O_USE_OPENMP ON CACHE BOOL "Build g2o with OpenMP support (EXPERIMENTAL)" FORCE)
 	
 	set(BUILD_TYPE_MSG "Release")
 endif()
