@@ -96,7 +96,7 @@ if flag == 1
                 
                 if flag == 1 && size(p,1) > 0 % sometimes I got an empty p
                     plot3(p(1,3)-x0,p(1,4)-y0,p(1,5)-z0,'b.');
-                    text(p(1,3)-x0,p(1,4)-y0,p(1,5)-z0,sprintf('%d',n));
+%                     text(p(1,3)-x0,p(1,4)-y0,p(1,5)-z0,sprintf('%d',n));
                 end                
             end            
         end
@@ -121,14 +121,14 @@ if flag == 1
                     A = x(ai,:);
 
                     hold on
-                    plot3(A(1,3), A(1,4), A(1,5), 'ro')
-                    text(A(1,3), A(1,4), sprintf('AP%d', n));
+                    plot3(A(1,3), A(1,4), A(1,5), 'b.')
+%                     text(A(1,3), A(1,4), A(1,5), sprintf('%d', n));
         
                     % compute 3d point
                     LW = A(3:5)'+1/HP(5)*quatrot(A(6:9))*[HP(3) HP(4) 1]';
 
                     plot3(LW(1)-x0, LW(2)-y0, LW(3)-z0, 'b.')
-                    text(LW(1)-x0, LW(2)-y0, LW(3)-z0, sprintf('%d', n));
+%                     text(LW(1)-x0, LW(2)-y0, LW(3)-z0, sprintf('%d', n));
                 end                
             end            
         end

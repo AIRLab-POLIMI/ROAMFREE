@@ -2,7 +2,7 @@
 %% create config
 
 config = struct();
-
+ 
 ss = get(0,'MonitorPositions'); % gets screen coordinates
     
 config.global.layout = 'horizontal';
@@ -16,18 +16,18 @@ config.pluginConfig = {};
 config.global.plugins{end+1} = 'Trajectory';
 config.pluginConfig{end+1}.axesLenght = 0.5;
 config.pluginConfig{end}.absolutePositionSensor = 'GPS'; %display also measures from an AbsolutePosition sensor
-% config.pluginConfig{end}.euclideanFeatureSensors = 'Camera'; %display also euclidean 3D features.
-config.pluginConfig{end}.FHPFeatureSensors = 'Camera'; %display also FHP 3D features.
+config.pluginConfig{end}.euclideanFeatureSensors = 'Camera'; %display also euclidean 3D features.
+% config.pluginConfig{end}.FHPFeatureSensors = 'Camera'; %display also FHP 3D features.
 
-% config.global.plugins{end+1} = 'EuclideanFeatures';
-% config.pluginConfig{end+1}.sensorName = 'Camera';
+config.global.plugins{end+1} = 'EuclideanFeatures';
+config.pluginConfig{end+1}.sensorName = 'Camera';
 
-% config.global.plugins{end+1} = 'GenericEdge';
-% config.pluginConfig{end+1}.sensorName = 'GPS';
-% config.pluginConfig{end}.errorSize = 3;
-% config.pluginConfig{end}.measureSize = 3;
+config.global.plugins{end+1} = 'GenericEdge';
+config.pluginConfig{end+1}.sensorName = 'GPS';
+config.pluginConfig{end}.errorSize = 3;
+config.pluginConfig{end}.measureSize = 3;
 % 
-% config.global.plugins{end+1} = 'GenericEdge';
+% config.global.plugins{end+1} = 'GenericEdge';   
 % config.pluginConfig{end+1}.sensorName = 'IMUintegralDeltaP';
 % config.pluginConfig{end}.errorSize = 3;
 % config.pluginConfig{end}.measureSize = 27;

@@ -3,6 +3,8 @@ function EuclideanFeatures( area, globalConfig, pluginConfig )
 subplot('Position', squeezeArea(area,0.02))
 hold on
 
+title('Image meas residuals (px)')
+
 F = dir(globalConfig.logPath);
 
 measureSize = 3;
@@ -10,22 +12,20 @@ errorSize = 3;
 
 for i = 1:length(F)            
     % assume it is a Euclidean feature edge log, get feature id
-    F(i).name(length(pluginConfig.sensorName)+6:end);            
+    F(i).name(length(pluginConfig.sensorName)+6:end);
     n = sscanf(F(i).name(length(pluginConfig.sensorName)+6:end), '%d');
 
-    parf = sprintf('%s_feat%d.log', pluginConfig.sensorName, n);          
+    parf = sprintf('%s_feat%d.log', pluginConfig.sensorName, n);    
 
     if (strcmp(F(i).name, parf)== true) 
-        
-        
-        
         [edge, flag] = stubbornLoad([globalConfig.logPath parf]);
 
         if flag == 1 && size(edge,1) > 0 % sometimes I got an empty p
             
-            err = edge(:,(23+measureSize):(23+measureSize+errorSize-1));
+            err = edge(:,(23+measureSize):(23+measureSize+errorSize-1));            
+            d = sqrt(sum(err.^2,2));
                 
-            plot(edge(:,1) - edge(1,1),err, '.');
+            plot(edge(:,1) - edge(1,1), d, '.');
         end
 
     end            
