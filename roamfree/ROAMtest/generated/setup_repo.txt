@@ -1,0 +1,28 @@
+
+clone the github public repository
+
+	git clone git@github.com:AIRLab-POLIMI/ROAMFREE.git
+
+add the remote for the private branches on bitbucket
+
+	git remote add private https://<BITBUCKET-USER>@bitbucket.org/airlab-polimi/roamfree_private.git
+
+download the stuff on bitbucket
+
+	git fetch private
+
+switch to the private dev branch 
+
+	git checkout -b dev private/dev
+
+do some serious work and prepare for commit
+
+	aplay ~/Music/Billy Bragg - There is Power in The Union.mp3
+
+push the stuff on the private branch (this also defaults push to dev branch on the private remote)
+
+	git push -u private dev
+
+
+
+after that, switch between mater and dev branches as usual (e.g. git checkout master) and push/pull normally.

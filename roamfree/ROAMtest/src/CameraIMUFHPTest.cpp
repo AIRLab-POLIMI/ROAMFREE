@@ -52,6 +52,10 @@ int main(int argc, char *argv[]) {
   double poseRate = 10; // Hz rate at which pose vertices have to be maintained
   int gpsDivisor = 10; // how many IMU constraint (hndl.step(...) == true) for each GPS?
 
+  double accSigma = (800) * 9.8 * 1e-6 * sqrt(imuRate); // ug/sqrt(Hz) in first parenthesis
+  double gyroSigma = (360) / 180.0 * M_PI / 3600.0 * sqrt(imuRate); // deg/h/sqrt(Hz) in first parenthesis
+  double gpsSigma = 0.05; // m
+
   // parameters for the generation of deterministic errors on the IMU readings
 
   double ba_x = 0.0; // biases on the accelerometer measurements
@@ -72,14 +76,13 @@ int main(int argc, char *argv[]) {
   ret = system("rm /tmp/roamfree/*");
 
   f->setLowLevelLogging(true); // default log folder
+//  f->setWriteGraph(true);
 
   /* ---------------------- Configure sensors ---------------------- */
 
   // -- accelerometer bias
   Eigen::VectorXd accBias0(3);  // initial value
   accBias0 << 0.0, 0.0, 0.0;
-
-  Eigen::MatrixXd randomWalkNoiseVar = 10 * Eigen::MatrixXd::Identity(3, 3);
 
   ParameterWrapper_Ptr ba_par =
       StochasticProcessFactory::addEucl3DRandomConstant(f,
@@ -105,60 +108,51 @@ int main(int argc, char *argv[]) {
 
   // -- white noise on accelerometer and gyro
   Eigen::Matrix<double, 6, 6> & sensorNoises = hndl.getSensorNoises();
-  sensorNoises.diagonal() << 0.0016, 0.0016, 0.0016, 1.15172e-05, 1.15172e-05, 1.15172e-05;
-//  sensorNoises.diagonal() << 10.0, 10.0, 10.0, 1.0, 1.0, 1.0;
+
+  sensorNoises.diagonal() << pow(accSigma, 2), pow(accSigma, 2), pow(accSigma,
+      2), pow(gyroSigma, 2), pow(gyroSigma, 2), pow(gyroSigma, 2);
 
   // -- GPS Sensor
-  Eigen::VectorXd T_OS_GPS(7); // Transformation between GPS and robot frame
+  Eigen::VectorXd T_OS_GPS(7); // Transformation between GPS and robot framepow(gyroSigma,2)
   T_OS_GPS << 0.0, 0.25, 0.0, 1.0, 0.0, 0.0, 0.0;
 
   f->addSensor("GPS", AbsolutePosition, false, true); // non master sensor, sequential sensor
   f->setSensorFrame("GPS", T_OS_GPS);
 
   Eigen::MatrixXd GPSCov(3, 3);
-  GPSCov = pow(2.5 / 3.0, 2) * Eigen::MatrixXd::Identity(3, 3); // standalone noise
-//  GPSCov = pow(0.05, 2) * Eigen::MatrixXd::Identity(3, 3); // carrier phase differential nosise
+
+  GPSCov = pow(gpsSigma, 2) * Eigen::MatrixXd::Identity(3, 3); // carrier phase differential nosise
 
   // -- CAMERA
   Eigen::VectorXd T_OS_CAM(7); // Transformation between CAMERA and robot frame
   T_OS_CAM << 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0;
 
-  // as it was before
-  // Eigen::VectorXd cm(9); // Intrinsic camera calibration matrix
-  // cm << 1454.5, 0.0, 1024.0, 0.0, 1454.5, 1024.0, 0.0, 0.0, 1.0; // ideal Ximea MQ042MG 4Mp camera with 8mm lens
-
-  // as it is now
-  Eigen::VectorXd cm(3); // Intrinsic camera calibration matrix
-  cm << 1454.5,1024.0,1024.0; // ideal Ximea MQ042MG 4Mp camera with 8mm lens
-
+  Eigen::VectorXd cm(9); // Intrinsic camera calibration matrix
+  cm << 1454.5, 0.0, 1024.0, 0.0, 1454.5, 1024.0, 0.0, 0.0, 1.0; // ideal Ximea MQ042MG 4Mp camera with 8mm lens
   double im_width = 2048, im_height = 2048;
 
   // With euclidean features
-  EuclideanFeatureHandler camera;
-  //*/
+   EuclideanFeatureHandler camera;
+   //*/
 
   /* .. or with FHP
-  FHPFeatureHandler camera(10.0);
+  FHPFeatureHandler camera(100.0);
   //*/
 
   camera.init(f, "Camera", T_OS_CAM, cm);
-
-  f->getParameterByName("Camera_Cam_CM")->setFixed(false);
-  f->getParameterByName("Camera_Cam_TD")->setFixed(false);
-  f->getParameterByName("Camera_Cam_RD")->setFixed(false);
 
   // generate 3D features on a sphere
   Eigen::Vector3d r; // vector that is rotated to generate features
   r << 10.0, 0.0, 0.0;
 
-  int Ny = 10, Np = 10; // number of yaw and pitch steps
+  int Ny = 20, Np = 10; // number of yaw and pitch steps
 
   vector<Eigen::Vector3d> features(Ny * Np);
 
   for (int iy = 0; iy < Ny; iy++) {
     for (int ip = 0; ip < Np; ip++) {
       double yaw = iy * 2 * M_PI / Ny;
-      double pitch = -(M_PI / 2.0 - M_PI/16) + ip * (M_PI-M_PI/8) / Np;
+      double pitch = -(M_PI / 2.0 - M_PI / 16) + ip * (M_PI - M_PI / 8) / Np;
 
       Eigen::Matrix3d R;
       R << cos(pitch) * cos(yaw), -sin(yaw), cos(yaw) * sin(pitch), cos(pitch)
@@ -169,7 +163,7 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  Eigen::MatrixXd CAMCov = 1e-4*Eigen::MatrixXd::Identity(2, 2);
+  Eigen::MatrixXd CAMCov = 1e-4 * Eigen::MatrixXd::Identity(2, 2);
 
   /* ---------------------- Initialize ---------------------- */
 
@@ -192,7 +186,7 @@ int main(int argc, char *argv[]) {
   bool keepOn = true;
   int cnt = 0;
 
-  while (t <= 600.0) {
+  while (t <= 120.0) {
 
     // generate synthetic accelerometer and gyroscope reading
 
@@ -206,6 +200,8 @@ int main(int argc, char *argv[]) {
       zw(2) += bw_z;
     }
 
+//    add_gaussian_noise(za.data(), 3, 0.0, accSigma);
+
     {
 #     include "../generated/Otto_a.cppready"
 
@@ -213,6 +209,8 @@ int main(int argc, char *argv[]) {
       za(1) += ba_y;
       za(2) += ba_z;
     }
+
+//    add_gaussian_noise(za.data(), 3, 0.0, gyroSigma);
 
     // make an integration step
     if (hndl.step(za.data(), zw.data())) { // if we have finished:
@@ -228,6 +226,8 @@ int main(int argc, char *argv[]) {
 
 #         include "../generated/Otto_gps.cppready"
         }
+
+//        add_gaussian_noise(zgps.data(), 3, 0, gpsSigma);
 
         f->addMeasurement("GPS", curx_ptr->getTimestamp(), zgps, GPSCov,
             curx_ptr);
@@ -274,21 +274,21 @@ int main(int argc, char *argv[]) {
 
       if (t > 10.0 && cntImu % ((int) gpsDivisor) == 0) { // after 5s of data, then each gps
 
-        f->getOldestPose()->setFixed(true);
+//        f->getOldestPose()->setFixed(true);
 
         /* initialize second pose with ground truth
-        {
-          PoseVertexWrapper_Ptr x_ptr = f->getNthOldestPose(1);
+         {
+         PoseVertexWrapper_Ptr x_ptr = f->getNthOldestPose(1);
 
-          double t = x_ptr->getTimestamp();
-          Eigen::VectorXd x(7);
+         double t = x_ptr->getTimestamp();
+         Eigen::VectorXd x(7);
 
-#         include "../generated/Otto_GT.cppready"
+         #         include "../generated/Otto_GT.cppready"
 
-          x_ptr->setEstimate(x);
-          x_ptr->setFixed(true);
-        }
-        //*/
+         x_ptr->setEstimate(x);
+         x_ptr->setFixed(true);
+         }
+         //*/
 
         keepOn = f->estimate(10);
 

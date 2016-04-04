@@ -47,8 +47,13 @@ bool EuclideanFeatureHandler::init(FactorGraphFilter* f, const string &name,
   _filter->addConstantParameter(_sensorName + "_Cam_qOSy", T_OS(5), true);
   _filter->addConstantParameter(_sensorName + "_Cam_qOSz", T_OS(6), true);
 
-  K_par = _filter->addConstantParameter(Matrix3D, _sensorName + "_Cam_CM", K,
+  K_par = _filter->addConstantParameter(Euclidean3D, _sensorName + "_Cam_CM", K,
       true);
+
+  _filter->addConstantParameter(Euclidean3D, _sensorName + "_Cam_RD",
+      Eigen::VectorXd::Zero(3), true);
+  _filter->addConstantParameter(Euclidean2D, _sensorName + "_Cam_TD",
+      Eigen::VectorXd::Zero(2), true);
 
   return true;
 }
@@ -112,6 +117,9 @@ bool EuclideanFeatureHandler::addFeatureObservation(long int id, double t,
         // add parameter vertices
 
         _filter->shareParameter(_sensorName + "_Cam_CM", sensor + "_CM");
+        _filter->shareParameter(_sensorName + "_Cam_RD", sensor + "_RD");
+        _filter->shareParameter(_sensorName + "_Cam_TD", sensor + "_TD");
+
         _filter->addConstantParameter(Euclidean3D, sensor + "_Lw",
             d.zHistory.begin()->first, Lw, false);
 
@@ -221,7 +229,12 @@ bool EuclideanFeatureHandler::initialize(const EuclideanTrackDescriptor &track,
   // the original code is due to Andrea Romanoni (andrea.romanoni@polimi.it)
 
   // convert the camera calibration once for all
-  const cv::Mat K_cv(3, 3, CV_64F, const_cast<double *>(K.data()));
+  cv::Mat K_cv(3, 3, CV_64F, cv::Scalar(0));
+  K_cv.at<double>(0, 0) = K(0);
+  K_cv.at<double>(1, 1) = K(0);
+  K_cv.at<double>(0, 2) = K(1);
+  K_cv.at<double>(1, 2) = K(2);
+  K_cv.at<double>(2, 2) = 1.0;
 
   vector<cv::Mat> curCams;
   vector<cv::Point2f> curPoints;
@@ -398,13 +411,13 @@ int EuclideanFeatureHandler::GaussNewton(const vector<cv::Mat> &cameras,
           * r.at<double>(2 * curMeas + 1, 0);
 #ifdef DEBUG_OPTIMIZATION_VERBOSE
       cout << "CurMeas: " << curMeas << endl << "curEstimate3DPointH="
-          << curEstimate3DPointH.t() << endl;
+      << curEstimate3DPointH.t() << endl;
       cout << "CurCam" << cameras[curMeas] << endl;
       cout << "cur2DpositionH: "
-          << cur2DpositionH.at<double>(0, 0) / cur2DpositionH.at<double>(2, 0)
-          << ", "
-          << cur2DpositionH.at<double>(1, 0) / cur2DpositionH.at<double>(2, 0)
-          << endl;
+      << cur2DpositionH.at<double>(0, 0) / cur2DpositionH.at<double>(2, 0)
+      << ", "
+      << cur2DpositionH.at<double>(1, 0) / cur2DpositionH.at<double>(2, 0)
+      << endl;
       cout << "points[curMeas]: " << points[curMeas] << endl;
       cout << "residual on x: " << r.at<double>(2 * curMeas, 0) << endl;
       cout << "residual on y: " << r.at<double>(2 * curMeas + 1, 0) << endl;
