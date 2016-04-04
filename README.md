@@ -40,7 +40,7 @@ Furthermore, it requires a compiler which supports C 11, (e.g. gcc 4.7 or newer)
 Under Ubuntu 15.04 you can provided the required dependencies
 with
 
-```sudo apt-get install libsuitesparse-dev libeigen3-dev libboost-all-dev
+```sudo apt-get install libsuitesparse-dev libeigen3-dev libboost-all-dev```
 
 # Build
 
@@ -63,7 +63,10 @@ In the following
 
 ROAMFREE is composed of three ros packages, `roamfree`, `roamros` and `roamros_msgs`. 
 
-You can either checkout the whole git repository into `<catkin_workspace>/src` or place there symbolic to the package folders, e.g.:
+As these folders contain ros packages, they have to live (or to be linked into) your catkin workspace.
+If you do not have one, you can create it following ![This tutorial](http://wiki.ros.org/catkin/Tutorials/create_a_workspace)
+
+The recommended way is to link single package folders into the workspace, e.g.:
 
 ```
 ln -s <src_path>/roamfree <catkin_workspace>/src/roamfree
