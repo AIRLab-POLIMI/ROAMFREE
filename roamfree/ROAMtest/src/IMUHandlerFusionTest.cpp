@@ -203,7 +203,7 @@ int main(int argc, char *argv[]) {
   bool keepOn = true;
   int cnt = 0;
 
-  while (t <= 600.0) {
+  while (t <= 120.0) {
 
     // generate synthetic accelerometer and gyroscope reading
 
