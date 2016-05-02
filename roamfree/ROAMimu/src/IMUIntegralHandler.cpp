@@ -24,6 +24,9 @@
 
 #include <iostream>
 
+#define DEBUG_PRINT_INFO_MESSAGES 1
+
+
 using namespace ROAMestimation;
 
 namespace ROAMimu {

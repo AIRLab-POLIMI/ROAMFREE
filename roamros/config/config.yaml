@@ -1,53 +1,91 @@
 solver:
-  base_link_frame_id: /odom_combined
+  base_link_frame_id: /base_link
   global_frame_id: /world
 
-  pose_window_length: 0.5
-  dead_reckoning: True  
+  pose_window_length: 10.0 # in seconds
+  dead_reckoning: True
   frequency: 10.0
   n_gauss_newton_iterations: 5
-
+  low_level_logging: True
+  
 sensors:
-  'Odometry':
-    type: GenericOdometer
+
+#  'Magnetometer':
+#    type: VectorField
+#    is_master: False
+#    frame_id: /imu
+#    topic: /xsens/mag
+#    topic_type: sensor_msgs/MagneticField
+#    use_header_stamp: True
+#    static_covariance: True
+#    covariance: [    1.0e-2,  0.0,  0.0,
+#                     0.0,  1.0e-2,  0.0,
+#                     0.0,  0.0,  1.0e-2 ]
+#
+#    parameters:
+#      h: [0.007719, 0.225097, -0.416133]
+#      R: [    1.737,   0.02352,    0.1375,
+#            0.06195,     1.682,   0.04554,
+#          -0.007721, -0.001173,    0.5542]
+#      S: [ -0.07541,    0.1091,   -0.5801]
+#
+#
+#  'GPS':
+#    type: AbsolutePosition
+#    is_master: False
+#    frame_id: /gps_link
+#    topic: /enu
+#    topic_type: geometry_msgs/PoseWithCovarianceStamped
+#    use_header_stamp: True
+#    static_covariance: True
+#    covariance: [0.7,    0.0, 0.0,
+#                    0.0, 0.7, 0.0,
+#                    0.0,    0.0, 1.0 ]
+
+  'IMUintegral':
+    type: IMUHandler
     is_master: True
-    frame_id: /base_link
-    topic: /base_odometry/odom
-    topic_type: nav_msgs/Odometry
+    frame_id: /imu
+    topic: /xsens/imu
+    topic_type: sensor_msgs/Imu
     use_header_stamp: True
     static_covariance: True
-    covariance: [ 1.0e-2,  1.0e-4,        0.0,        0.0,        0.0,        1.0e-4,
-                  1.0e-4,  1.0e-2,        0.0,        0.0,        0.0,        1.0e-4,
-                  0.0,        0.0,     1.0e-6,        0.0,        0.0,        0.0,
-                  0.0,        0.0,        0.0,     1.0e-6,        0.0,        0.0,
-                  0.0,        0.0,        0.0,        0.0,     1.0e-6,        0.0,
-                  1.0e-4,  1.0e-4,        0.0,        0.0,        0.0,        1.0e-2]
-
-  'Accelerometer':
-    type: LinearAcceleration
-    is_master: False
-    frame_id: /imu_link
-    topic: /torso_lift_imu/data
-    topic_type: sensor_msgs/Imu
-    use_header_stamp: True
-    static_covariance: False
-    covariance: [ 1.0e-2, 0.0, 0.0,
-                  0.0, 1.0e-2, 0.0,
-                  0.0, 0.0, 1.0e-2]
+    covariance: [1.0e-2,    0.0, 0.0,
+                    0.0, 1.0e-2, 0.0,
+                    0.0,    0.0, 1.0e-2 ]
 
     parameters:
-      G: [1.0, 1.0, 1.0]
-      B: [0.0, 0.0, 0.0]
+     G: [1.0, 1.0, 1.0]
+     B: [0.0, 0.0, 0.0]
 
-  'Gyroscope':
-    type: AngularVelocity
-    is_master: False
-    frame_id: /imu_link
-    topic: /torso_lift_imu/data
-    topic_type: sensor_msgs/Imu
-    use_header_stamp: True
-    static_covariance: False
+#  'Gyroscope':
+#    type: AngularVelocity
+#    is_master: False
+#    frame_id: /imu
+#    topic: /xsens/imu
+#    topic_type: sensor_msgs/Imu
+#    use_header_stamp: True
+#    static_covariance: True
+#    covariance: [1.0e-2,    0.0, 0.0,
+#                    0.0, 1.0e-2, 0.0,
+#                    0.0,    0.0, 1.0e-2 ]
+#
+#    parameters:
+#     G: [1.0, 1.0, 1.0]
+#     B: [0.0, 0.0, 0.0]
 
-    parameters:
-      G: [1.0, 1.0, 1.0]
-      B: [0.0, 0.0, 0.0]
+#  'Accelerometer':
+#    type: LinearAcceleration
+#    is_master: True
+#    frame_id: /imu
+#    topic: /xsens/imu
+#    topic_type: sensor_msgs/Imu
+#    use_header_stamp: True
+#    static_covariance: True
+#    covariance: [1.0e+0,    0.0, 0.0,
+#                    0.0, 1.0e+0, 0.0,
+#                    0.0,    0.0, 1.0e+0 ]
+#
+#    parameters:
+#     G: [1.0, 1.0, 1.0]
+#     B: [0.0, 0.0, 0.0]

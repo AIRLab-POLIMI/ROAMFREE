@@ -56,7 +56,9 @@ SensorConfiguration::SensorConfiguration(std::string name,
     type_ = ROAMestimation::FixedFeaturePose;
   } else if (type == "PlanarConstraint") {
     type_ = ROAMestimation::PlanarConstraint;
-  } else {
+  }else if (type == "IMUHandler") {
+	    type_ = ROAMestimation::IMUHandler;
+  }else {
     ROS_FATAL("sensor %s: unknown sensor type '%s'", name.c_str(),
         type.c_str());
     ROS_BREAK();

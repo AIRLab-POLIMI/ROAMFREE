@@ -13,6 +13,7 @@
 #include <ros/ros.h>
 
 #include "ROAMestimation/FactorGraphFilter.h"
+#include "ROAMimu/IMUIntegralHandler.h"
 
 #include "sensor_configuration.h"
 
@@ -20,9 +21,11 @@ namespace roamros {
 
 void PoseWithCovarianceStampedToAbsolutePosition(
 		const ros::MessageEvent<geometry_msgs::PoseWithCovarianceStamped const>& event,
-		const SensorConfiguration *sensor, ROAMestimation::FactorGraphFilter* filter) {
+		const SensorConfiguration *sensor,
+		ROAMestimation::FactorGraphFilter* filter) {
 	const geometry_msgs::PoseWithCovarianceStamped &msg = *(event.getMessage());
 
+	ROS_INFO("callback gps");
 	static Eigen::VectorXd z(3);
 	static Eigen::MatrixXd cov(3, 3);
 
@@ -34,7 +37,12 @@ void PoseWithCovarianceStampedToAbsolutePosition(
 
 	if (sensor->static_covariance_) {
 		ROS_ASSERT(sensor->covariance_ != NULL);
-		filter->addSequentialMeasurement(sensor->name_, t, z, *sensor->covariance_);
+		if (filter->addSequentialMeasurement(sensor->name_, t, z,
+				*sensor->covariance_) != NULL)
+
+			ROS_INFO("added gps measurement");
+		else
+			ROS_INFO("Error adding gps measurement");
 	} else {
 		for (int r = 0; r < 3; r++) {
 			for (int c = 0; c < 3; c++) {
@@ -43,12 +51,14 @@ void PoseWithCovarianceStampedToAbsolutePosition(
 		}
 
 		filter->addSequentialMeasurement(sensor->name_, t, z, cov);
+
 	}
 }
 
 void PoseStampedToAbsolutePosition(
 		const ros::MessageEvent<const geometry_msgs::PoseStamped>& event,
-		const SensorConfiguration *sensor, ROAMestimation::FactorGraphFilter* filter) {
+		const SensorConfiguration *sensor,
+		ROAMestimation::FactorGraphFilter* filter) {
 	const geometry_msgs::PoseStamped &msg = *(event.getMessage());
 
 	static Eigen::VectorXd z(3);
@@ -64,7 +74,8 @@ void PoseStampedToAbsolutePosition(
 
 void TwistWithCovarianceStampedToLinearVelocity(
 		const ros::MessageEvent<const geometry_msgs::TwistWithCovarianceStamped>& event,
-		const SensorConfiguration *sensor, ROAMestimation::FactorGraphFilter* filter) {
+		const SensorConfiguration *sensor,
+		ROAMestimation::FactorGraphFilter* filter) {
 	const geometry_msgs::TwistWithCovarianceStamped &msg = *(event.getMessage());
 
 	static Eigen::VectorXd z(3);
@@ -78,7 +89,8 @@ void TwistWithCovarianceStampedToLinearVelocity(
 
 	if (sensor->static_covariance_) {
 		ROS_ASSERT(sensor->covariance_ != NULL);
-		filter->addSequentialMeasurement(sensor->name_, t, z, *sensor->covariance_);
+		filter->addSequentialMeasurement(sensor->name_, t, z,
+				*sensor->covariance_);
 	} else {
 		for (int r = 0; r < 3; r++) {
 			for (int c = 0; c < 3; c++) {
@@ -92,7 +104,8 @@ void TwistWithCovarianceStampedToLinearVelocity(
 
 void TwistStampedToLinearVelocity(
 		const ros::MessageEvent<const geometry_msgs::TwistStamped>& event,
-		const SensorConfiguration *sensor, ROAMestimation::FactorGraphFilter* filter) {
+		const SensorConfiguration *sensor,
+		ROAMestimation::FactorGraphFilter* filter) {
 	const geometry_msgs::TwistStamped &msg = *(event.getMessage());
 
 	static Eigen::VectorXd z(3);
@@ -108,7 +121,8 @@ void TwistStampedToLinearVelocity(
 
 void TwistWithCovarianceStampedToAngularVelocity(
 		const ros::MessageEvent<const geometry_msgs::TwistWithCovarianceStamped>& event,
-		const SensorConfiguration *sensor, ROAMestimation::FactorGraphFilter* filter) {
+		const SensorConfiguration *sensor,
+		ROAMestimation::FactorGraphFilter* filter) {
 	const geometry_msgs::TwistWithCovarianceStamped &msg = *(event.getMessage());
 
 	static Eigen::VectorXd z(3);
@@ -122,7 +136,8 @@ void TwistWithCovarianceStampedToAngularVelocity(
 
 	if (sensor->static_covariance_) {
 		ROS_ASSERT(sensor->covariance_ != NULL);
-		filter->addSequentialMeasurement(sensor->name_, t, z, *sensor->covariance_);
+		filter->addSequentialMeasurement(sensor->name_, t, z,
+				*sensor->covariance_);
 	} else {
 		for (int r = 3; r < 6; r++) {
 			for (int c = 3; c < 6; c++) {
@@ -136,7 +151,8 @@ void TwistWithCovarianceStampedToAngularVelocity(
 
 void TwistStampedToAngularVelocity(
 		const ros::MessageEvent<const geometry_msgs::TwistStamped>& event,
-		const SensorConfiguration *sensor, ROAMestimation::FactorGraphFilter* filter) {
+		const SensorConfiguration *sensor,
+		ROAMestimation::FactorGraphFilter* filter) {
 	const geometry_msgs::TwistStamped &msg = *(event.getMessage());
 
 	static Eigen::VectorXd z(3);
@@ -151,9 +167,12 @@ void TwistStampedToAngularVelocity(
 }
 
 void SingleTrackAckermannOdometryStampedToAckermannOdometer(
-		const ros::MessageEvent<roamros_msgs::SingleTrackAckermannOdometryStamped const>& event,
-		const SensorConfiguration *sensor, ROAMestimation::FactorGraphFilter* filter) {
-	const roamros_msgs::SingleTrackAckermannOdometryStamped &msg = *(event.getMessage());
+		const ros::MessageEvent<
+				roamros_msgs::SingleTrackAckermannOdometryStamped const>& event,
+		const SensorConfiguration *sensor,
+		ROAMestimation::FactorGraphFilter* filter) {
+	const roamros_msgs::SingleTrackAckermannOdometryStamped &msg =
+			*(event.getMessage());
 
 	static Eigen::VectorXd z(2);
 
@@ -168,7 +187,8 @@ void SingleTrackAckermannOdometryStampedToAckermannOdometer(
 
 void TwistWithCovarianceStampedToGenericOdometer(
 		const ros::MessageEvent<const geometry_msgs::TwistWithCovarianceStamped>& event,
-		const SensorConfiguration *sensor, ROAMestimation::FactorGraphFilter* filter) {
+		const SensorConfiguration *sensor,
+		ROAMestimation::FactorGraphFilter* filter) {
 	const geometry_msgs::TwistWithCovarianceStamped &msg = *(event.getMessage());
 
 	static Eigen::VectorXd z(6);
@@ -182,7 +202,8 @@ void TwistWithCovarianceStampedToGenericOdometer(
 
 	if (sensor->static_covariance_) {
 		ROS_ASSERT(sensor->covariance_ != NULL);
-		filter->addSequentialMeasurement(sensor->name_, t, z, *sensor->covariance_);
+		filter->addSequentialMeasurement(sensor->name_, t, z,
+				*sensor->covariance_);
 	} else {
 		for (int r = 0; r < 6; r++) {
 			for (int c = 0; c < 6; c++) {
@@ -196,7 +217,8 @@ void TwistWithCovarianceStampedToGenericOdometer(
 
 void TwistStampedToGenericOdometer(
 		const ros::MessageEvent<const geometry_msgs::TwistStamped>& event,
-		const SensorConfiguration *sensor, ROAMestimation::FactorGraphFilter* filter) {
+		const SensorConfiguration *sensor,
+		ROAMestimation::FactorGraphFilter* filter) {
 	const geometry_msgs::TwistStamped &msg = *(event.getMessage());
 
 	static Eigen::VectorXd z(6);
@@ -213,7 +235,8 @@ void TwistStampedToGenericOdometer(
 
 void OdometryToGenericOdometer(
 		const ros::MessageEvent<const nav_msgs::Odometry>& event,
-		const SensorConfiguration *sensor, ROAMestimation::FactorGraphFilter* filter) {
+		const SensorConfiguration *sensor,
+		ROAMestimation::FactorGraphFilter* filter) {
 	const nav_msgs::Odometry &msg = *(event.getMessage());
 
 	static Eigen::VectorXd z(6);
@@ -227,7 +250,8 @@ void OdometryToGenericOdometer(
 
 	if (sensor->static_covariance_) {
 		ROS_ASSERT(sensor->covariance_ != NULL);
-		filter->addSequentialMeasurement(sensor->name_, t, z, *sensor->covariance_);
+		filter->addSequentialMeasurement(sensor->name_, t, z,
+				*sensor->covariance_);
 	} else {
 		for (int r = 0; r < 6; r++) {
 			for (int c = 0; c < 6; c++) {
@@ -241,7 +265,8 @@ void OdometryToGenericOdometer(
 
 void ImuToAngularVelocity(
 		const ros::MessageEvent<const sensor_msgs::Imu>& event,
-		const SensorConfiguration *sensor, ROAMestimation::FactorGraphFilter* filter) {
+		const SensorConfiguration *sensor,
+		ROAMestimation::FactorGraphFilter* filter) {
 	const sensor_msgs::Imu &msg = *(event.getMessage());
 
 	static Eigen::VectorXd z(3);
@@ -255,7 +280,8 @@ void ImuToAngularVelocity(
 
 	if (sensor->static_covariance_) {
 		ROS_ASSERT(sensor->covariance_ != NULL);
-		filter->addSequentialMeasurement(sensor->name_, t, z, *sensor->covariance_);
+		filter->addSequentialMeasurement(sensor->name_, t, z,
+				*sensor->covariance_);
 	} else {
 		for (int r = 0; r < 3; r++) {
 			for (int c = 0; c < 3; c++) {
@@ -269,7 +295,8 @@ void ImuToAngularVelocity(
 
 void ImuToLinearAcceleration(
 		const ros::MessageEvent<const sensor_msgs::Imu>& event,
-		const SensorConfiguration *sensor, ROAMestimation::FactorGraphFilter* filter) {
+		const SensorConfiguration *sensor,
+		ROAMestimation::FactorGraphFilter* filter) {
 	const sensor_msgs::Imu &msg = *(event.getMessage());
 
 	static Eigen::VectorXd z(3);
@@ -283,7 +310,8 @@ void ImuToLinearAcceleration(
 
 	if (sensor->static_covariance_) {
 		ROS_ASSERT(sensor->covariance_ != NULL);
-		filter->addSequentialMeasurement(sensor->name_, t, z, *sensor->covariance_);
+		filter->addSequentialMeasurement(sensor->name_, t, z,
+				*sensor->covariance_);
 	} else {
 		for (int r = 0; r < 3; r++) {
 			for (int c = 0; c < 3; c++) {
@@ -297,7 +325,8 @@ void ImuToLinearAcceleration(
 
 void MagneticFieldToVectorField(
 		const ros::MessageEvent<sensor_msgs::MagneticField const>& event,
-		const SensorConfiguration *sensor, ROAMestimation::FactorGraphFilter* filter) {
+		const SensorConfiguration *sensor,
+		ROAMestimation::FactorGraphFilter* filter) {
 	const sensor_msgs::MagneticField &msg = *(event.getMessage());
 
 	static Eigen::VectorXd z(3);
@@ -311,7 +340,8 @@ void MagneticFieldToVectorField(
 
 	if (sensor->static_covariance_) {
 		ROS_ASSERT(sensor->covariance_ != NULL);
-		filter->addSequentialMeasurement(sensor->name_, t, z, *sensor->covariance_);
+		filter->addSequentialMeasurement(sensor->name_, t, z,
+				*sensor->covariance_);
 	} else {
 		for (int r = 0; r < 3; r++) {
 			for (int c = 0; c < 3; c++) {
@@ -325,7 +355,8 @@ void MagneticFieldToVectorField(
 
 void Vector3StampedToGeneric3DOFsensor(
 		const ros::MessageEvent<const geometry_msgs::Vector3Stamped>& event,
-		const SensorConfiguration* sensor, ROAMestimation::FactorGraphFilter* filter) {
+		const SensorConfiguration* sensor,
+		ROAMestimation::FactorGraphFilter* filter) {
 	const geometry_msgs::Vector3Stamped &msg = *(event.getMessage());
 
 	static Eigen::VectorXd z(3);
@@ -337,6 +368,21 @@ void Vector3StampedToGeneric3DOFsensor(
 	z << msg.vector.x, msg.vector.y, msg.vector.z;
 
 	filter->addSequentialMeasurement(sensor->name_, t, z, *sensor->covariance_);
+}
+//callback to manage messages coming from the imu sensor with IMUHandler
+void ImuToIMUHandler(const ros::MessageEvent<const sensor_msgs::Imu>& event,
+		const SensorConfiguration *sensor,
+		ROAMimu::IMUIntegralHandler* handler) {
+
+	const sensor_msgs::Imu &msg = *(event.getMessage());
+	Eigen::VectorXd za(3), zw(3);
+
+	za << msg.linear_acceleration.x, msg.linear_acceleration.y, msg.linear_acceleration.z;
+	zw << msg.angular_velocity.x, msg.angular_velocity.y, msg.angular_velocity.z;
+
+	//ROS_INFO("chiamata step, measurements: %f %f %f %f %f %f", za(0), za(1),
+	//		za(2), zw(0), zw(1), zw(2));
+	handler->step(za.data(), zw.data());
 }
 
 }

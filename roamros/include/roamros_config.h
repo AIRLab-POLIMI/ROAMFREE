@@ -14,6 +14,11 @@ namespace ROAMestimation {
 class FactorGraphFilter;
 }
 
+namespace ROAMimu {
+class IMUIntegralHandler;
+class IMUIntegrator;
+}
+
 namespace roamros {
 class SensorConfiguration;
 class SolverConfiguration;
@@ -45,7 +50,7 @@ bool setUpSolver(SolverConfiguration *solver_conf,
 /*
  * wait for the initial pose and set it into the filter
  */
-bool initializeSolver(ROAMestimation::FactorGraphFilter *solver);
+bool initializeSolver(ROAMestimation::FactorGraphFilter *solver, ROAMimu::IMUIntegralHandler *handler);
 
 /*
  * subscribes to the /initialpose topic and waits till the first message is available
@@ -58,7 +63,7 @@ void initialPoseCallback(const geometry_msgs::PoseWithCovarianceStamped &msg);
  */
 bool setUpSensors(const std::vector<SensorConfiguration*> *sensors,
 		const std::string &base_link_frame_id,
-		ROAMestimation::FactorGraphFilter* filter);
+		ROAMestimation::FactorGraphFilter* filter, ROAMimu::IMUIntegralHandler** handler);
 
 /*
  * binds callbacks accordint to sensor type and subscribe to sensor reading topics
@@ -66,7 +71,7 @@ bool setUpSensors(const std::vector<SensorConfiguration*> *sensors,
 
 bool setUpSubscriptions(const std::vector<SensorConfiguration *> *sensors,
 		ROAMestimation::FactorGraphFilter *filter,
-		std::vector<ros::Subscriber> *subscribers);
+		std::vector<ros::Subscriber> *subscribers, ROAMimu::IMUIntegralHandler* handler);
 
 /*
  * helper method, builds a parameter name starting from the sensor name and the parameter name
