@@ -32,8 +32,11 @@ class MeasurementEdgeWrapper_Impl : public MeasurementEdgeWrapper {
 
 public:
 	MeasurementEdgeWrapper_Impl(GenericEdgeInterface *edge);
+	virtual ~MeasurementEdgeWrapper_Impl() {};
 
 	virtual bool predict();
+
+	virtual PoseVertexWrapper_Ptr getConnectedPose(int N);
 
 protected:
 	GenericEdgeInterface *_e;

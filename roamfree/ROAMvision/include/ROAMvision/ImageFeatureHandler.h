@@ -1,13 +1,13 @@
 /*
-Copyright (c) 2013-2016 Politecnico di Milano.
-All rights reserved. This program and the accompanying materials
-are made available under the terms of the GNU Lesser Public License v3
-which accompanies this distribution, and is available at
-https://www.gnu.org/licenses/lgpl.html
+ Copyright (c) 2013-2016 Politecnico di Milano.
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the GNU Lesser Public License v3
+ which accompanies this distribution, and is available at
+ https://www.gnu.org/licenses/lgpl.html
 
-Contributors:
-    Davide A. Cucci (davide.cucci@epfl.ch)    
-*/
+ Contributors:
+ Davide A. Cucci (davide.cucci@epfl.ch)
+ */
 
 /*
  * ImageFeatureHandler.h
@@ -25,37 +25,44 @@ namespace ROAMvision {
 
 class ImageFeatureHandler {
 
-public:
+  public:
 
-	virtual ~ImageFeatureHandler() {
-	}
-	;
+    virtual ~ImageFeatureHandler() {
+    }
+    ;
 
-	ImageFeatureHandler() :
-			_timestampOffsetTreshold(std::numeric_limits<double>::infinity()) {
-	}
-	;
+    ImageFeatureHandler() :
+        _timestampOffsetTreshold(std::numeric_limits<double>::infinity()) {
+    }
+    ;
 
-	virtual bool init(ROAMestimation::FactorGraphFilter* f,
-			const std::string &name, const Eigen::VectorXd & T_OS,
-			const Eigen::VectorXd & K) = 0;
-	virtual bool addFeatureObservation(long int id, double t,
-			const Eigen::VectorXd &z, const Eigen::MatrixXd &cov) = 0;
+    virtual bool init(ROAMestimation::FactorGraphFilter* f,
+        const std::string &name, const Eigen::VectorXd & T_OS,
+        const Eigen::VectorXd & K, const Eigen::VectorXd & RD,
+        const Eigen::VectorXd & TD) = 0;
 
-	virtual bool getFeaturePositionInWorldFrame(long int id,
-			Eigen::VectorXd &lw) const = 0;
-	virtual bool getFeaturesIds(std::vector<long int> &to) const = 0;
-	virtual long int getNActiveFeatures() const = 0;
+    /**
+     *  \brief feed the FeatureHandler with a new image measurement
+     *
+     *  @return true if the feature is initialized and ready for estimation, false otherwise     *
+     */
+    virtual bool addFeatureObservation(long int id, double t,
+        const Eigen::VectorXd &z, const Eigen::MatrixXd &cov) = 0;
 
-	virtual void setTimestampOffsetTreshold(double dt) = 0;
+    virtual bool getFeaturePositionInWorldFrame(long int id,
+        Eigen::VectorXd &lw) const = 0;
+    virtual bool getFeaturesIds(std::vector<long int> &to) const = 0;
+    virtual long int getNActiveFeatures() const = 0;
 
-	virtual void fixOlderPosesWRTVisibleFeatures() = 0;
+    virtual void setTimestampOffsetTreshold(double dt) = 0;
 
-protected:
+    virtual void fixOlderPosesWRTVisibleFeatures() = 0;
 
-	std::string _sensorName;
-	double _timestampOffsetTreshold;
-	ROAMestimation::FactorGraphFilter* _filter;
+  protected:
+
+    std::string _sensorName;
+    double _timestampOffsetTreshold;
+    ROAMestimation::FactorGraphFilter* _filter;
 
 };
 

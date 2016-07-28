@@ -19,10 +19,15 @@ Contributors:
 #ifndef MEASUREMENTEDGEWRAPPER_H_
 #define MEASUREMENTEDGEWRAPPER_H_
 
+#include "interfaceTypes.h"
+
 namespace ROAMestimation {
 
 class MeasurementEdgeWrapper {
 public:
+
+  virtual ~MeasurementEdgeWrapper() {};
+
 	/*
 	 * \brief evaluates a prediction for the most recent pose in the edge
 	 *
@@ -33,6 +38,12 @@ public:
 	 * @return false if the edge does not support prediction
 	 */
 	virtual bool predict() = 0;
+
+	/*
+	 * \ brief get a wrapper to the pose vertices that are connected by this edge
+	 */
+
+	virtual PoseVertexWrapper_Ptr getConnectedPose(int N) = 0;
 };
 
 } /* namespace ROAMestimation */

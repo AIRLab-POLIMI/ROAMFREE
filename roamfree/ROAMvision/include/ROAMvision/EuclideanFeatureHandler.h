@@ -37,7 +37,9 @@ class EuclideanFeatureHandler: public ImageFeatureHandler {
 
     virtual bool init(ROAMestimation::FactorGraphFilter* f,
         const std::string &name, const Eigen::VectorXd & T_OS,
-        const Eigen::VectorXd & K);
+        const Eigen::VectorXd & K, const Eigen::VectorXd & RD =
+            Eigen::VectorXd::Zero(3), const Eigen::VectorXd & TD =
+            Eigen::VectorXd::Zero(2));
     virtual bool addFeatureObservation(long int id, double t,
         const Eigen::VectorXd &z, const Eigen::MatrixXd &cov);
 

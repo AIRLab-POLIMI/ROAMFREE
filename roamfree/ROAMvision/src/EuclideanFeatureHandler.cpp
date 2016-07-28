@@ -34,7 +34,7 @@ EuclideanFeatureHandler::EuclideanFeatureHandler() {
 }
 
 bool EuclideanFeatureHandler::init(FactorGraphFilter* f, const string &name,
-    const Eigen::VectorXd & T_OS, const Eigen::VectorXd & K) {
+    const Eigen::VectorXd & T_OS, const Eigen::VectorXd & K, const Eigen::VectorXd & RD, const Eigen::VectorXd & TD) {
 
   _filter = f;
   _sensorName = name;
@@ -51,9 +51,9 @@ bool EuclideanFeatureHandler::init(FactorGraphFilter* f, const string &name,
       true);
 
   _filter->addConstantParameter(Euclidean3D, _sensorName + "_Cam_RD",
-      Eigen::VectorXd::Zero(3), true);
+      RD, true);
   _filter->addConstantParameter(Euclidean2D, _sensorName + "_Cam_TD",
-      Eigen::VectorXd::Zero(2), true);
+      TD, true);
 
   return true;
 }
@@ -142,8 +142,12 @@ bool EuclideanFeatureHandler::addFeatureObservation(long int id, double t,
         cerr << "[EuclideanFeatureHandler] Ready to estimate depth for track " << id
         << endl;
 #			endif
+
+        return true;
       }
     }
+
+    return false;
 
   } else { // it has already been initialized, just add the measurement
     MeasurementEdgeWrapper_Ptr ret = _filter->addMeasurement(sensor, t, z, cov,

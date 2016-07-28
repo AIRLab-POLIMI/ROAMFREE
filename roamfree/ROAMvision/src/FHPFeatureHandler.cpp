@@ -155,11 +155,15 @@ bool FHPFeatureHandler::addFeatureObservation(long int id, double t,
       d.zHistory.clear();
       d.isInitialized = true;
 
+      return true;
+
 #			ifdef DEBUG_PRINT_VISION_INFO_MESSAGES
       cerr << "[FHPFeatureHandler] Ready to estimate depth for track " << id
       << endl;
 #			endif
     }
+
+    return false;
 
   } else { // it has already been initialized, just add the measurement
     MeasurementEdgeWrapper_Ptr ret = _filter->addMeasurement(sensor, t, z, cov,

@@ -702,8 +702,11 @@ MeasurementEdgeWrapperVector_Ptr FactorGraphFilter_Impl::addSequentialMeasuremen
 
     inserted = addNonMasterSequentialMeasurement_i(sensor, timestamp, z, cov);
 
-    ret->push_back(
-        MeasurementEdgeWrapper_Ptr(new MeasurementEdgeWrapper_Impl(inserted)));
+    if (inserted != NULL) {
+      ret->push_back(
+          MeasurementEdgeWrapper_Ptr(
+              new MeasurementEdgeWrapper_Impl(inserted)));
+    }
   }
 
   return ret;
@@ -1029,7 +1032,7 @@ GenericEdgeInterface* FactorGraphFilter_Impl::addNonMasterSequentialMeasurement_
 
 // if the measurement is more recent with respect to the newest vertex we defer it
   PoseVertex *newest = getNewestPose_i();
-  if (newest == NULL || newest->getTimestamp() < timestamp) {
+  if (newest == NULL || newest->getTimestamp() + 1e-6 < timestamp) { // one us tolerance
     deferMeasurement(sensor, timestamp, z, cov);
     return NULL;
   }
@@ -1464,7 +1467,7 @@ bool FactorGraphFilter_Impl::estimate(PoseVertexWrapperVector poses,
 
     if (!pw) {
       cerr
-          << "[FactorGraphFilter] Error: Null PoseVertexWrapper_Ptr in pose set"
+      << "[FactorGraphFilter] Error: Null PoseVertexWrapper_Ptr in pose set"
           << endl;
       return false;
     }
@@ -2143,7 +2146,8 @@ void FactorGraphFilter_Impl::setWriteGraph(bool writeGraph) {
   _writeGraph = writeGraph;
 }
 
-void FactorGraphFilter_Impl::setWriteHessianStructure(bool writeHessianStructure) {
+void FactorGraphFilter_Impl::setWriteHessianStructure(
+    bool writeHessianStructure) {
   _writeHessianStructure = writeHessianStructure;
 }
 
