@@ -98,6 +98,12 @@ void FactorGraphFilter_Impl::initSolver() {
   // init the spatial index
 
   _spatialIndex = new SpatialIndex;
+
+  _lastReturnedN_fromBack = -1;
+  _lastReturnedPose_fromBack = _poses.end();
+
+  _lastReturnedN_fromFront = -1;
+  _lastReturnedPose_fromFront = _poses.end();
 }
 
 void FactorGraphFilter_Impl::setSolverMethod(SolverMethod method) {
@@ -1034,6 +1040,10 @@ GenericEdgeInterface* FactorGraphFilter_Impl::addNonMasterSequentialMeasurement_
   PoseVertex *newest = getNewestPose_i();
   if (newest == NULL || newest->getTimestamp() + 1e-6 < timestamp) { // one us tolerance
     deferMeasurement(sensor, timestamp, z, cov);
+#   ifdef DEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES
+    cerr
+    << "[FactorGraphFilter] Why? Measurement is newer than last pose or I don't have any pose yet." << endl;
+#   endif
     return NULL;
   }
 
@@ -1074,7 +1084,26 @@ GenericEdgeInterface* FactorGraphFilter_Impl::addNonMasterSequentialMeasurement_
 
 // check if I have enough vertices wrt the sensor order
   if (!checkSensorOrder(sensor, th, last, secondlast)) {
-    deferMeasurement(sensor, timestamp, z, cov);
+    // deferMeasurement(sensor, timestamp, z, cov); // TODO: why should I defer this? This will just create mess later
+
+#   ifdef DEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES
+    cerr << "[FactorGraphFilter] Discarding it" << endl;
+    cerr
+    << "[FactorGraphFilter] Why? sensor of order " << sensor.order << " and I have only: ";
+    cerr << "second-last: ";
+    if (secondlast ==  NULL) {
+      cerr << "NULL";
+    } else {
+      cerr << ROAMutils::StringUtils::writeNiceTimestamp(secondlast->getTimestamp());
+    }
+    cerr << ", last: ";
+    if (last ==  NULL) {
+      cerr << "NULL";
+    } else {
+      cerr << ROAMutils::StringUtils::writeNiceTimestamp(last->getTimestamp());
+    }
+#   endif
+    cerr << endl;
     return NULL;
   }
 
@@ -1408,33 +1437,57 @@ PoseVertexWrapper_Ptr FactorGraphFilter_Impl::getNthOldestPose(int n) {
 }
 
 PoseVertex *FactorGraphFilter_Impl::getNthPose_i(int n) {
-  PoseVertex *pose = NULL;
-
-  if (n < _poses.size()) {
-    auto it = _poses.end();
-    for (int k = 0; k <= n; k++) {
-      --it;
+  if (n < _poses.size() && n >= 0) {
+    // if the last returned is nearer than starting from scratch ...
+    if (_lastReturnedN_fromBack != -1 && abs(_lastReturnedN_fromBack - n) < n) {
+      int dir = _lastReturnedN_fromBack < n ? 1 : -1;
+      while (_lastReturnedN_fromBack != n) {
+        if (dir > 0) {
+          --_lastReturnedPose_fromBack; // we are going backwards, we count from end to begin
+        } else {
+          ++_lastReturnedPose_fromBack;
+        }
+        _lastReturnedN_fromBack += dir;
+      }
+    } else {
+      auto it = _poses.end();
+      for (int k = 0; k <= n; k++) {
+        --it;
+      }
+      _lastReturnedPose_fromBack = it;
+      _lastReturnedN_fromBack = n;
     }
-
-    pose = it->second;
+    return _lastReturnedPose_fromBack->second;
+  } else {
+    return NULL;
   }
-
-  return pose;
 }
 
 PoseVertex *FactorGraphFilter_Impl::getNthOldestPose_i(int n) {
-  PoseVertex *pose = NULL;
-
-  if (n < _poses.size()) {
-    auto it = _poses.begin();
-    for (int k = 0; k < n; k++) {
-      ++it;
+  if (n < _poses.size() && n >= 0) {
+    // if the last returned is nearer than starting from scratch ...
+    if (_lastReturnedN_fromFront != -1 && abs(_lastReturnedN_fromFront - n) < n) {
+      int dir = _lastReturnedN_fromFront < n ? 1 : -1;
+      while (_lastReturnedN_fromFront != n) {
+        if (dir > 0) {
+          ++_lastReturnedPose_fromFront;
+        } else {
+          --_lastReturnedPose_fromFront;
+        }
+        _lastReturnedN_fromFront += dir;
+      }
+    } else {
+      auto it = _poses.begin();
+      for (int k = 0; k < n; k++) {
+        ++it;
+      }
+      _lastReturnedPose_fromFront = it;
+      _lastReturnedN_fromFront = n;
     }
-
-    pose = it->second;
+    return _lastReturnedPose_fromFront->second;
+  } else {
+    return NULL;
   }
-
-  return pose;
 }
 
 bool FactorGraphFilter_Impl::estimate(int nIterations) {

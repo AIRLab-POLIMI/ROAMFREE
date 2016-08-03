@@ -46,7 +46,10 @@ public:
 
   bool predict(const Eigen::VectorXd &x, double **params,
       const Eigen::VectorXd& z, double dt, Eigen::VectorXd &xhat) {
-    return false;
+    xhat = x; // TODO: dummy predictor
+
+    return true;
+
   }
 
   template<typename T>

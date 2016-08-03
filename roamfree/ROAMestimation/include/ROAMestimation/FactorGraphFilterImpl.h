@@ -251,7 +251,13 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
 
     PoseVertex *getNewestPose_i();
     PoseVertex *getOldestPose_i();
+
+    int _lastReturnedN_fromBack; // two variables to speed up calls of getNthPose_i
+    PoseMapIterator _lastReturnedPose_fromBack;
     PoseVertex *getNthPose_i(int n);
+
+    int _lastReturnedN_fromFront; // two variables to speed up calls of getNthPose_i
+    PoseMapIterator _lastReturnedPose_fromFront;
     PoseVertex *getNthOldestPose_i(int n);
 
     PoseVertex *getNearestPoseByTimestamp_i(double t, bool onlyBefore = false);
