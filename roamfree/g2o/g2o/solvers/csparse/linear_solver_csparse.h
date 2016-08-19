@@ -258,6 +258,10 @@ class LinearSolverCSparse : public LinearSolver<MatrixType>
     bool blockOrdering() const { return _blockOrdering;}
     void setBlockOrdering(bool blockOrdering) { _blockOrdering = blockOrdering;}
 
+    const CSparseExt *getccsA() {
+      return _ccsA;
+    }
+
   protected:
     css* _symbolicDecomposition;
     int _csWorkspaceSize;
