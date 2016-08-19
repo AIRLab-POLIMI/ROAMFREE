@@ -24,12 +24,13 @@
 
 #include <iostream>
 
+using namespace std;
 using namespace ROAMestimation;
 
 namespace ROAMimu {
 
 IMUIntegralHandler::IMUIntegralHandler(ROAMestimation::FactorGraphFilter* f,
-    const std::string& name, int N, double dt,
+    const string& name, int N, double dt,
     ROAMestimation::ParameterWrapper_Ptr ba_par,
     ROAMestimation::ParameterWrapper_Ptr bw_par, const Eigen::VectorXd &T_OS) :
     _filter(f), _sensorNameDeltaP(name + "DeltaP"), _ba_par(ba_par), _bw_par(
@@ -127,11 +128,11 @@ bool IMUIntegralHandler::step(double* za, double* zw) {
      //*/
 
 #		ifdef DEBUG_PRINT_INFO_MESSAGES
-    std::cerr
+    cerr
     << "[IMUIntegralHandler] Info: acquiring current biases estimates:"
-    << std::endl;
-    std::cerr << "Ba: " << ba_tmp.transpose().format(CleanFmt) << std::endl;
-    std::cerr << "Bw: " << bw_tmp.transpose().format(CleanFmt) << std::endl;
+    << endl;
+    cerr << "Ba: " << ba_tmp.transpose().format(CleanFmt) << endl;
+    cerr << "Bw: " << bw_tmp.transpose().format(CleanFmt) << endl;
 #		endif
 
     // reset the integral with bias for z1
@@ -151,7 +152,7 @@ bool IMUIntegralHandler::step(double* za, double* zw) {
   // if we have done all the steps, collect the results
   if (_cnt == _N) {
 #   ifdef DEBUG_PRINT_INFO_MESSAGES
-      std::cerr << "[IMUIntegralHandler] Completed integration, adding poses and low level measurements ..." << std::endl;
+    cerr << "[IMUIntegralHandler] Completed integration, adding poses and low level measurements ..." << endl;
 #   endif
 
     // -------------------- STEP 1: z1 = z1 + delta  ---------------------- //
@@ -217,9 +218,9 @@ bool IMUIntegralHandler::step(double* za, double* zw) {
         double dt12 = _x2->getTimestamp() - _x1->getTimestamp();
 
         if (abs(dt01 - dt12) > 1e-6) {
-          std::cerr
+          cerr
               << "[IMUIntegralHandler] Warning: non master, mismatch in existing poses dt of more that 1us"
-              << std::endl;
+              << endl;
         }
       }
 
@@ -282,7 +283,8 @@ bool IMUIntegralHandler::step(double* za, double* zw) {
       if (_isMaster == true) {
         _x1 = _filter->addPose(_x0->getTimestamp() + _dt * _N);
       } else {
-        _x1 = _filter->getNearestPoseByTimestamp(_x0->getTimestamp() + _dt * _N);
+        _x1 = _filter->getNearestPoseByTimestamp(
+            _x0->getTimestamp() + _dt * _N);
       }
 
       if (_predictorEnabled) {
@@ -368,10 +370,10 @@ bool IMUIntegralHandler::step(double* za, double* zw) {
 
     // -------------------- STEP 5: swap storage for z1 and z2 ------------ //
 
-    std::swap(_z01, _z12);
-    std::swap(_z01Cov, _z12Cov);
-    std::swap(ba_ptr_z2, ba_ptr_z1);
-    std::swap(bw_ptr_z2, bw_ptr_z1);
+    swap(_z01, _z12);
+    swap(_z01Cov, _z12Cov);
+    swap(ba_ptr_z2, ba_ptr_z1);
+    swap(bw_ptr_z2, bw_ptr_z1);
 
     // -------------------- STEP 6: reset the counter --------------------- //
 
