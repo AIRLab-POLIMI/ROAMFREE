@@ -1091,13 +1091,13 @@ GenericEdgeInterface* FactorGraphFilter_Impl::addNonMasterSequentialMeasurement_
     cerr
     << "[FactorGraphFilter] Why? sensor of order " << sensor.order << " and I have only: ";
     cerr << "second-last: ";
-    if (secondlast ==  NULL) {
+    if (secondlast == NULL) {
       cerr << "NULL";
     } else {
       cerr << ROAMutils::StringUtils::writeNiceTimestamp(secondlast->getTimestamp());
     }
     cerr << ", last: ";
-    if (last ==  NULL) {
+    if (last == NULL) {
       cerr << "NULL";
     } else {
       cerr << ROAMutils::StringUtils::writeNiceTimestamp(last->getTimestamp());
@@ -1466,7 +1466,8 @@ PoseVertex *FactorGraphFilter_Impl::getNthPose_i(int n) {
 PoseVertex *FactorGraphFilter_Impl::getNthOldestPose_i(int n) {
   if (n < _poses.size() && n >= 0) {
     // if the last returned is nearer than starting from scratch ...
-    if (_lastReturnedN_fromFront != -1 && abs(_lastReturnedN_fromFront - n) < n) {
+    if (_lastReturnedN_fromFront != -1
+        && abs(_lastReturnedN_fromFront - n) < n) {
       int dir = _lastReturnedN_fromFront < n ? 1 : -1;
       while (_lastReturnedN_fromFront != n) {
         if (dir > 0) {
@@ -2023,6 +2024,20 @@ double FactorGraphFilter_Impl::getWindowLenght() {
   }
 
   return getNewestPose_i()->getTimestamp() - getOldestPose_i()->getTimestamp();
+}
+
+double FactorGraphFilter_Impl::getChi2() {
+  return _optimizer->chi2();
+}
+
+void FactorGraphFilter_Impl::writeFinalHessian() {
+  g2o::BlockSolverX *blocksolver =
+      static_cast<g2o::BlockSolverX *>(_optimizer->solver());
+
+  g2o::LinearSolverCSparse<g2o::BlockSolverX::PoseMatrixType> *cspsolver =
+      static_cast<g2o::LinearSolverCSparse<g2o::BlockSolverX::PoseMatrixType> *>(blocksolver->linearSolver());
+
+  g2o::writeCs2Octave("/tmp/roamfree/H.txt", cspsolver->getccsA(), true); // TODO: put the same folder as for _logger
 }
 
 MeasurementEdgeWrapperVector_Ptr FactorGraphFilter_Impl::handleDeferredMeasurements() {

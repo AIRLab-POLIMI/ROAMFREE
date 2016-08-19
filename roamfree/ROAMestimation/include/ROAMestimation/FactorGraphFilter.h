@@ -100,6 +100,17 @@ class FactorGraphFilter {
      */
     virtual double getWindowLenght() = 0;
 
+    /**
+     *  \brief gets the chi2 (meaningful only after an estimation)
+     */
+    virtual double getChi2() = 0;
+
+    /**
+     *  \brief writes the final hessian matrix to a file
+     */
+    virtual void writeFinalHessian() = 0;
+
+
     /* --------------------------- SENSOR LEVEL METHODS ---------------------------- */
 
     /**

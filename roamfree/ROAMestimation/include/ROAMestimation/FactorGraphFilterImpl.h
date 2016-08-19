@@ -73,6 +73,10 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
 
     double getWindowLenght();
 
+    double getChi2();
+
+    void writeFinalHessian();
+
     /* --------------------------- SENSOR LEVEL METHODS ---------------------------- */
 
     bool addSensor(const std::string &name, MeasTypes type, bool isMaster,
