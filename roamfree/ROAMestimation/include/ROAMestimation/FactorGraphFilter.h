@@ -296,6 +296,19 @@ class FactorGraphFilter {
     virtual PoseVertexWrapper_Ptr addPose(double t) = 0;
 
     /**
+     * \brief add an extra pose which interpolates between the two nearest ones
+     *
+     * A new pose is added with timestamp t which lies between the two nearest
+     * existing pose vertices based on the difference of timestamps.
+     *
+     * @param t the new pose timestamp
+     * @param pseudoObsCov the covariance of the pseudo-observation constraining the interpolating pose value
+     *
+     * @return a wrapper to the created pose or NULL in case of failure.
+     */
+    virtual PoseVertexWrapper_Ptr addInterpolatingPose(double t, const Eigen::MatrixXd &pseudoObsCov) = 0;
+
+    /**
      *  \brief Adds a measurement.
      *
      * This is a low level method to feed the FactorGraphFilter with sensor readings. The edge of maximum order

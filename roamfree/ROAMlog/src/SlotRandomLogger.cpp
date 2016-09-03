@@ -117,7 +117,8 @@ double SlotRandomLogger::getToLogComponent(int i,
 
   	// if the edge is robustified we have to undo the process before storing the result
   	if (oe->robustKernel() == true) {
-  		return ov.errorData()[i-n2]/oe->currentHuberWeight();
+  		//return ov.errorData()[i-n2]/oe->currentHuberWeight();
+  	  return oe->currentHuberWeight();
   	} else {
   		return ov.errorData()[i-n2];
   	}

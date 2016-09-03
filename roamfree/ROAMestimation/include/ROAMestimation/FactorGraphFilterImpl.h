@@ -139,6 +139,8 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
 
     PoseVertexWrapper_Ptr addPose(double t);
 
+    PoseVertexWrapper_Ptr addInterpolatingPose(double t, const Eigen::MatrixXd &pseudoObsCov);
+
     MeasurementEdgeWrapper_Ptr addMeasurement(const std::string& sensorName,
         double timestamp, const Eigen::VectorXd &z, const Eigen::MatrixXd &cov,
         PoseVertexWrapper_Ptr v2, PoseVertexWrapper_Ptr v1 =
@@ -252,6 +254,8 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
     // these are some internal methods which do not return wrappers
 
     PoseVertex *addPose_i(double t);
+
+    PoseVertex *addInterpolatingPose_i(double t, const Eigen::MatrixXd &pseudoObsCov);
 
     PoseVertex *getNewestPose_i();
     PoseVertex *getOldestPose_i();

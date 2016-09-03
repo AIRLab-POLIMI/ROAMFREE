@@ -32,6 +32,7 @@
 #include "ROAMlog/GraphLogger.h"
 
 #include "QuaternionGenericEdge.h"
+#include "SE3InterpolationEdge.h"
 #include "GenericEdgeInterface.h"
 #include "EstimationEdgeCollectInterface.h"
 #include "g2oSolverFactory.h"
@@ -655,6 +656,75 @@ PoseVertex *FactorGraphFilter_Impl::addPose_i(double t) {
 # endif
 
   return v;
+}
+
+PoseVertexWrapper_Ptr FactorGraphFilter_Impl::addInterpolatingPose(double t,
+    const Eigen::MatrixXd &pseudoObsCov)
+    {
+  PoseVertex *v = addInterpolatingPose_i(t, pseudoObsCov);
+
+  return PoseVertexWrapper_Ptr(v != NULL ? new PoseVertexWrapper_Impl(v) : NULL);
+
+}
+
+PoseVertex *FactorGraphFilter_Impl::addInterpolatingPose_i(double t,
+    const Eigen::MatrixXd &pseudoObsCov) {
+
+  // get the two poses between which t lies
+
+  PoseMapIterator before, after;
+  after = _poses.lower_bound(t);
+
+  if (after == _poses.end()) {
+    cerr << "[FactorGraphFilter] Error: timestap "
+        << ROAMutils::StringUtils::writeNiceTimestamp(t)
+        << " is newer than the most recent pose.";
+    return NULL;
+  } else if (after == _poses.begin()) {
+    cerr << "[FactorGraphFilter] Error: timestap "
+        << ROAMutils::StringUtils::writeNiceTimestamp(t)
+        << " is older than the oldest pose.";
+    return NULL;
+  }
+
+  before = after;
+  --before;
+
+  PoseVertex *xi = addPose_i(t);
+
+  if (xi == NULL) {
+    return NULL;
+  }
+
+  SE3InterpolationEdge *edge = new SE3InterpolationEdge;
+
+  edge->vertices()[0] = before->second;
+  edge->vertices()[1] = xi;
+  edge->vertices()[2] = after->second;
+
+  ROAMmath::invDiagonal(pseudoObsCov, edge->information());
+
+  edge->init();
+
+  // create the metadata
+  edge->setUserData(new MeasurementEdgeMetadata);
+
+  // insert the edge into the g2o graph
+  _optimizer->addEdge(edge);
+
+# ifdef DEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES
+  cerr << "[FactorGraphFilter] Info: adding interpolating Pose vertex at t="
+      << ROAMutils::StringUtils::writeNiceTimestamp(t) << ", id " << xi->id()
+      << " between "
+      << ROAMutils::StringUtils::writeNiceTimestamp(
+          before->second->getTimestamp()) << " and "
+      << ROAMutils::StringUtils::writeNiceTimestamp(
+          after->second->getTimestamp())
+      << endl;
+# endif
+
+  return xi;
+
 }
 
 MeasurementEdgeWrapperVector_Ptr FactorGraphFilter_Impl::addSequentialMeasurement(
@@ -2139,6 +2209,7 @@ string FactorGraphFilter_Impl::writeEdge(g2o::HyperGraph::Edge * e) {
   GenericEdgeInterface *gei;
   BasePriorEdgeInterface *pei;
   GenericLinearConstraint *glc;
+  SE3InterpolationEdge *ie;
 
   if ((gei = dynamic_cast<GenericEdgeInterface *>(e)) != NULL) {
     s << gei->writeDebugInfo();
@@ -2146,6 +2217,8 @@ string FactorGraphFilter_Impl::writeEdge(g2o::HyperGraph::Edge * e) {
     s << pei->writeDebugInfo();
   } else if ((glc = dynamic_cast<GenericLinearConstraint *>(e)) != NULL) {
     s << glc->writeDebugInfo();
+  } else if ((ie = dynamic_cast<SE3InterpolationEdge *>(e)) != NULL) {
+    s << ie->writeDebugInfo();
   } else {
     s << "Unknown (this is bad) ";
   }
