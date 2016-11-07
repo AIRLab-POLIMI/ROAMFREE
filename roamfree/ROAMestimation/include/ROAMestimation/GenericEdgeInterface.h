@@ -141,12 +141,6 @@ public:
    */
   virtual long int getFrameCounter() const = 0;
   virtual void setFrameCounter(long int c) = 0;
-
-  /**
-   * \brief returns a string which uniquely identifies this edge
-   */
-  virtual std::string getEdgeHash() const = 0;
-
 };
 
 }

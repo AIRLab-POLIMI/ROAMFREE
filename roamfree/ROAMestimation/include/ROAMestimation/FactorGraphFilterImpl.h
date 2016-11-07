@@ -326,7 +326,6 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
     /* --------------------------- STUFF FOR DEBUG ------------------------------------ */
 
     std::string writeFactorGraph();
-    std::string writeFactorGraphToDot();
     std::string writeVertexIdMap(); // for each vertex it writes its indices in the hessian matrix
     std::string writeEdge(g2o::HyperGraph::Edge *e);
 

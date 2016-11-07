@@ -2227,52 +2227,6 @@ string FactorGraphFilter_Impl::writeEdge(g2o::HyperGraph::Edge * e) {
   return s.str();
 }
 
-string FactorGraphFilter_Impl::writeFactorGraphToDot() {
-
-  stringstream s;
-
-  s << "graph {" << endl;
-  s << "overlap=false;" << endl;
-
-  for (PoseMapIterator pit = _poses.begin(); pit != _poses.end(); ++pit) {
-    PoseVertex *v = pit->second;
-
-    s << v->id() << "[label=\"" << "(" << v->id() << ") t="
-        << ROAMutils::StringUtils::writeNiceTimestamp(v->getTimestamp())
-        << (v->fixed() ? " Fixed" : "") << "\"];" << endl;
-
-    g2o::HyperGraph::EdgeSet::const_iterator weit;
-    for (weit = v->edges().begin(); weit != v->edges().end(); ++weit) {
-
-      GenericEdgeInterface *e = dynamic_cast<GenericEdgeInterface *>(*weit);
-      if (e != NULL) {
-        s << e->getEdgeHash() << "[label=\"" << e->getCategory() << "\n"
-            << ROAMutils::StringUtils::writeNiceTimestamp(e->getTimestamp())
-            << "\", shape=box];";
-        s << e->getEdgeHash() << "--" << v->id() << ";" << endl;
-      }
-
-      //TODO other information
-      /*BasePriorEdgeInterface *p = dynamic_cast<BasePriorEdgeInterface *>(*weit);
-       if (p != NULL) {
-       s << "Prior ";
-       }
-
-       GenericLinearConstraint *glc =
-       dynamic_cast<GenericLinearConstraint *>(*weit);
-       if (glc != NULL) {
-       s << glc->writeDebugInfo();
-       }
-
-       s << endl;*/
-    }
-  }
-
-  s << "}" << endl;
-
-  return s.str();
-}
-
 void FactorGraphFilter_Impl::setLowLevelLogging(bool lowLevelLogging,
     string folder) {
   if (lowLevelLogging == true) {

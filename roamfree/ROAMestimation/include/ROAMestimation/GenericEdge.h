@@ -70,8 +70,6 @@ class GenericEdge: public g2o::BaseMultiEdge<D, Eigen::VectorXd>,
     virtual long int getFrameCounter() const;
     virtual void setFrameCounter(long int c);
 
-    virtual std::string getEdgeHash() const;
-
     inline operator g2o::OptimizableGraph::Edge *() {
       return this;
     }
@@ -258,21 +256,6 @@ inline long int ROAMestimation::GenericEdge<D>::getFrameCounter() const {
 template<int D>
 inline void ROAMestimation::GenericEdge<D>::setFrameCounter(long int c) {
   _frameCounter = c;
-}
-
-template<int D>
-inline std::string ROAMestimation::GenericEdge<D>::getEdgeHash() const {
-
-  // N.B. if this method is changed it HAS to be changed also into the python utility library
-
-  std::stringstream s;
-  long long int tstamphash;
-
-  std::memcpy(&tstamphash, &_tstamp, 8);
-
-  s << getCategory() << "_" << tstamphash;
-
-  return s.str();
 }
 
 #endif /* GENERICEDGE_H_ */
