@@ -705,6 +705,7 @@ PoseVertex *FactorGraphFilter_Impl::addInterpolatingPose_i(double t,
   ROAMmath::invDiagonal(pseudoObsCov, edge->information());
 
   edge->init();
+  static_cast<PoseVertexMetadata *>(xi->userData())->hasBeenEstimated = true; // prediction is already accurate
 
   // create the metadata
   edge->setUserData(new MeasurementEdgeMetadata);
@@ -1717,7 +1718,7 @@ bool FactorGraphFilter_Impl::estimate_i(g2o::HyperGraph::EdgeSet &eset,
   _optimizer->initializeOptimization(eset);
 
   if (_writeHessianStructure == true) {
-    ofstream fid("debug/Hstruct.txt"); // TODO: put the same folder as for _logger
+    ofstream fid("/tmp/roamfree/Hstruct.txt"); // TODO: put the same folder as for _logger
 
     if (fid.is_open()) {
       fid << writeVertexIdMap();
