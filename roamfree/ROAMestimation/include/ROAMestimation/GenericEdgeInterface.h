@@ -134,13 +134,6 @@ public:
    * i.e. category, timestamp and vertices it is connected to
    */
   virtual std::string writeDebugInfo() const = 0;
-
-  /**
-   * the frame counter is an integer which gives the position of this edge
-   * with respect to the ordering of this sensor readings
-   */
-  virtual long int getFrameCounter() const = 0;
-  virtual void setFrameCounter(long int c) = 0;
 };
 
 }

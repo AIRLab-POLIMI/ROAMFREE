@@ -1367,7 +1367,6 @@ GenericEdgeInterface *FactorGraphFilter_Impl::addMeasurement_i(
 // fill in the measurement and the covariance
   e->setMeasurement_GE(z);
   e->setNoiseCov(cov);
-  e->setFrameCounter(0); // TODO: implement frame counter handling
 
 // set robustification according to sensor configuration
 

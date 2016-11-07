@@ -67,9 +67,6 @@ class GenericEdge: public g2o::BaseMultiEdge<D, Eigen::VectorXd>,
 
     virtual const Eigen::VectorXd &getAugmentedState() const;
 
-    virtual long int getFrameCounter() const;
-    virtual void setFrameCounter(long int c);
-
     inline operator g2o::OptimizableGraph::Edge *() {
       return this;
     }
@@ -246,16 +243,6 @@ inline void ROAMestimation::GenericEdge<D>::setMeasurement_GE(
 template<int D>
 inline const Eigen::VectorXd& ROAMestimation::GenericEdge<D>::getAugmentedState() const {
   return _x;
-}
-
-template<int D>
-inline long int ROAMestimation::GenericEdge<D>::getFrameCounter() const {
-  return _frameCounter;
-}
-
-template<int D>
-inline void ROAMestimation::GenericEdge<D>::setFrameCounter(long int c) {
-  _frameCounter = c;
 }
 
 #endif /* GENERICEDGE_H_ */

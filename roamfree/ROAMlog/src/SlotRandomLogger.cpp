@@ -107,7 +107,7 @@ double SlotRandomLogger::getToLogComponent(int i,
   int n3 = n2 + ov.dimension();
 
   if (i < n0) {
-    return o.getFrameCounter();
+    return 0; // this was the slot reserved for frameCounter, so now its free
   } else if (i < n1) {
     return o.getAugmentedState()[i-n0];
   } else if (i < n2) {
@@ -117,8 +117,8 @@ double SlotRandomLogger::getToLogComponent(int i,
 
   	// if the edge is robustified we have to undo the process before storing the result
   	if (oe->robustKernel() == true) {
-  		//return ov.errorData()[i-n2]/oe->currentHuberWeight();
-  	  return oe->currentHuberWeight();
+  		return ov.errorData()[i-n2]/oe->currentHuberWeight();
+//  	  return oe->currentHuberWeight();
   	} else {
   		return ov.errorData()[i-n2];
   	}
