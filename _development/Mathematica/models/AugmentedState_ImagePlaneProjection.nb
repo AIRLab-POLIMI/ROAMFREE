@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       145,          7]
-NotebookDataLength[     45345,       1254]
-NotebookOptionsPosition[     43410,       1196]
-NotebookOutlinePosition[     43794,       1213]
-CellTagsIndexPosition[     43751,       1210]
+NotebookDataLength[     45550,       1260]
+NotebookOptionsPosition[     43614,       1202]
+NotebookOutlinePosition[     43998,       1219]
+CellTagsIndexPosition[     43955,       1216]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -510,35 +510,40 @@ Cell[BoxData[
   3.6191773075356197`*^9}, {3.621677854739362*^9, 3.621677855724633*^9}}],
 
 Cell[BoxData[
- RowBox[{"(*", " ", 
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"with", " ", "no", " ", "distortion", " ", "model", " ", 
+    RowBox[{"(", 
+     RowBox[{"used", " ", "in", " ", "prediction"}], ")"}]}], " ", "*)"}], 
+  "\[IndentingNewLine]", 
   RowBox[{
    RowBox[{
-    RowBox[{
-    "with", " ", "no", " ", "distortion", " ", "model", " ", 
-     "\[IndentingNewLine]", "Zhat"}], "=", 
-    RowBox[{"CM", ".", "TCW", ".", "LwO"}]}], ";", "\[IndentingNewLine]", 
-   RowBox[{"ZhatNormlong", "=", 
-    RowBox[{"{", 
-     RowBox[{
+    RowBox[{"Zhat", "=", 
+     RowBox[{"CM", ".", "TCW", ".", "LwO"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"ZhatNormlong", "=", 
+     RowBox[{"{", 
       RowBox[{
-       RowBox[{"Zhat", "[", 
-        RowBox[{"[", "1", "]"}], "]"}], "/", 
-       RowBox[{"Zhat", "[", 
-        RowBox[{"[", "3", "]"}], "]"}]}], ",", 
-      RowBox[{
-       RowBox[{"Zhat", "[", 
-        RowBox[{"[", "2", "]"}], "]"}], "/", 
-       RowBox[{"Zhat", "[", 
-        RowBox[{"[", "3", "]"}], "]"}]}]}], "}"}]}], ";", 
+       RowBox[{
+        RowBox[{"Zhat", "[", 
+         RowBox[{"[", "1", "]"}], "]"}], "/", 
+        RowBox[{"Zhat", "[", 
+         RowBox[{"[", "3", "]"}], "]"}]}], ",", 
+       RowBox[{
+        RowBox[{"Zhat", "[", 
+         RowBox[{"[", "2", "]"}], "]"}], "/", 
+        RowBox[{"Zhat", "[", 
+         RowBox[{"[", "3", "]"}], "]"}]}]}], "}"}]}], ";"}], 
    "\[IndentingNewLine]", 
-   RowBox[{"ZhatNorm", "=", 
-    RowBox[{"SimplifyQLite", "[", 
-     RowBox[{"ZhatNormlong", ",", 
-      RowBox[{"{", "Q", "}"}], ",", 
-      RowBox[{"AreReals", "[", 
-       RowBox[{"{", 
-        RowBox[{"CM", ",", "Lw", ",", "POSE"}], "}"}], "]"}]}], "]"}]}], 
-   ";"}], "\[IndentingNewLine]", "*)"}]], "Input",
+   RowBox[{
+    RowBox[{"ZhatNorm", "=", 
+     RowBox[{"SimplifyQLite", "[", 
+      RowBox[{"ZhatNormlong", ",", 
+       RowBox[{"{", "Q", "}"}], ",", 
+       RowBox[{"AreReals", "[", 
+        RowBox[{"{", 
+         RowBox[{"CM", ",", "Lw", ",", "POSE"}], "}"}], "]"}]}], "]"}]}], 
+    ";"}], "\[IndentingNewLine]"}]}]], "Input",
  CellChangeTimes->{{3.61915328367031*^9, 3.6191532838372803`*^9}, {
    3.61915348879582*^9, 3.61915366203856*^9}, {3.6216778583724546`*^9, 
    3.6216778588128023`*^9}, {3.621833460833398*^9, 3.621833469548517*^9}, {
@@ -546,7 +551,8 @@ Cell[BoxData[
    3.6218371504530983`*^9}, 3.621920923783033*^9, {3.621921012684723*^9, 
    3.621921015203308*^9}, 3.6612314216991568`*^9, {3.66546469780581*^9, 
    3.665464700959652*^9}, {3.686392985587743*^9, 3.6863929930543833`*^9}, {
-   3.6864555834237213`*^9, 3.6864555861514463`*^9}}],
+   3.6864555834237213`*^9, 3.6864555861514463`*^9}, {3.68752831364937*^9, 
+   3.6875283216030407`*^9}}],
 
 Cell[BoxData[
  RowBox[{
@@ -1241,21 +1247,21 @@ Cell[13799, 410, 2342, 64, 370, "Input"],
 Cell[16144, 476, 226, 3, 52, "Subsubtitle"],
 Cell[16373, 481, 324, 8, 54, "Input"],
 Cell[16700, 491, 697, 18, 54, "Input"],
-Cell[17400, 511, 1569, 37, 195, "Input"],
-Cell[18972, 550, 12121, 325, 1455, "Input"],
-Cell[31096, 877, 246, 7, 54, "Input"],
-Cell[31345, 886, 593, 15, 125, "Input"],
-Cell[31941, 903, 94, 1, 52, "Subsubtitle"],
-Cell[32038, 906, 220, 5, 54, "Input"],
-Cell[32261, 913, 3034, 77, 300, "Input"],
-Cell[35298, 992, 160, 3, 54, "Input"],
-Cell[35461, 997, 3070, 67, 300, "Input"],
-Cell[38534, 1066, 1935, 57, 300, "Input"],
-Cell[40472, 1125, 398, 9, 54, "Input"],
-Cell[40873, 1136, 790, 17, 90, "Input"],
-Cell[41666, 1155, 760, 16, 90, "Input"],
-Cell[42429, 1173, 460, 9, 54, "Input"],
-Cell[42892, 1184, 514, 10, 90, "Input"]
+Cell[17400, 511, 1773, 43, 195, "Input"],
+Cell[19176, 556, 12121, 325, 1455, "Input"],
+Cell[31300, 883, 246, 7, 54, "Input"],
+Cell[31549, 892, 593, 15, 125, "Input"],
+Cell[32145, 909, 94, 1, 52, "Subsubtitle"],
+Cell[32242, 912, 220, 5, 54, "Input"],
+Cell[32465, 919, 3034, 77, 300, "Input"],
+Cell[35502, 998, 160, 3, 54, "Input"],
+Cell[35665, 1003, 3070, 67, 300, "Input"],
+Cell[38738, 1072, 1935, 57, 300, "Input"],
+Cell[40676, 1131, 398, 9, 54, "Input"],
+Cell[41077, 1142, 790, 17, 90, "Input"],
+Cell[41870, 1161, 760, 16, 90, "Input"],
+Cell[42633, 1179, 460, 9, 54, "Input"],
+Cell[43096, 1190, 514, 10, 90, "Input"]
 }
 ]
 *)
