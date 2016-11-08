@@ -22,19 +22,21 @@ Contributors:
 #include <Eigen/Dense>
 #include "ParameterTemporaries.h"
 
+#include "BaseEdgeInterface.h"
+
 namespace ROAMestimation {
 
-class GenericEdgeInterface {
+class GenericEdgeInterface : public BaseEdgeInterface {
 
 public:
-
-  virtual void setNoiseCov(const Eigen::MatrixXd &noiseCov) = 0;
   virtual const Eigen::MatrixXd & getNoiseCov() const = 0;
 
-  virtual int measurementDimension() const = 0;
-  virtual double *accessMeasurementData() = 0;
-
   virtual int noiseDimension() const = 0;
+
+  /**
+   * \brief get the measurement vector
+   */
+  virtual const Eigen::VectorXd& getMeasurement() const = 0;
 
   /**
    * \brief update the local copy of the function parameters current estimate and their jacobian, if needed
@@ -54,19 +56,7 @@ public:
    * TODO: this has a precise meaning only for normal state estimation edges, i.e. QuaternionGenericEdge
    *       consider some other place to put this stuff
    */
-
   virtual void predictNextState() = 0;
-
-  virtual void setTimestamp(double timestamp) = 0;
-  virtual double getTimestamp() const = 0;
-
-  /**
-   * \brief category now means the logical sensor it is associated to.
-   *
-   * TODO: change the name to something more related to the logical sensor name
-   */
-  virtual void setCategory(const std::string &name) = 0;
-  virtual const std::string &getCategory() const = 0;
 
   /**
    * \brief get the edge associated augmented state
@@ -74,18 +64,7 @@ public:
    * each GenericEdge in roamfree has an augmented state, which means
    * x, q, v, w, a, alpha, in reals^19
    */
-
   virtual const Eigen::VectorXd &getAugmentedState() const = 0;
-
-  /**
-   * \brief get the measurement vector
-   *
-   * TODO: these methods already exist at the g2o::BaseEdge
-   *       for inheritance reasons I have to put there also here (tweak)
-   */
-
-  virtual const Eigen::VectorXd& getMeasurement_GE() const = 0;
-  virtual void setMeasurement_GE(const Eigen::VectorXd& m) = 0; /**< this sets the measurement instead */
 
   /**
    * \brief get the order of the generc edge
@@ -100,9 +79,7 @@ public:
    * 2  -> also accelerations
    *
    */
-
-  inline
-  virtual int getOrder() const {
+  inline virtual int getOrder() const {
     return -1;
   }
 
@@ -111,29 +88,7 @@ public:
    *
    * it returns the array of bool defined in the corresponding ROAMfunction element
    */
-
   virtual const bool *getUsedComponents() const = 0;
-
-  /*
-   * \brief abstract GenericEdgeInterface -> & OptimizableGraph conversion operator.
-   *
-   * We need this since children o this class in ROAMFREE are also children of
-   * g2o::OptimizableGraph::Edge and we would like to go back in the inheritance on the other branch
-   *
-   */
-  virtual operator g2o::OptimizableGraph::Edge &() = 0;
-
-  /**
-   * \brief abstract GenericEdgeInterface -> OptimizableGraph * conversion operator.
-   */
-  virtual operator g2o::OptimizableGraph::Edge *() = 0;
-
-  /**
-   * \brief returns a string containing debug informations about the edge
-   *
-   * i.e. category, timestamp and vertices it is connected to
-   */
-  virtual std::string writeDebugInfo() const = 0;
 };
 
 }

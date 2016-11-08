@@ -49,7 +49,7 @@ template<>
 int SlotRandomLogger::getToLogVectorSize(
     ROAMestimation::GenericEdgeInterface& o) const {
 
-  g2o::OptimizableGraph::Edge &ov = o;
+  g2o::OptimizableGraph::Edge *ov = o.getg2oOptGraphPointer();
 
   int paramsize = 0;
   const std::vector<ROAMestimation::ParameterTemporaries> &params = o.getParameterTemporariesVector();
@@ -57,12 +57,12 @@ int SlotRandomLogger::getToLogVectorSize(
     paramsize += params[k].value.rows();
   }
 
-  return 1 + 19 + ov.measurementDimension() + paramsize + ov.dimension();
+  return 1 + 19 + o.getMeasurement().size() + paramsize + ov->dimension();
 }
 
 template<>
 int SlotRandomLogger::getToLogVectorSize(
-    ROAMestimation::BasePriorEdgeInterface& o) const {
+    ROAMestimation::BaseEdgeInterface& o) const {
 
   g2o::OptimizableGraph::Edge *ov = o.getg2oOptGraphPointer();
 
@@ -99,28 +99,26 @@ template<>
 double SlotRandomLogger::getToLogComponent(int i,
     ROAMestimation::GenericEdgeInterface& o) {
 
-  g2o::OptimizableGraph::Edge &ov = o;
+  g2o::OptimizableGraph::Edge *ov = o.getg2oOptGraphPointer();
 
   int n0 = 1;
   int n1 = n0 + 19;
-  int n2 = n1 + ov.measurementDimension();
-  int n3 = n2 + ov.dimension();
+  int n2 = n1 + o.getMeasurement().size();
+  int n3 = n2 + ov->dimension();
 
   if (i < n0) {
     return 0; // this was the slot reserved for frameCounter, so now its free
   } else if (i < n1) {
     return o.getAugmentedState()[i-n0];
   } else if (i < n2) {
-    return ov.accessMeasurementData()[i-n1];
+    return o.getMeasurement()[i-n1];
   } else if (i < n3) {
-  	g2o::OptimizableGraph::Edge *oe = o;
-
   	// if the edge is robustified we have to undo the process before storing the result
-  	if (oe->robustKernel() == true) {
-  		return ov.errorData()[i-n2]/oe->currentHuberWeight();
-//  	  return oe->currentHuberWeight();
+  	if (ov->robustKernel() == true) {
+  		return ov->errorData()[i-n2]/ov->currentHuberWeight();
+//  	  return ov->currentHuberWeight();
   	} else {
-  		return ov.errorData()[i-n2];
+  		return ov->errorData()[i-n2];
   	}
   } else {
     const std::vector<ROAMestimation::ParameterTemporaries> &params = o.getParameterTemporariesVector();
@@ -140,7 +138,7 @@ double SlotRandomLogger::getToLogComponent(int i,
 
 template<>
 double SlotRandomLogger::getToLogComponent(int i,
-    ROAMestimation::BasePriorEdgeInterface& o) {
+    ROAMestimation::BaseEdgeInterface& o) {
 
   g2o::OptimizableGraph::Edge *oe = o.getg2oOptGraphPointer();
 

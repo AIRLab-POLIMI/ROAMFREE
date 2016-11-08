@@ -25,7 +25,7 @@ Contributors:
 
 #include "g2o/solvers/csparse/linear_solver_csparse.h"
 
-#include "PriorEdges/BasePriorEdgeInterface.h"
+#include "BaseEdgeInterface.h"
 #include "GenericEdgeInterface.h"
 
 #include "ROAMutils/StringUtils.h"

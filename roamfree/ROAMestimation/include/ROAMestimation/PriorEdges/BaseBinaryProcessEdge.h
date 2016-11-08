@@ -21,13 +21,13 @@ Contributors:
 
 #include "g2o/core/base_binary_edge.h"
 
-#include "BasePriorEdgeInterface.h"
+#include "BaseEdgeInterface.h"
 
 namespace ROAMestimation {
 
 template<int D, typename VertexXi>
 class BaseBinaryProcessEdge: public g2o::BaseBinaryEdge<D, Eigen::VectorXd,
-    VertexXi, VertexXi>, public BasePriorEdgeInterface {
+    VertexXi, VertexXi>, public BaseEdgeInterface {
 
   protected:
 

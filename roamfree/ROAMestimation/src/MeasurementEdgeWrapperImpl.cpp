@@ -41,7 +41,7 @@ PoseVertexWrapper_Ptr MeasurementEdgeWrapper_Impl::getConnectedPose(
     return PoseVertexWrapper_Ptr(NULL);
   }
 
-  g2o::OptimizableGraph::Edge *oe = *_e;
+  g2o::OptimizableGraph::Edge *oe = _e->getg2oOptGraphPointer();
   return PoseVertexWrapper_Ptr(
       new PoseVertexWrapper_Impl(
           static_cast<g2o::OptimizableGraph::Vertex *>(oe->vertices()[N])));

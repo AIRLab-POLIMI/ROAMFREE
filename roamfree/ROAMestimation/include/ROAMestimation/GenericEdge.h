@@ -47,13 +47,13 @@ class GenericEdge: public g2o::BaseMultiEdge<D, Eigen::VectorXd>,
     virtual void setNoiseCov(const Eigen::MatrixXd &noiseCov);
     virtual const Eigen::MatrixXd & getNoiseCov() const;
 
-    virtual int measurementDimension() const;
-    virtual double *accessMeasurementData();
+//    virtual int measurementDimension() const;
+//    virtual double *accessMeasurementData();
 
     virtual int noiseDimension() const;
 
-    virtual const Eigen::VectorXd& getMeasurement_GE() const;
-    virtual void setMeasurement_GE(const Eigen::VectorXd& m);
+    virtual const Eigen::VectorXd& getMeasurement() const;
+    virtual void setMeasurement(const Eigen::VectorXd& m);
 
     virtual void handleParamTemporaries();
     virtual void updateParamPtrs();
@@ -67,11 +67,8 @@ class GenericEdge: public g2o::BaseMultiEdge<D, Eigen::VectorXd>,
 
     virtual const Eigen::VectorXd &getAugmentedState() const;
 
-    inline operator g2o::OptimizableGraph::Edge *() {
-      return this;
-    }
-    inline operator g2o::OptimizableGraph::Edge &() {
-      return *this;
+    inline virtual g2o::OptimizableGraph::Edge *getg2oOptGraphPointer() {
+      return static_cast<g2o::OptimizableGraph::Edge *>(this);
     }
 
     virtual bool read(std::istream &s);
@@ -125,7 +122,7 @@ using g2o::BaseMultiEdge<MT::_ERROR_SIZE, Eigen::VectorXd>::chi2; \
 using g2o::BaseMultiEdge<MT::_ERROR_SIZE, Eigen::VectorXd>::resize;
 
 template<int D>
-ROAMestimation::GenericEdge<D>::GenericEdge(int nParams) :
+GenericEdge<D>::GenericEdge(int nParams) :
     _paramsPtrsSize(nParams), _name("undefined"), _tstamp(
         -std::numeric_limits<double>::infinity()), _Dt01(0), _Dt12(0), _x(33), _frameCounter(
         -1) {
@@ -134,12 +131,12 @@ ROAMestimation::GenericEdge<D>::GenericEdge(int nParams) :
 }
 
 template<int D>
-inline ROAMestimation::GenericEdge<D>::~GenericEdge() {
+inline GenericEdge<D>::~GenericEdge() {
   delete[] _paramsPtrs;
 }
 
 template<int D>
-void ROAMestimation::GenericEdge<D>::setNoiseCov(
+void GenericEdge<D>::setNoiseCov(
     const Eigen::MatrixXd& noiseCov) {
 
   _noiseCov = noiseCov;
@@ -153,29 +150,18 @@ void ROAMestimation::GenericEdge<D>::setNoiseCov(
 }
 
 template<int D>
-inline const Eigen::MatrixXd& ROAMestimation::GenericEdge<D>::getNoiseCov() const {
+inline const Eigen::MatrixXd& GenericEdge<D>::getNoiseCov() const {
   return _noiseCov;
 }
 
-} /* namespace ROAMestimation */
 
 template<int D>
-inline int ROAMestimation::GenericEdge<D>::measurementDimension() const {
-  return _measurement.size();
-}
-
-template<int D>
-inline double* ROAMestimation::GenericEdge<D>::accessMeasurementData() {
-  return _measurement.data();
-}
-
-template<int D>
-inline int ROAMestimation::GenericEdge<D>::noiseDimension() const {
+inline int GenericEdge<D>::noiseDimension() const {
   return _noiseCov.rows();
 }
 
 template<int D>
-inline void ROAMestimation::GenericEdge<D>::handleParamTemporaries() {
+inline void GenericEdge<D>::handleParamTemporaries() {
 
   for (auto it = _params.begin(); it != _params.end(); ++it) {
     it->updateTemporaries();
@@ -186,63 +172,65 @@ inline void ROAMestimation::GenericEdge<D>::handleParamTemporaries() {
 }
 
 template<int D>
-void ROAMestimation::GenericEdge<D>::updateParamPtrs() {
+void GenericEdge<D>::updateParamPtrs() {
   for (int k = 0; k < _paramsPtrsSize; k++) {
     _paramsPtrs[k] = _params[k + 6].value.data();
   }
 }
 
 template<int D>
-inline const std::vector<ROAMestimation::ParameterTemporaries>& ROAMestimation::GenericEdge<
+inline const std::vector<ParameterTemporaries>& GenericEdge<
     D>::getParameterTemporariesVector() const {
   return _params;
 }
 
 template<int D>
-inline bool ROAMestimation::GenericEdge<D>::read(std::istream& s) {
+inline bool GenericEdge<D>::read(std::istream& s) {
   return false;
 }
 
 template<int D>
-inline bool ROAMestimation::GenericEdge<D>::write(std::ostream& s) const {
+inline bool GenericEdge<D>::write(std::ostream& s) const {
   return false;
 }
 
 template<int D>
-inline void ROAMestimation::GenericEdge<D>::setTimestamp(double timestamp) {
+inline void GenericEdge<D>::setTimestamp(double timestamp) {
   _tstamp = timestamp;
 }
 
 template<int D>
-inline double ROAMestimation::GenericEdge<D>::getTimestamp() const {
+inline double GenericEdge<D>::getTimestamp() const {
   return _tstamp;
 }
 
 template<int D>
-inline void ROAMestimation::GenericEdge<D>::setCategory(
+inline void GenericEdge<D>::setCategory(
     const std::string& name) {
   _name = name;
 }
 
 template<int D>
-inline const std::string& ROAMestimation::GenericEdge<D>::getCategory() const {
+inline const std::string& GenericEdge<D>::getCategory() const {
   return _name;
 }
 
 template<int D>
-inline const Eigen::VectorXd& ROAMestimation::GenericEdge<D>::getMeasurement_GE() const {
+inline const Eigen::VectorXd& GenericEdge<D>::getMeasurement() const {
   return _measurement;
 }
 
 template<int D>
-inline void ROAMestimation::GenericEdge<D>::setMeasurement_GE(
+inline void GenericEdge<D>::setMeasurement(
     const Eigen::VectorXd& m) {
   _measurement = m;
 }
 
 template<int D>
-inline const Eigen::VectorXd& ROAMestimation::GenericEdge<D>::getAugmentedState() const {
+inline const Eigen::VectorXd& GenericEdge<D>::getAugmentedState() const {
   return _x;
 }
+
+} /* namespace ROAMestimation */
 
 #endif /* GENERICEDGE_H_ */

@@ -500,7 +500,7 @@ MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnConstantParameter(
 
   g2o::OptimizableGraph::Vertex *v = cnst_par->getVertices(0.0)->second;
 
-  BasePriorEdgeInterface *priorif;
+  BaseEdgeInterface *priorif;
 
   switch (type) {
 
@@ -569,7 +569,7 @@ MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnTimeVaryingParamete
     return MeasurementEdgeWrapper_Ptr();
   }
 
-  BasePriorEdgeInterface *priorif;
+  BaseEdgeInterface *priorif;
 
   switch (type) {
 
@@ -1365,12 +1365,12 @@ GenericEdgeInterface *FactorGraphFilter_Impl::addMeasurement_i(
   cif->collect(v0, v1, v2, timestamp, dt01, dt12, sensor.name, _params);
 
 // fill in the measurement and the covariance
-  e->setMeasurement_GE(z);
+  e->setMeasurement(z);
   e->setNoiseCov(cov);
 
 // set robustification according to sensor configuration
 
-  g2o::OptimizableGraph::Edge *oe = *e; // conversion operator
+  g2o::OptimizableGraph::Edge *oe = e->getg2oOptGraphPointer(); // conversion operator
 
 // if the sensor is currently robustified, set these properties into the edge
   if (sensor.robustified) {
@@ -1646,7 +1646,7 @@ bool FactorGraphFilter_Impl::estimate_i(g2o::HyperGraph::EdgeSet &eset,
   for (auto vit = activeVertices.begin(); vit != activeVertices.end(); ++vit) {
     for (auto eit = (*vit)->edges().begin(); eit != (*vit)->edges().end();
         ++eit) {
-      if (dynamic_cast<BasePriorEdgeInterface *>(*eit) != NULL) {
+      if (dynamic_cast<BaseEdgeInterface *>(*eit) != NULL) {
         eset.insert(*eit);
       }
     }
@@ -1906,7 +1906,7 @@ void FactorGraphFilter_Impl::updatePosesAndEdgesMetadata() {
         GenericEdgeInterface *e = dynamic_cast<GenericEdgeInterface *>(*weit);
 
         if (e != NULL) {
-          g2o::OptimizableGraph::Edge *oe = *e;
+          g2o::OptimizableGraph::Edge *oe = e->getg2oOptGraphPointer();
 
           MeasurementEdgeMetadata *meta =
               static_cast<MeasurementEdgeMetadata *>(oe->userData());
@@ -2207,13 +2207,13 @@ string FactorGraphFilter_Impl::writeEdge(g2o::HyperGraph::Edge * e) {
   stringstream s;
 
   GenericEdgeInterface *gei;
-  BasePriorEdgeInterface *pei;
+  BaseEdgeInterface *pei;
   GenericLinearConstraint *glc;
   SE3InterpolationEdge *ie;
 
   if ((gei = dynamic_cast<GenericEdgeInterface *>(e)) != NULL) {
     s << gei->writeDebugInfo();
-  } else if ((pei = dynamic_cast<BasePriorEdgeInterface *>(e)) != NULL) {
+  } else if ((pei = dynamic_cast<BaseEdgeInterface *>(e)) != NULL) {
     s << pei->writeDebugInfo();
   } else if ((glc = dynamic_cast<GenericLinearConstraint *>(e)) != NULL) {
     s << glc->writeDebugInfo();
