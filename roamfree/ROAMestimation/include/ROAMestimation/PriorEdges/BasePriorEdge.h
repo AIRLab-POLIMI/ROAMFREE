@@ -81,6 +81,10 @@ class BasePriorEdge: public g2o::BaseUnaryEdge<D, Eigen::VectorXd, VertexXi>,
       return _tstamp;
     }
 
+    virtual bool predict() {
+      return false;
+    }
+
     bool read(std::istream &s) {
       return false;
     }

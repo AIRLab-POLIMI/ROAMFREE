@@ -504,7 +504,7 @@ public:
 		 //*/
 	}
 
-	void predictNextState() {
+	bool predict() {
 
 		handleParamTemporaries();
 
@@ -515,7 +515,7 @@ public:
 		Eigen::VectorXd &x2 =
 		static_cast<GenericVertex<ROAMfunctions::SE3V> *>(_vertices[0])->estimate();
 
-		assert(_F.predict(x1, _paramsPtrs, _measurement, _Dt12, x2));
+		return _F.predict(x1, _paramsPtrs, _measurement, _Dt12, x2);
 	}
 
 	inline

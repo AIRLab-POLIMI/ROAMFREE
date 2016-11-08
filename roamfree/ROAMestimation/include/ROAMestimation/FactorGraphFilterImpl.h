@@ -37,6 +37,8 @@
 #include "PoseVertexWrapperImpl.h"
 #include "MeasurementEdgeWrapperImpl.h"
 
+#include "GenericEdgeInterface.h"
+
 namespace ROAMlog {
 class GraphLogger;
 }

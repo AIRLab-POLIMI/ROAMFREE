@@ -70,6 +70,10 @@ class BaseBinaryProcessEdge: public g2o::BaseBinaryEdge<D, Eigen::VectorXd,
       return _tstamp;
     }
 
+    virtual bool predict() {
+      return false;
+    }
+
     bool read(std::istream &s) {
       return false;
     }

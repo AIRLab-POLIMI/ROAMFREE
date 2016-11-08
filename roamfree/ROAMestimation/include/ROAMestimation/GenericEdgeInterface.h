@@ -50,15 +50,6 @@ public:
   virtual const std::vector<ParameterTemporaries> & getParameterTemporariesVector() const = 0;
 
   /**
-   * this method tells the edge to predict the next state based on the posterior of the current state
-   * and the associated measurement.
-   *
-   * TODO: this has a precise meaning only for normal state estimation edges, i.e. QuaternionGenericEdge
-   *       consider some other place to put this stuff
-   */
-  virtual void predictNextState() = 0;
-
-  /**
    * \brief get the edge associated augmented state
    *
    * each GenericEdge in roamfree has an augmented state, which means

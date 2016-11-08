@@ -19,25 +19,28 @@
 #include "MeasurementEdgeWrapperImpl.h"
 #include "PoseVertexWrapperImpl.h"
 
+#include "BaseEdgeInterface.h"
 #include "GenericEdgeInterface.h"
 
 namespace ROAMestimation {
 
 MeasurementEdgeWrapper_Impl::MeasurementEdgeWrapper_Impl(
-    GenericEdgeInterface* edge) :
+    BaseEdgeInterface* edge) :
     _e(edge) {
 }
 
 bool MeasurementEdgeWrapper_Impl::predict() {
   //TODO: there is an assert in the predictNextState method that make everything crash if the edge does not support prediction
-  _e->predictNextState();
+  _e->predict();
   return true;
 }
 
 PoseVertexWrapper_Ptr MeasurementEdgeWrapper_Impl::getConnectedPose(
     int N)
     {
-  if (N > _e->getOrder()) {
+  GenericEdgeInterface *gei = dynamic_cast<GenericEdgeInterface *>(_e);
+
+  if (!gei || N > gei->getOrder()) {
     return PoseVertexWrapper_Ptr(NULL);
   }
 
@@ -45,6 +48,7 @@ PoseVertexWrapper_Ptr MeasurementEdgeWrapper_Impl::getConnectedPose(
   return PoseVertexWrapper_Ptr(
       new PoseVertexWrapper_Impl(
           static_cast<g2o::OptimizableGraph::Vertex *>(oe->vertices()[N])));
+
 }
 
 } /* namespace ROAMestimation */

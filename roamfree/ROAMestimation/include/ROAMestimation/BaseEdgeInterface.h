@@ -41,6 +41,14 @@ class BaseEdgeInterface {
     virtual double getTimestamp() const = 0;
 
     /**
+     * \brief prediciton based on measurement and other states (if meaningful)
+     *
+     * predict the next state based on the measurement
+     * and on other states posterios (depending on the edge type)
+     */
+    virtual bool predict() = 0;
+
+    /**
      * \brief returns a string containing debug informations about the edge
      *
      * i.e. category, timestamp and vertices it is connected to

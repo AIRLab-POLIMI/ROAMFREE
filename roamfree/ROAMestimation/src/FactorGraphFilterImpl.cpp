@@ -472,9 +472,11 @@ MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnPose(
     }
   }
 
-  addPriorOnPose_i(p, x0, cov);
+  BaseEdgeInterface *e = addPriorOnPose_i(p, x0, cov);
 
-  return MeasurementEdgeWrapper_Ptr();
+  assert(e != NULL);
+
+  return MeasurementEdgeWrapper_Ptr(new MeasurementEdgeWrapper_Impl(e));
 }
 
 MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnConstantParameter(
@@ -532,8 +534,7 @@ MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnConstantParameter(
   << endl;
 #   endif
 
-// TODO: return the pointer to the edge. Problem, BasePriorEdgeInterface is not connected with GenericEdgeInterface
-  return MeasurementEdgeWrapper_Ptr();
+  return MeasurementEdgeWrapper_Ptr(new MeasurementEdgeWrapper_Impl(priorif));
 
 }
 
@@ -602,7 +603,7 @@ MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnTimeVaryingParamete
 #   endif
 
 // TODO: return the pointer to the edge. Problem, BasePriorEdgeInterface is not connected with GenericEdgeInterface
-  return MeasurementEdgeWrapper_Ptr();
+  return MeasurementEdgeWrapper_Ptr(new MeasurementEdgeWrapper_Impl(priorif));
 }
 
 PoseVertexWrapper_Ptr FactorGraphFilter_Impl::addPose(double t) {
@@ -821,7 +822,7 @@ void FactorGraphFilter_Impl::addMasterSequentialMeasurement_i(
 
   if (edge != NULL) {
     // predictor
-    edge->predictNextState();
+    edge->predict();
 
     handleDeferredMeasurements_i(outIter);
 
