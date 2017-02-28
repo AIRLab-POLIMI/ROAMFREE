@@ -34,7 +34,8 @@ EuclideanFeatureHandler::EuclideanFeatureHandler() {
 }
 
 bool EuclideanFeatureHandler::init(FactorGraphFilter* f, const string &name,
-    const Eigen::VectorXd & T_OS, const Eigen::VectorXd & K, const Eigen::VectorXd & RD, const Eigen::VectorXd & TD) {
+    const Eigen::VectorXd & T_OS, const Eigen::VectorXd & K,
+    const Eigen::VectorXd & RD, const Eigen::VectorXd & TD) {
 
   _filter = f;
   _sensorName = name;
@@ -78,7 +79,7 @@ bool EuclideanFeatureHandler::addFeatureObservation(long int id, double t,
   }
 # endif
 
-  const string &sensor = getFeatureSensor(id);
+  const string &sensor = getFeatureParameterName(id);
 
   // this implicitly initialize the new track if it was not there
   EuclideanTrackDescriptor &d = _features[id];
@@ -111,8 +112,17 @@ bool EuclideanFeatureHandler::addFeatureObservation(long int id, double t,
               sensor + suffixes[k]);
         }
 
+        // TODO: hardcoded
         // do we want the robust kernel by default?
-        // _filter->setRobustKernel(sensor, true, 3.0);
+
+        // considering a 1.5 sigma plus 1e6 scaling, threshold at 10 pix
+        // beta =  || err || / sigma
+        // where ||err|| is where we want the weight to start to decrease
+
+        // TODO: sigma is hardcoded
+        double beta = 5 / sqrt(1e6 * pow(0.8, 2));
+
+        _filter->setRobustKernel(sensor, true, beta);
 
         // add parameter vertices
 
@@ -186,7 +196,7 @@ bool EuclideanFeatureHandler::getFeaturePositionInWorldFrame(long int id,
     Eigen::VectorXd& fw) const {
 
   ParameterWrapper_Ptr lw_par = _filter->getParameterByName(
-      getFeatureSensor(id) + "_Lw"); // euclidean coordinates
+      getFeatureParameterName(id) + "_Lw"); // euclidean coordinates
 
   fw = lw_par->getEstimate();
 }
@@ -215,7 +225,7 @@ long int EuclideanFeatureHandler::getNActiveFeatures() const {
   return N;
 }
 
-string EuclideanFeatureHandler::getFeatureSensor(long int id) const {
+string EuclideanFeatureHandler::getFeatureParameterName(long int id) const {
   stringstream s;
   s << _sensorName << "_feat" << id;
   return s.str();
@@ -226,7 +236,7 @@ void EuclideanFeatureHandler::setTimestampOffsetTreshold(double dt) {
 }
 
 bool EuclideanFeatureHandler::initialize(const EuclideanTrackDescriptor &track,
-    const Eigen::VectorXd &K, Eigen::VectorXd &Lw) {
+    const Eigen::VectorXd &K, Eigen::VectorXd &lw) {
 
   // this method triangulates a 3D feature from n cameras refining
   // the initial estimate minimizing the reprojection error with Gauss-Newton
@@ -283,8 +293,29 @@ bool EuclideanFeatureHandler::initialize(const EuclideanTrackDescriptor &track,
   int resGN = GaussNewton(curCams, curPoints, triangulated3DPointInit,
       triangulated3DPoint);
 
-  // store the triangulated coordinates into output
-  Lw << triangulated3DPoint.x, triangulated3DPoint.y, triangulated3DPoint.z;
+  lw << triangulated3DPoint.x, triangulated3DPoint.y, triangulated3DPoint.z;
+  //*/
+
+  if (resGN != -1) {
+    // test that the triangulated points lies in front of each camera
+    for (auto it = track.zHistory.begin(); it != track.zHistory.end(); ++it) {
+
+      Eigen::VectorXd testz(1); // it could be a double, but automated equation generation always works with vectors
+      const int _OFF = -1;
+
+      if (it->second.pose->hasBeenEstimated()) {
+        const Eigen::VectorXd & x = it->second.pose->getEstimate();
+
+#       include "../../ROAMfunctions/generated/ImagePlaneProjection_testZ.cppready"
+
+        if (testz(0) < 0) {
+          cerr << "WARNING: point behind camera: z = " << testz(0) << ". Initialization failed" << endl;
+          resGN = -1;
+          break;
+        }
+      }
+    }
+  }
 
 # ifdef DEBUG_PRINT_VISION_INFO_MESSAGES
   if (resGN != -1) {
@@ -448,6 +479,7 @@ int EuclideanFeatureHandler::GaussNewton(const vector<cv::Mat> &cameras,
     printf("%d %f\n", i, last_mse);
 #endif
   }
+
 //  if (last_mse < 1e4/*100 pixels*/) {
   if (true) {
     optimizedPoint.x = curEstimate3DPoint.at<double>(0, 0);

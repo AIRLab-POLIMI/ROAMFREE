@@ -52,9 +52,9 @@ class EuclideanFeatureHandler: public ImageFeatureHandler {
 
     virtual void fixOlderPosesWRTVisibleFeatures();
 
-  protected:
+    virtual std::string getFeatureParameterName(long int id) const;
 
-    std::string getFeatureSensor(long int id) const;
+  protected:
 
     inline const ObservationDescriptor &getNewestObservation(
         long int id) const {

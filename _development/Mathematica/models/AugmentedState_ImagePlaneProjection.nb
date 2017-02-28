@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       145,          7]
-NotebookDataLength[     45550,       1260]
-NotebookOptionsPosition[     43614,       1202]
-NotebookOutlinePosition[     43998,       1219]
-CellTagsIndexPosition[     43955,       1216]
+NotebookDataLength[     45833,       1269]
+NotebookOptionsPosition[     43854,       1210]
+NotebookOutlinePosition[     44238,       1227]
+CellTagsIndexPosition[     44195,       1224]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -1180,6 +1180,14 @@ ImagePlaneProjection_testZ.mthout testz 0 0\>\"", "]"}], ";"}]}], "Input",
 Cell[BoxData[
  RowBox[{
   RowBox[{
+  "Run", "[", 
+   "\"\<cp ImagePlaneProjection_testZ.cppready \
+../../../roamfree/ROAMfunctions/generated\>\"", "]"}], ";"}]], "Input",
+ CellChangeTimes->{{3.6884641285574493`*^9, 3.68846414742483*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
   "Run", "[", "\"\<mv *.cppready ../../../roamfree/ROAMtest/generated\>\"", 
    "]"}], ";"}]], "Input",
  CellChangeTimes->{{3.6050014532183523`*^9, 3.6050015701885967`*^9}, {
@@ -1257,11 +1265,12 @@ Cell[32465, 919, 3034, 77, 300, "Input"],
 Cell[35502, 998, 160, 3, 54, "Input"],
 Cell[35665, 1003, 3070, 67, 300, "Input"],
 Cell[38738, 1072, 1935, 57, 300, "Input"],
-Cell[40676, 1131, 398, 9, 54, "Input"],
-Cell[41077, 1142, 790, 17, 90, "Input"],
-Cell[41870, 1161, 760, 16, 90, "Input"],
-Cell[42633, 1179, 460, 9, 54, "Input"],
-Cell[43096, 1190, 514, 10, 90, "Input"]
+Cell[40676, 1131, 398, 9, 79, "Input"],
+Cell[41077, 1142, 790, 17, 115, "Input"],
+Cell[41870, 1161, 760, 16, 115, "Input"],
+Cell[42633, 1179, 237, 6, 79, "Input"],
+Cell[42873, 1187, 460, 9, 79, "Input"],
+Cell[43336, 1198, 514, 10, 172, "Input"]
 }
 ]
 *)
