@@ -2163,6 +2163,7 @@ string FactorGraphFilter_Impl::writeFactorGraph() {
 
   stringstream s;
 
+  /*
   s << " --> PARAMETERS <--" << endl;
 
   for (auto pit = _params.begin(); pit != _params.end(); ++pit) {
@@ -2185,6 +2186,7 @@ string FactorGraphFilter_Impl::writeFactorGraph() {
       }
     }
   }
+  */
 
   s << endl << " --> POSE GRAPH <--" << endl;
   for (PoseMapIterator pit = _poses.begin(); pit != _poses.end(); ++pit) {
@@ -2202,6 +2204,20 @@ string FactorGraphFilter_Impl::writeFactorGraph() {
   }
 
   return s.str();
+}
+
+bool FactorGraphFilter_Impl::removeMeasurement(MeasurementEdgeWrapper_Ptr edge)
+    {
+
+  if (!edge) {
+    return false;
+  }
+
+  BaseEdgeInterface *bei = boost::static_pointer_cast<MeasurementEdgeWrapper_Impl>(edge)->_e;
+
+  g2o::OptimizableGraph::Edge *e =  bei->getg2oOptGraphPointer();
+
+  return _optimizer->removeEdge(e);
 }
 
 string FactorGraphFilter_Impl::writeEdge(g2o::HyperGraph::Edge * e) {

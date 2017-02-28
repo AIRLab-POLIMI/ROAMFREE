@@ -332,6 +332,15 @@ class FactorGraphFilter {
             PoseVertexWrapper_Ptr()) = 0;
 
     /**
+     *  \brief Removes a previously added measurement
+     *
+     * @param edge the measurement to be removed
+     *
+     * @return true if the measurement was succesfully found and removed
+     */
+    virtual bool removeMeasurement(MeasurementEdgeWrapper_Ptr edge) = 0;
+
+    /**
      *  \brief Adds a measurement for a sequential sensor.
      *
      * This method manages the poses which have to be connected by the provided measurement

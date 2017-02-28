@@ -149,6 +149,8 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
             PoseVertexWrapper_Ptr(), PoseVertexWrapper_Ptr v0 =
             PoseVertexWrapper_Ptr());
 
+    bool removeMeasurement(MeasurementEdgeWrapper_Ptr edge);
+
     MeasurementEdgeWrapperVector_Ptr addSequentialMeasurement(
         const std::string& sensorName, double timestamp,
         const Eigen::VectorXd &z, const Eigen::MatrixXd &cov);
