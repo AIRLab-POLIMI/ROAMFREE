@@ -46,7 +46,7 @@ enum MeasTypes {
   IMUintegralDeltaP,
   IMUintegralDeltaQ,
   PlanarConstraint,
-  RotatingPushbroom
+  QuadDynamicModel
 };
 
 enum ParameterTypes {

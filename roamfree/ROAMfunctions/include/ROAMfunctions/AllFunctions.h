@@ -42,6 +42,7 @@ Contributors:
 #include "DisplacementM.h"
 #include "IMUIntegralDeltaPM.h"
 #include "IMUIntegralDeltaQM.h"
+#include "QuadDynamicModelM.h"
 
 #endif /* ALLFUNCTIONS_H_ */
 
