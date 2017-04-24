@@ -121,6 +121,34 @@ def fixMathFunctions(l):
 		l = l[:start]+l[coma+1:end-1]+','+l[start:coma]+')'+l[end:]
 		
 		cnt = occ + 5
+
+	# we have to replace Sign(x) with (0.0 < x) - (x < 0)
+
+	cnt = 0;
+	while True:		
+		
+		occ = string.find(l,'Sign',cnt)
+
+		if occ == -1:
+			break
+
+		start = occ+5		
+		pt = occ+5			
+
+		depth=1
+		while depth>0:
+			if l[pt] == '(':
+				depth = depth + 1
+			elif l[pt] == ')':
+				depth = depth - 1
+
+			pt = pt + 1
+
+		end = pt				
+
+		l = l[:occ]+'(0.0 < '+l[start:end-1]+' - '+l[start:end-1]+' < 0.0)'+l[end:]
+		
+		cnt = occ + 4
 		
 
 	return l
