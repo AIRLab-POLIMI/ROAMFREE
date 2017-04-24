@@ -47,11 +47,6 @@ class GenericEdge: public g2o::BaseMultiEdge<D, Eigen::VectorXd>,
     virtual void setNoiseCov(const Eigen::MatrixXd &noiseCov);
     virtual const Eigen::MatrixXd & getNoiseCov() const;
 
-//    virtual int measurementDimension() const;
-//    virtual double *accessMeasurementData();
-
-    virtual int noiseDimension() const;
-
     virtual const Eigen::VectorXd& getMeasurement() const;
     virtual void setMeasurement(const Eigen::VectorXd& m);
 
@@ -152,12 +147,6 @@ void GenericEdge<D>::setNoiseCov(
 template<int D>
 inline const Eigen::MatrixXd& GenericEdge<D>::getNoiseCov() const {
   return _noiseCov;
-}
-
-
-template<int D>
-inline int GenericEdge<D>::noiseDimension() const {
-  return _noiseCov.rows();
 }
 
 template<int D>

@@ -31,8 +31,6 @@ class GenericEdgeInterface : public BaseEdgeInterface {
 public:
   virtual const Eigen::MatrixXd & getNoiseCov() const = 0;
 
-  virtual int noiseDimension() const = 0;
-
   /**
    * \brief get the measurement vector
    */
