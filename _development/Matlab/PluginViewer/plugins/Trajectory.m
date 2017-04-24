@@ -55,6 +55,9 @@ if flag == 1
 
     plot3(x(i,3)-x0,x(i,4)-y0,x(i,5)-z0,'m');
     plot3(x(1:i(1),3)-x0,x(1:i(1),4)-y0,x(1:i(1),5)-z0,'k');
+    xlabel('E [m]');
+    ylabel('N [m]');
+    zlabel('U [m]');
 
     for j = 1:orstep:size(x,1)
       plotAxis(x(j,3:5)'-[x0 y0 z0]',x(j,6:9),pluginConfig.axesLenght)       
