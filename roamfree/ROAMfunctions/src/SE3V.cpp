@@ -32,7 +32,11 @@ SE3VI::~SE3VI() {
 void SE3VI::oplus(Eigen::VectorXd& newx, const Eigen::VectorXd& dx_in) {
   Eigen::VectorXd x = newx;
 
-  Eigen::VectorXd dx = dx_in;
+  // scaling of the deltas according
+  // Eigen::VectorXd dx = dx_in;
+  Eigen::VectorXd dx(6);
+  dx.head(3) = dx_in.head(3)*0.001;
+  dx.tail(3) = dx_in.tail(3)*0.01;
 
   // if norm([0, dx]) > 1 we have to normalize the increment
   double norm = std::pow(dx(3), 2) + std::pow(dx(4), 2) + std::pow(dx(5), 2);
