@@ -171,7 +171,7 @@ GenericLinearConstraint *GenericLinearConstraintFactory::buildGLC(
       std::cerr << e->writeDebugInfo();
     }
 
-    BasePriorEdgeInterface *p = dynamic_cast<BasePriorEdgeInterface *>(*deit);
+    BaseEdgeInterface *p = dynamic_cast<BaseEdgeInterface *>(*deit);
     if (p != NULL) {
       std::cerr << p->writeDebugInfo();
     }
