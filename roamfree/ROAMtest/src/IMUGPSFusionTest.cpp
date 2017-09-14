@@ -86,16 +86,18 @@ int main(int argc, char *argv[]) {
 
   int ret = system("mkdir /tmp/roamfree");
   f->setLowLevelLogging(true); // default log folder
+  f->setWriteGraph(true);
+  f->setWriteHessianStructure(true);
 
   /* ---------------------- Configure sensors ---------------------- */
 
-  bool isbafixed = false, isbwfixed = true;
+  bool isbafixed = true, isbwfixed = true;
 
   // Accelerometer sensor
   Eigen::VectorXd R_OS_ACC(7); // Transformation between Accelerometer and robot frame
   R_OS_ACC << 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0;
 
-  f->addSensor("Accelerometer", LinearAcceleration, true, true); // master sensor, sequential sensor
+  f->addSensor("Accelerometer", LinearAcceleration, false, true); // master sensor, sequential sensor
   f->setSensorFrame("Accelerometer", R_OS_ACC);
 
   //gain calibration parameter
@@ -113,14 +115,14 @@ int main(int argc, char *argv[]) {
       "Accelerometer_B", accBias0, isbafixed, 1.0);
 
   ba_par->setProcessModelType(RandomWalk);
-  ba_par->setRandomWalkNoiseCov(10*Eigen::MatrixXd::Identity(3, 3));
+  ba_par->setRandomWalkNoiseCov(10 * Eigen::MatrixXd::Identity(3, 3));
 
   Eigen::MatrixXd accelerometerCov(3, 3); // covariance of Accelerometer readings
   accelerometerCov = 0.0016 * Eigen::MatrixXd::Identity(3, 3);
 
   // Gyroscope sensor
 
-  f->addSensor("Gyroscope", AngularVelocity, false, true);
+  f->addSensor("Gyroscope", AngularVelocity, true, true);
   f->shareSensorFrame("Accelerometer", "Gyroscope"); // usually gyro and acc are housed together
 
   //gain calibration parameter
@@ -165,7 +167,6 @@ int main(int argc, char *argv[]) {
   /* ---------------------- Initialize ---------------------- */
 
   Eigen::VectorXd x0(7), x1(7);
-
 
   // compute the ground truth for the first two poses
   {
@@ -219,6 +220,8 @@ int main(int argc, char *argv[]) {
       za(2) += ba_z + ba_dz * t + ba_Az * sin(2 * M_PI * ba_fz * t);
     }
 
+    f->addSequentialMeasurement("Gyroscope", t, zw, gyroscopeCov);
+
     f->addSequentialMeasurement("Accelerometer", t, za, accelerometerCov);
 
     if (cntImu == 0) {
@@ -231,24 +234,28 @@ int main(int argc, char *argv[]) {
       // and fix it (or put a prior) to remove gauge freedom
       // we fix the second for no special reason, it is just that t = 0.0 for it
 
-      PoseVertexWrapper_Ptr first = f->getNthOldestPose(0);
-      first->setFixed(true);
+      /*
+       PoseVertexWrapper_Ptr first = f->getNthOldestPose(0);
+       first->setFixed(true);
+       */
 
-      PoseVertexWrapper_Ptr second = f->getNthOldestPose(1);
-      second->setEstimate(x1);
-      second->setFixed(true);
+      /*
+       PoseVertexWrapper_Ptr second = f->getNthOldestPose(1);
+       second->setEstimate(x1);
+       second->setFixed(true);
+       */
 
       /* or to put a gaussian prior on it, with:
-       Eigen::MatrixXd priorCov(6, 6);
-       priorCov.setZero();
-       priorCov.diagonal() << pow(0.01 / 3, 2), pow(0.01 / 3, 2), pow(0.01 / 3, 2), 1, 1, 1;
+      Eigen::MatrixXd priorCov(6, 6);
+      priorCov.setZero();
+//      priorCov.diagonal() << pow(0.01 / 3, 2), pow(0.01 / 3, 2), pow(0.01 / 3,
+//          2), 1, 1, 1;
+      priorCov.diagonal() << 1e12, 1e12, 1e12, 1e12, 1e12, 1;
 
-       f->addPriorOnPose(firstPose, x0, priorCov);
-       //*/
+      f->addPriorOnPose(firstPose, x0, priorCov);
+      //*/
 
     }
-
-    f->addSequentialMeasurement("Gyroscope", t, zw, gyroscopeCov);
 
     if (cntImu % gpsDivisor == 0) {
 
@@ -259,7 +266,19 @@ int main(int argc, char *argv[]) {
 #       include "../generated/Otto_gps.cppready"
       }
 
-      f->addSequentialMeasurement("GPS", t, zgps, GPSCov);
+      MeasurementEdgeWrapperVector_Ptr edges = f->addSequentialMeasurement(
+          "GPS", t, zgps, GPSCov);
+
+      /* initialize the connected vertex with GPS measurement
+       assert (edges->size() > 0);
+
+       PoseVertexWrapper_Ptr pose = (*edges)[0]->getConnectedPose(0);
+       assert(pose);
+
+       Eigen::VectorXd xInit = pose->getEstimate();
+       xInit.segment(0,3) << zgps;
+       pose->setEstimate(xInit);
+       //*/
 
       cntGps++;
     }
@@ -270,7 +289,7 @@ int main(int argc, char *argv[]) {
 
     // do the estimation
 
-    if (t > 0.25 && cntImu % ( (int) imuRate) == 0) { // after 1s of data, then each time
+    if (t > 2.0 && cntImu % ((int) imuRate) == 0) { // after 1s of data, then each time
       keepOn = f->estimate(10);
 
       if (!keepOn) {
