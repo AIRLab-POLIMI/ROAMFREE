@@ -28,3 +28,24 @@ add_executable(CameraIMUTest
 target_link_libraries(CameraIMUTest
     ROAMestimation ROAMimu ROAMvision
 )
+
+# ----------- TestPoseGetters
+
+add_executable(TestPoseGetters
+    src/TestPoseGetters.cpp
+)
+
+target_link_libraries(TestPoseGetters
+    ROAMestimation
+)
+
+# ----------- TestInterpolatingEdge
+
+add_executable(TestInterpolatingEdge
+    src/TestSE3InterpolationEdge.cpp
+)
+
+target_link_libraries(TestInterpolatingEdge
+    ROAMestimation
+)
+
