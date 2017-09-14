@@ -81,7 +81,7 @@ void GraphLogger::sync() {
         static_cast<g2o::OptimizableGraph::Edge *>(*it);
 
     ROAMestimation::GenericEdgeInterface *ei;
-    ROAMestimation::BasePriorEdgeInterface *pi;
+    ROAMestimation::BaseEdgeInterface *pi;
 
     if ((ei = dynamic_cast<ROAMestimation::GenericEdgeInterface *>(e)) != NULL) {
       std::map<std::string, SlotRandomLogger *>::iterator l_it = _loggers.find(
@@ -102,7 +102,7 @@ void GraphLogger::sync() {
       }
 
       l_it->second->logObject(*ei);
-    } else if ((pi = dynamic_cast<ROAMestimation::BasePriorEdgeInterface *>(e))
+    } else if ((pi = dynamic_cast<ROAMestimation::BaseEdgeInterface *>(e))
         != NULL) {
       std::map<std::string, SlotRandomLogger *>::iterator l_it = _loggers.find(
           pi->getCategory());

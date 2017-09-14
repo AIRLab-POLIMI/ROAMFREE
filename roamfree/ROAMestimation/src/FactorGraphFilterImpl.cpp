@@ -32,6 +32,7 @@
 #include "ROAMlog/GraphLogger.h"
 
 #include "QuaternionGenericEdge.h"
+#include "SE3InterpolationEdge.h"
 #include "GenericEdgeInterface.h"
 #include "EstimationEdgeCollectInterface.h"
 #include "g2oSolverFactory.h"
@@ -98,6 +99,12 @@ void FactorGraphFilter_Impl::initSolver() {
   // init the spatial index
 
   _spatialIndex = new SpatialIndex;
+
+  _lastReturnedN_fromBack = -1;
+  _lastReturnedPose_fromBack = _poses.end();
+
+  _lastReturnedN_fromFront = -1;
+  _lastReturnedPose_fromFront = _poses.end();
 }
 
 void FactorGraphFilter_Impl::setSolverMethod(SolverMethod method) {
@@ -465,9 +472,11 @@ MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnPose(
     }
   }
 
-  addPriorOnPose_i(p, x0, cov);
+  BaseEdgeInterface *e = addPriorOnPose_i(p, x0, cov);
 
-  return MeasurementEdgeWrapper_Ptr();
+  assert(e != NULL);
+
+  return MeasurementEdgeWrapper_Ptr(new MeasurementEdgeWrapper_Impl(e));
 }
 
 MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnConstantParameter(
@@ -493,7 +502,7 @@ MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnConstantParameter(
 
   g2o::OptimizableGraph::Vertex *v = cnst_par->getVertices(0.0)->second;
 
-  BasePriorEdgeInterface *priorif;
+  BaseEdgeInterface *priorif;
 
   switch (type) {
 
@@ -525,8 +534,7 @@ MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnConstantParameter(
   << endl;
 #   endif
 
-// TODO: return the pointer to the edge. Problem, BasePriorEdgeInterface is not connected with GenericEdgeInterface
-  return MeasurementEdgeWrapper_Ptr();
+  return MeasurementEdgeWrapper_Ptr(new MeasurementEdgeWrapper_Impl(priorif));
 
 }
 
@@ -562,7 +570,7 @@ MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnTimeVaryingParamete
     return MeasurementEdgeWrapper_Ptr();
   }
 
-  BasePriorEdgeInterface *priorif;
+  BaseEdgeInterface *priorif;
 
   switch (type) {
 
@@ -595,7 +603,7 @@ MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnTimeVaryingParamete
 #   endif
 
 // TODO: return the pointer to the edge. Problem, BasePriorEdgeInterface is not connected with GenericEdgeInterface
-  return MeasurementEdgeWrapper_Ptr();
+  return MeasurementEdgeWrapper_Ptr(new MeasurementEdgeWrapper_Impl(priorif));
 }
 
 PoseVertexWrapper_Ptr FactorGraphFilter_Impl::addPose(double t) {
@@ -651,6 +659,76 @@ PoseVertex *FactorGraphFilter_Impl::addPose_i(double t) {
   return v;
 }
 
+PoseVertexWrapper_Ptr FactorGraphFilter_Impl::addInterpolatingPose(double t,
+    const Eigen::MatrixXd &pseudoObsCov)
+    {
+  PoseVertex *v = addInterpolatingPose_i(t, pseudoObsCov);
+
+  return PoseVertexWrapper_Ptr(v != NULL ? new PoseVertexWrapper_Impl(v) : NULL);
+
+}
+
+PoseVertex *FactorGraphFilter_Impl::addInterpolatingPose_i(double t,
+    const Eigen::MatrixXd &pseudoObsCov) {
+
+  // get the two poses between which t lies
+
+  PoseMapIterator before, after;
+  after = _poses.lower_bound(t);
+
+  if (after == _poses.end()) {
+    cerr << "[FactorGraphFilter] Error: timestap "
+        << ROAMutils::StringUtils::writeNiceTimestamp(t)
+        << " is newer than the most recent pose.";
+    return NULL;
+  } else if (after == _poses.begin()) {
+    cerr << "[FactorGraphFilter] Error: timestap "
+        << ROAMutils::StringUtils::writeNiceTimestamp(t)
+        << " is older than the oldest pose.";
+    return NULL;
+  }
+
+  before = after;
+  --before;
+
+  PoseVertex *xi = addPose_i(t);
+
+  if (xi == NULL) {
+    return NULL;
+  }
+
+  SE3InterpolationEdge *edge = new SE3InterpolationEdge;
+
+  edge->vertices()[0] = before->second;
+  edge->vertices()[1] = xi;
+  edge->vertices()[2] = after->second;
+
+  ROAMmath::invDiagonal(pseudoObsCov, edge->information());
+
+  edge->init();
+  static_cast<PoseVertexMetadata *>(xi->userData())->hasBeenEstimated = true; // prediction is already accurate
+
+  // create the metadata
+  edge->setUserData(new MeasurementEdgeMetadata);
+
+  // insert the edge into the g2o graph
+  _optimizer->addEdge(edge);
+
+# ifdef DEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES
+  cerr << "[FactorGraphFilter] Info: adding interpolating Pose vertex at t="
+      << ROAMutils::StringUtils::writeNiceTimestamp(t) << ", id " << xi->id()
+      << " between "
+      << ROAMutils::StringUtils::writeNiceTimestamp(
+          before->second->getTimestamp()) << " and "
+      << ROAMutils::StringUtils::writeNiceTimestamp(
+          after->second->getTimestamp())
+      << endl;
+# endif
+
+  return xi;
+
+}
+
 MeasurementEdgeWrapperVector_Ptr FactorGraphFilter_Impl::addSequentialMeasurement(
     const string& sensorName, double timestamp, const Eigen::VectorXd& z,
     const Eigen::MatrixXd& cov) {
@@ -702,8 +780,11 @@ MeasurementEdgeWrapperVector_Ptr FactorGraphFilter_Impl::addSequentialMeasuremen
 
     inserted = addNonMasterSequentialMeasurement_i(sensor, timestamp, z, cov);
 
-    ret->push_back(
-        MeasurementEdgeWrapper_Ptr(new MeasurementEdgeWrapper_Impl(inserted)));
+    if (inserted != NULL) {
+      ret->push_back(
+          MeasurementEdgeWrapper_Ptr(
+              new MeasurementEdgeWrapper_Impl(inserted)));
+    }
   }
 
   return ret;
@@ -741,7 +822,7 @@ void FactorGraphFilter_Impl::addMasterSequentialMeasurement_i(
 
   if (edge != NULL) {
     // predictor
-    edge->predictNextState();
+    edge->predict();
 
     handleDeferredMeasurements_i(outIter);
 
@@ -1029,8 +1110,12 @@ GenericEdgeInterface* FactorGraphFilter_Impl::addNonMasterSequentialMeasurement_
 
 // if the measurement is more recent with respect to the newest vertex we defer it
   PoseVertex *newest = getNewestPose_i();
-  if (newest == NULL || newest->getTimestamp() < timestamp) {
+  if (newest == NULL || newest->getTimestamp() + 1e-6 < timestamp) { // one us tolerance
     deferMeasurement(sensor, timestamp, z, cov);
+#   ifdef DEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES
+    cerr
+    << "[FactorGraphFilter] Why? Measurement is newer than last pose or I don't have any pose yet." << endl;
+#   endif
     return NULL;
   }
 
@@ -1071,7 +1156,26 @@ GenericEdgeInterface* FactorGraphFilter_Impl::addNonMasterSequentialMeasurement_
 
 // check if I have enough vertices wrt the sensor order
   if (!checkSensorOrder(sensor, th, last, secondlast)) {
-    deferMeasurement(sensor, timestamp, z, cov);
+    // deferMeasurement(sensor, timestamp, z, cov); // TODO: why should I defer this? This will just create mess later
+
+#   ifdef DEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES
+    cerr << "[FactorGraphFilter] Discarding it" << endl;
+    cerr
+    << "[FactorGraphFilter] Why? sensor of order " << sensor.order << " and I have only: ";
+    cerr << "second-last: ";
+    if (secondlast == NULL) {
+      cerr << "NULL";
+    } else {
+      cerr << ROAMutils::StringUtils::writeNiceTimestamp(secondlast->getTimestamp());
+    }
+    cerr << ", last: ";
+    if (last == NULL) {
+      cerr << "NULL";
+    } else {
+      cerr << ROAMutils::StringUtils::writeNiceTimestamp(last->getTimestamp());
+    }
+#   endif
+    cerr << endl;
     return NULL;
   }
 
@@ -1262,13 +1366,12 @@ GenericEdgeInterface *FactorGraphFilter_Impl::addMeasurement_i(
   cif->collect(v0, v1, v2, timestamp, dt01, dt12, sensor.name, _params);
 
 // fill in the measurement and the covariance
-  e->setMeasurement_GE(z);
+  e->setMeasurement(z);
   e->setNoiseCov(cov);
-  e->setFrameCounter(0); // TODO: implement frame counter handling
 
 // set robustification according to sensor configuration
 
-  g2o::OptimizableGraph::Edge *oe = *e; // conversion operator
+  g2o::OptimizableGraph::Edge *oe = e->getg2oOptGraphPointer(); // conversion operator
 
 // if the sensor is currently robustified, set these properties into the edge
   if (sensor.robustified) {
@@ -1405,33 +1508,58 @@ PoseVertexWrapper_Ptr FactorGraphFilter_Impl::getNthOldestPose(int n) {
 }
 
 PoseVertex *FactorGraphFilter_Impl::getNthPose_i(int n) {
-  PoseVertex *pose = NULL;
-
-  if (n < _poses.size()) {
-    auto it = _poses.end();
-    for (int k = 0; k <= n; k++) {
-      --it;
+  if (n < _poses.size() && n >= 0) {
+    // if the last returned is nearer than starting from scratch ...
+    if (_lastReturnedN_fromBack != -1 && abs(_lastReturnedN_fromBack - n) < n) {
+      int dir = _lastReturnedN_fromBack < n ? 1 : -1;
+      while (_lastReturnedN_fromBack != n) {
+        if (dir > 0) {
+          --_lastReturnedPose_fromBack; // we are going backwards, we count from end to begin
+        } else {
+          ++_lastReturnedPose_fromBack;
+        }
+        _lastReturnedN_fromBack += dir;
+      }
+    } else {
+      auto it = _poses.end();
+      for (int k = 0; k <= n; k++) {
+        --it;
+      }
+      _lastReturnedPose_fromBack = it;
+      _lastReturnedN_fromBack = n;
     }
-
-    pose = it->second;
+    return _lastReturnedPose_fromBack->second;
+  } else {
+    return NULL;
   }
-
-  return pose;
 }
 
 PoseVertex *FactorGraphFilter_Impl::getNthOldestPose_i(int n) {
-  PoseVertex *pose = NULL;
-
-  if (n < _poses.size()) {
-    auto it = _poses.begin();
-    for (int k = 0; k < n; k++) {
-      ++it;
+  if (n < _poses.size() && n >= 0) {
+    // if the last returned is nearer than starting from scratch ...
+    if (_lastReturnedN_fromFront != -1
+        && abs(_lastReturnedN_fromFront - n) < n) {
+      int dir = _lastReturnedN_fromFront < n ? 1 : -1;
+      while (_lastReturnedN_fromFront != n) {
+        if (dir > 0) {
+          ++_lastReturnedPose_fromFront;
+        } else {
+          --_lastReturnedPose_fromFront;
+        }
+        _lastReturnedN_fromFront += dir;
+      }
+    } else {
+      auto it = _poses.begin();
+      for (int k = 0; k < n; k++) {
+        ++it;
+      }
+      _lastReturnedPose_fromFront = it;
+      _lastReturnedN_fromFront = n;
     }
-
-    pose = it->second;
+    return _lastReturnedPose_fromFront->second;
+  } else {
+    return NULL;
   }
-
-  return pose;
 }
 
 bool FactorGraphFilter_Impl::estimate(int nIterations) {
@@ -1464,7 +1592,7 @@ bool FactorGraphFilter_Impl::estimate(PoseVertexWrapperVector poses,
 
     if (!pw) {
       cerr
-          << "[FactorGraphFilter] Error: Null PoseVertexWrapper_Ptr in pose set"
+      << "[FactorGraphFilter] Error: Null PoseVertexWrapper_Ptr in pose set"
           << endl;
       return false;
     }
@@ -1519,7 +1647,7 @@ bool FactorGraphFilter_Impl::estimate_i(g2o::HyperGraph::EdgeSet &eset,
   for (auto vit = activeVertices.begin(); vit != activeVertices.end(); ++vit) {
     for (auto eit = (*vit)->edges().begin(); eit != (*vit)->edges().end();
         ++eit) {
-      if (dynamic_cast<BasePriorEdgeInterface *>(*eit) != NULL) {
+      if (dynamic_cast<BaseEdgeInterface *>(*eit) != NULL) {
         eset.insert(*eit);
       }
     }
@@ -1590,7 +1718,7 @@ bool FactorGraphFilter_Impl::estimate_i(g2o::HyperGraph::EdgeSet &eset,
   _optimizer->initializeOptimization(eset);
 
   if (_writeHessianStructure == true) {
-    ofstream fid("debug/Hstruct.txt"); // TODO: put the same folder as for _logger
+    ofstream fid("/tmp/roamfree/Hstruct.txt"); // TODO: put the same folder as for _logger
 
     if (fid.is_open()) {
       fid << writeVertexIdMap();
@@ -1779,7 +1907,7 @@ void FactorGraphFilter_Impl::updatePosesAndEdgesMetadata() {
         GenericEdgeInterface *e = dynamic_cast<GenericEdgeInterface *>(*weit);
 
         if (e != NULL) {
-          g2o::OptimizableGraph::Edge *oe = *e;
+          g2o::OptimizableGraph::Edge *oe = e->getg2oOptGraphPointer();
 
           MeasurementEdgeMetadata *meta =
               static_cast<MeasurementEdgeMetadata *>(oe->userData());
@@ -1969,6 +2097,20 @@ double FactorGraphFilter_Impl::getWindowLenght() {
   return getNewestPose_i()->getTimestamp() - getOldestPose_i()->getTimestamp();
 }
 
+double FactorGraphFilter_Impl::getChi2() {
+  return _optimizer->chi2();
+}
+
+void FactorGraphFilter_Impl::writeFinalHessian() {
+  g2o::BlockSolverX *blocksolver =
+      static_cast<g2o::BlockSolverX *>(_optimizer->solver());
+
+  g2o::LinearSolverCSparse<g2o::BlockSolverX::PoseMatrixType> *cspsolver =
+      static_cast<g2o::LinearSolverCSparse<g2o::BlockSolverX::PoseMatrixType> *>(blocksolver->linearSolver());
+
+  g2o::writeCs2Octave("/tmp/roamfree/H.txt", cspsolver->getccsA(), true); // TODO: put the same folder as for _logger
+}
+
 MeasurementEdgeWrapperVector_Ptr FactorGraphFilter_Impl::handleDeferredMeasurements() {
   MeasurementEdgeWrapperVector_Ptr ret(new MeasurementEdgeWrapperVector);
 
@@ -2021,6 +2163,7 @@ string FactorGraphFilter_Impl::writeFactorGraph() {
 
   stringstream s;
 
+  /*
   s << " --> PARAMETERS <--" << endl;
 
   for (auto pit = _params.begin(); pit != _params.end(); ++pit) {
@@ -2043,6 +2186,7 @@ string FactorGraphFilter_Impl::writeFactorGraph() {
       }
     }
   }
+  */
 
   s << endl << " --> POSE GRAPH <--" << endl;
   for (PoseMapIterator pit = _poses.begin(); pit != _poses.end(); ++pit) {
@@ -2062,68 +2206,39 @@ string FactorGraphFilter_Impl::writeFactorGraph() {
   return s.str();
 }
 
+bool FactorGraphFilter_Impl::removeMeasurement(MeasurementEdgeWrapper_Ptr edge)
+    {
+
+  if (!edge) {
+    return false;
+  }
+
+  BaseEdgeInterface *bei = boost::static_pointer_cast<MeasurementEdgeWrapper_Impl>(edge)->_e;
+
+  g2o::OptimizableGraph::Edge *e =  bei->getg2oOptGraphPointer();
+
+  return _optimizer->removeEdge(e);
+}
+
 string FactorGraphFilter_Impl::writeEdge(g2o::HyperGraph::Edge * e) {
   stringstream s;
 
   GenericEdgeInterface *gei;
-  BasePriorEdgeInterface *pei;
+  BaseEdgeInterface *pei;
   GenericLinearConstraint *glc;
+  SE3InterpolationEdge *ie;
 
   if ((gei = dynamic_cast<GenericEdgeInterface *>(e)) != NULL) {
     s << gei->writeDebugInfo();
-  } else if ((pei = dynamic_cast<BasePriorEdgeInterface *>(e)) != NULL) {
+  } else if ((pei = dynamic_cast<BaseEdgeInterface *>(e)) != NULL) {
     s << pei->writeDebugInfo();
   } else if ((glc = dynamic_cast<GenericLinearConstraint *>(e)) != NULL) {
     s << glc->writeDebugInfo();
+  } else if ((ie = dynamic_cast<SE3InterpolationEdge *>(e)) != NULL) {
+    s << ie->writeDebugInfo();
   } else {
     s << "Unknown (this is bad) ";
   }
-
-  return s.str();
-}
-
-string FactorGraphFilter_Impl::writeFactorGraphToDot() {
-
-  stringstream s;
-
-  s << "graph {" << endl;
-  s << "overlap=false;" << endl;
-
-  for (PoseMapIterator pit = _poses.begin(); pit != _poses.end(); ++pit) {
-    PoseVertex *v = pit->second;
-
-    s << v->id() << "[label=\"" << "(" << v->id() << ") t="
-        << ROAMutils::StringUtils::writeNiceTimestamp(v->getTimestamp())
-        << (v->fixed() ? " Fixed" : "") << "\"];" << endl;
-
-    g2o::HyperGraph::EdgeSet::const_iterator weit;
-    for (weit = v->edges().begin(); weit != v->edges().end(); ++weit) {
-
-      GenericEdgeInterface *e = dynamic_cast<GenericEdgeInterface *>(*weit);
-      if (e != NULL) {
-        s << e->getEdgeHash() << "[label=\"" << e->getCategory() << "\n"
-            << ROAMutils::StringUtils::writeNiceTimestamp(e->getTimestamp())
-            << "\", shape=box];";
-        s << e->getEdgeHash() << "--" << v->id() << ";" << endl;
-      }
-
-      //TODO other information
-      /*BasePriorEdgeInterface *p = dynamic_cast<BasePriorEdgeInterface *>(*weit);
-       if (p != NULL) {
-       s << "Prior ";
-       }
-
-       GenericLinearConstraint *glc =
-       dynamic_cast<GenericLinearConstraint *>(*weit);
-       if (glc != NULL) {
-       s << glc->writeDebugInfo();
-       }
-
-       s << endl;*/
-    }
-  }
-
-  s << "}" << endl;
 
   return s.str();
 }
@@ -2143,7 +2258,8 @@ void FactorGraphFilter_Impl::setWriteGraph(bool writeGraph) {
   _writeGraph = writeGraph;
 }
 
-void FactorGraphFilter_Impl::setWriteHessianStructure(bool writeHessianStructure) {
+void FactorGraphFilter_Impl::setWriteHessianStructure(
+    bool writeHessianStructure) {
   _writeHessianStructure = writeHessianStructure;
 }
 

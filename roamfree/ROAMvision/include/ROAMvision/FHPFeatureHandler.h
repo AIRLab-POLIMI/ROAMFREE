@@ -66,6 +66,8 @@ protected:
 
 	FeatureMap _features;
 
+	ROAMestimation::ParameterWrapper_Ptr _K_par;
+
 };
 
 } /* namespace ROAMvision */

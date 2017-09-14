@@ -23,7 +23,7 @@ Contributors:
 
 namespace ROAMestimation {
 
-class GenericEdgeInterface;
+class BaseEdgeInterface;
 class FactorGraphFilter_Impl;
 
 class MeasurementEdgeWrapper_Impl : public MeasurementEdgeWrapper {
@@ -31,12 +31,15 @@ class MeasurementEdgeWrapper_Impl : public MeasurementEdgeWrapper {
 	friend FactorGraphFilter_Impl;
 
 public:
-	MeasurementEdgeWrapper_Impl(GenericEdgeInterface *edge);
+	MeasurementEdgeWrapper_Impl(BaseEdgeInterface *edge);
+	virtual ~MeasurementEdgeWrapper_Impl() {};
 
 	virtual bool predict();
 
+	virtual PoseVertexWrapper_Ptr getConnectedPose(int N);
+
 protected:
-	GenericEdgeInterface *_e;
+	BaseEdgeInterface *_e;
 };
 
 } /* namespace ROAMestimation */

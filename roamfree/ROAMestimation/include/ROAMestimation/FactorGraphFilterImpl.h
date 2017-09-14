@@ -37,6 +37,8 @@
 #include "PoseVertexWrapperImpl.h"
 #include "MeasurementEdgeWrapperImpl.h"
 
+#include "GenericEdgeInterface.h"
+
 namespace ROAMlog {
 class GraphLogger;
 }
@@ -72,6 +74,10 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
     void setWriteHessianStructure(bool writeHessianStructure);
 
     double getWindowLenght();
+
+    double getChi2();
+
+    void writeFinalHessian();
 
     /* --------------------------- SENSOR LEVEL METHODS ---------------------------- */
 
@@ -135,11 +141,15 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
 
     PoseVertexWrapper_Ptr addPose(double t);
 
+    PoseVertexWrapper_Ptr addInterpolatingPose(double t, const Eigen::MatrixXd &pseudoObsCov);
+
     MeasurementEdgeWrapper_Ptr addMeasurement(const std::string& sensorName,
         double timestamp, const Eigen::VectorXd &z, const Eigen::MatrixXd &cov,
         PoseVertexWrapper_Ptr v2, PoseVertexWrapper_Ptr v1 =
             PoseVertexWrapper_Ptr(), PoseVertexWrapper_Ptr v0 =
             PoseVertexWrapper_Ptr());
+
+    bool removeMeasurement(MeasurementEdgeWrapper_Ptr edge);
 
     MeasurementEdgeWrapperVector_Ptr addSequentialMeasurement(
         const std::string& sensorName, double timestamp,
@@ -249,9 +259,17 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
 
     PoseVertex *addPose_i(double t);
 
+    PoseVertex *addInterpolatingPose_i(double t, const Eigen::MatrixXd &pseudoObsCov);
+
     PoseVertex *getNewestPose_i();
     PoseVertex *getOldestPose_i();
+
+    int _lastReturnedN_fromBack; // two variables to speed up calls of getNthPose_i
+    PoseMapIterator _lastReturnedPose_fromBack;
     PoseVertex *getNthPose_i(int n);
+
+    int _lastReturnedN_fromFront; // two variables to speed up calls of getNthPose_i
+    PoseMapIterator _lastReturnedPose_fromFront;
     PoseVertex *getNthOldestPose_i(int n);
 
     PoseVertex *getNearestPoseByTimestamp_i(double t, bool onlyBefore = false);
@@ -312,7 +330,6 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
     /* --------------------------- STUFF FOR DEBUG ------------------------------------ */
 
     std::string writeFactorGraph();
-    std::string writeFactorGraphToDot();
     std::string writeVertexIdMap(); // for each vertex it writes its indices in the hessian matrix
     std::string writeEdge(g2o::HyperGraph::Edge *e);
 

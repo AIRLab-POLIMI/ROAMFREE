@@ -15,7 +15,7 @@ config.pluginConfig = {};
 
 config.global.plugins{end+1} = 'Trajectory';
 config.pluginConfig{1}.axesLenght = 0.5;
-config.pluginConfig{end}.sensorName = 'GPS'; %display also measures from an AbsolutePosition sensor
+config.pluginConfig{end}.absolutePositionSensor = 'GPS'; %display also measures from an AbsolutePosition sensor
 
 config.global.plugins{end+1} = 'GenericEdge';
 config.pluginConfig{end+1}.sensorName = 'GPS';

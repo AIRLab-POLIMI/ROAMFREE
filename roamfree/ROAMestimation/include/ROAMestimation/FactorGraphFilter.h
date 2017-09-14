@@ -100,6 +100,17 @@ class FactorGraphFilter {
      */
     virtual double getWindowLenght() = 0;
 
+    /**
+     *  \brief gets the chi2 (meaningful only after an estimation)
+     */
+    virtual double getChi2() = 0;
+
+    /**
+     *  \brief writes the final hessian matrix to a file
+     */
+    virtual void writeFinalHessian() = 0;
+
+
     /* --------------------------- SENSOR LEVEL METHODS ---------------------------- */
 
     /**
@@ -285,6 +296,19 @@ class FactorGraphFilter {
     virtual PoseVertexWrapper_Ptr addPose(double t) = 0;
 
     /**
+     * \brief add an extra pose which interpolates between the two nearest ones
+     *
+     * A new pose is added with timestamp t which lies between the two nearest
+     * existing pose vertices based on the difference of timestamps.
+     *
+     * @param t the new pose timestamp
+     * @param pseudoObsCov the covariance of the pseudo-observation constraining the interpolating pose value
+     *
+     * @return a wrapper to the created pose or NULL in case of failure.
+     */
+    virtual PoseVertexWrapper_Ptr addInterpolatingPose(double t, const Eigen::MatrixXd &pseudoObsCov) = 0;
+
+    /**
      *  \brief Adds a measurement.
      *
      * This is a low level method to feed the FactorGraphFilter with sensor readings. The edge of maximum order
@@ -306,6 +330,15 @@ class FactorGraphFilter {
         PoseVertexWrapper_Ptr v2, PoseVertexWrapper_Ptr v1 =
             PoseVertexWrapper_Ptr(), PoseVertexWrapper_Ptr v0 =
             PoseVertexWrapper_Ptr()) = 0;
+
+    /**
+     *  \brief Removes a previously added measurement
+     *
+     * @param edge the measurement to be removed
+     *
+     * @return true if the measurement was succesfully found and removed
+     */
+    virtual bool removeMeasurement(MeasurementEdgeWrapper_Ptr edge) = 0;
 
     /**
      *  \brief Adds a measurement for a sequential sensor.

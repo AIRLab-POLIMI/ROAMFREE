@@ -1,13 +1,13 @@
 /*
-Copyright (c) 2013-2016 Politecnico di Milano.
-All rights reserved. This program and the accompanying materials
-are made available under the terms of the GNU Lesser Public License v3
-which accompanies this distribution, and is available at
-https://www.gnu.org/licenses/lgpl.html
+ Copyright (c) 2013-2016 Politecnico di Milano.
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the GNU Lesser Public License v3
+ which accompanies this distribution, and is available at
+ https://www.gnu.org/licenses/lgpl.html
 
-Contributors:
-    Davide A. Cucci (davide.cucci@epfl.ch)    
-*/
+ Contributors:
+ Davide A. Cucci (davide.cucci@epfl.ch)
+ */
 
 /*
  * FHPFeatureHandler.cpp
@@ -18,7 +18,8 @@ Contributors:
 
 #include "FHPFeatureHandler.h"
 
-#include "SufficientParallax.h"
+//#include "SufficientParallax.h"
+#include "SufficientZChange.h"
 
 #include <iostream>
 
@@ -40,16 +41,16 @@ bool FHPFeatureHandler::init(FactorGraphFilter* f, const string &name,
   // TODO: currently FHP works only if system is camera-centric, i.e., T_OS = I
   assert(T_OS.head(3).norm() == 0.0 && T_OS.tail(3).norm() == 0.0);
 
-  _filter->addConstantParameter("Camera_SOx", 0.000, true);
-  _filter->addConstantParameter("Camera_SOy", 0.000, true);
-  _filter->addConstantParameter("Camera_SOz", 0.000, true);
+  _filter->addConstantParameter(_sensorName + "_Cam_SOx", T_OS(0), true);
+  _filter->addConstantParameter(_sensorName + "_Cam_SOy", T_OS(1), true);
+  _filter->addConstantParameter(_sensorName + "_Cam_SOz", T_OS(2), true);
 
-  // camera centric
-  _filter->addConstantParameter("Camera_qOSx", 0.0, true);
-  _filter->addConstantParameter("Camera_qOSy", 0.0, true);
-  _filter->addConstantParameter("Camera_qOSz", 0.0, true);
+  _filter->addConstantParameter(_sensorName + "_Cam_qOSx", T_OS(4), true);
+  _filter->addConstantParameter(_sensorName + "_Cam_qOSy", T_OS(5), true);
+  _filter->addConstantParameter(_sensorName + "_Cam_qOSz", T_OS(6), true);
 
-  _filter->addConstantParameter(Matrix3D, "Camera_CM", K, true);
+  _K_par = _filter->addConstantParameter(Matrix3D, _sensorName + "_Cam_CM", K,
+      true);
 }
 
 bool FHPFeatureHandler::addFeatureObservation(long int id, double t,
@@ -113,17 +114,16 @@ bool FHPFeatureHandler::addFeatureObservation(long int id, double t,
 
       // add prior on the viewing ray
 
-      ParameterWrapper_Ptr K_par = _filter->getParameterByName("Camera_CM");
-      assert(K_par);
-      double fx = K_par->getEstimate()(0);
-      double fy = K_par->getEstimate()(4);
+      double fx = _K_par->getEstimate()(0);
+      double fy = _K_par->getEstimate()(4);
 
       //TODO: let user decide this
       const double sigma_pixel = 1.0;
 
       // prior on viewing ray only
       Eigen::MatrixXd prior_cov(2, 2);
-      prior_cov << sigma_pixel / pow(fx, 2), 0, 0, sigma_pixel / pow(fy, 2);
+      prior_cov << pow(sigma_pixel, 2) / pow(fx, 2), 0, 0, pow(sigma_pixel, 2)
+          / pow(fy, 2);
 
       Eigen::VectorXd prior_mean(2);
       prior_mean = HP.head(2);
@@ -155,11 +155,15 @@ bool FHPFeatureHandler::addFeatureObservation(long int id, double t,
       d.zHistory.clear();
       d.isInitialized = true;
 
+      return true;
+
 #			ifdef DEBUG_PRINT_VISION_INFO_MESSAGES
       cerr << "[FHPFeatureHandler] Ready to estimate depth for track " << id
       << endl;
 #			endif
     }
+
+    return false;
 
   } else { // it has already been initialized, just add the measurement
     MeasurementEdgeWrapper_Ptr ret = _filter->addMeasurement(sensor, t, z, cov,
@@ -176,21 +180,34 @@ bool FHPFeatureHandler::initFeature(const std::string& sensor,
     long int id) {
 
   _filter->addSensor(sensor, FramedHomogeneousPoint, false, true);
-  _filter->shareSensorFrame("Camera", sensor);
-  _filter->shareParameter("Camera_CM", sensor + "_CM");
 
-  ParameterWrapper_Ptr K_par = _filter->getParameterByName("Camera_CM");
-  assert(K_par);
+  // it does not work, there is no sensor called _sensorName + "_Cam"
+  // we have to share manually the parameters
+  // _filter->shareSensorFrame(_sensorName + "_Cam", sensor);
+
+  const string suffixes[] =
+      { "_SOx", "_SOy", "_SOz", "_qOSx", "_qOSy", "_qOSz" };
+  for (int k = 0; k < 6; k++) {
+    _filter->shareParameter(_sensorName + "_Cam" + suffixes[k],
+        sensor + suffixes[k]);
+  }
+
+  _filter->shareParameter(_sensorName + "_Cam_CM", sensor + "_CM");
 
   //add to current track list
   FHPTrackDescriptor &d = _features[id];
   d.isInitialized = false;
-  d.initStrategy = new SufficientParallax(0.0, _initialDepth, d.zHistory,
-      K_par->getEstimate().data());
+
+  /*
+   d.initStrategy = new SufficientParallax(0.0, _initialDepth, d.zHistory,
+   K_par->getEstimate().data());
+   //*/
+  d.initStrategy = new SufficientZChange(10.0, 10.0, d.zHistory,
+      _K_par->getEstimate().data());
 
   d.anchorFrame = pv;
 
-  _filter->setRobustKernel(sensor, true, 3.0);
+  // _filter->setRobustKernel(sensor, true, 3.0);
 
 # ifdef DEBUG_PRINT_VISION_INFO_MESSAGES
   cerr << "[FHPFeatureHandler] New feature, id " << id << endl;

@@ -25,7 +25,7 @@ Contributors:
 
 #include "g2o/solvers/csparse/linear_solver_csparse.h"
 
-#include "PriorEdges/BasePriorEdgeInterface.h"
+#include "BaseEdgeInterface.h"
 #include "GenericEdgeInterface.h"
 
 #include "ROAMutils/StringUtils.h"
@@ -171,7 +171,7 @@ GenericLinearConstraint *GenericLinearConstraintFactory::buildGLC(
       std::cerr << e->writeDebugInfo();
     }
 
-    BasePriorEdgeInterface *p = dynamic_cast<BasePriorEdgeInterface *>(*deit);
+    BaseEdgeInterface *p = dynamic_cast<BaseEdgeInterface *>(*deit);
     if (p != NULL) {
       std::cerr << p->writeDebugInfo();
     }

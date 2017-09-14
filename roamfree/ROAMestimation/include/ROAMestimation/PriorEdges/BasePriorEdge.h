@@ -26,14 +26,14 @@
 
 #include "g2o/core/base_unary_edge.h"
 
-#include "BasePriorEdgeInterface.h"
+#include "BaseEdgeInterface.h"
 
 namespace ROAMestimation {
 
 template<int D, typename VertexXi>
 
 class BasePriorEdge: public g2o::BaseUnaryEdge<D, Eigen::VectorXd, VertexXi>,
-    public BasePriorEdgeInterface {
+    public BaseEdgeInterface {
 
   protected:
 
@@ -79,6 +79,10 @@ class BasePriorEdge: public g2o::BaseUnaryEdge<D, Eigen::VectorXd, VertexXi>,
 
     virtual double getTimestamp() const {
       return _tstamp;
+    }
+
+    virtual bool predict() {
+      return false;
     }
 
     bool read(std::istream &s) {

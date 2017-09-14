@@ -29,7 +29,7 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
 
 # --- Boost
 
-find_package(Boost COMPONENTS python REQUIRED)
+find_package(Boost)
 
 include_directories("${Boost_INCLUDE_DIRS}")
 set(Boost_USE_STATIC_LIBS OFF)
@@ -52,10 +52,10 @@ set(G2O_LIBS core solver_csparse)
 find_package(SuiteSparse REQUIRED)
 include_directories(${CSPARSE_INCLUDE_DIR})
 
-# --- python
+# --- Opencv
 
-find_package(PythonLibs REQUIRED)
-include_directories(${PYTHON_INCLUDE_PATH})
+find_package(OpenCV REQUIRED)
+include_directories(${OpenCV_INCLUDE_DIR})
 
 # ----------------------- GCC FLAGS ----------------------------
 
@@ -87,17 +87,15 @@ if(CMAKE_BUILD_TYPE MATCHES Debug)
 	add_definitions( -DDEBUG_G2O_OPTIMIZER_VERBOSE=1 )
 
 	# disable OpenMP in g2o TODO check message
-	set( G2O_USE_OPENMP OFF CACHE BOOL "Build g2o with OpenMP support (EXPERIMENTAL)")
+	set( G2O_USE_OPENMP OFF CACHE BOOL "Build g2o with OpenMP support (EXPERIMENTAL)" FORCE)
 	
 	set(BUILD_TYPE_MSG "Debug") 
 
 else()
 	add_definitions( -DDEBUG_G2O_OPTIMIZER_VERBOSE=0 )
 	
-	add_definitions( -DDEBUG_PRINT_VISION_INFO_MESSAGES)
-	
 	#enable OpenMP in g2o
-	set( G2O_USE_OPENMP ON CACHE BOOL "Build g2o with OpenMP support (EXPERIMENTAL)")
+	set( G2O_USE_OPENMP ON CACHE BOOL "Build g2o with OpenMP support (EXPERIMENTAL)" FORCE)
 	
 	set(BUILD_TYPE_MSG "Release")
 endif()
@@ -113,7 +111,11 @@ message(STATUS "csparse found?   : " ${CSPARSE_FOUND})
 message(STATUS "csparse includes : " ${CSPARSE_INCLUDE_DIR})
 message(STATUS "csparse libs     : " ${CSPARSE_LIBRARY})
 message(STATUS "cholmod libs     : " ${CHOLMOD_LIBRARY})
-message(STATUS "python includes  : " ${PYTHON_INCLUDE_PATH})
+
+message(STATUS "opencv found?    : " ${OpenCV_FOUND})
+message(STATUS "opencv includes  : " ${OpenCV_INCLUDE_DIR})
+message(STATUS "opencv libs      : " ${OpenCV_LIBS})
+
 # -------------------------------------------------------------
 
 add_subdirectory(g2o)
