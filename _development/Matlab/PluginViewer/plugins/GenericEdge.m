@@ -33,8 +33,8 @@ if exist(edgef, 'file')
         
         xlim([0, edge(end,1)-edge(1,1)])
         ylim([-3*yl-eps 3*yl+eps]);
-        
-        %axis tight
+        grid on        
+        axis tight
         
         % possibly plot events
         if isfield(pluginConfig, 'events')
@@ -55,6 +55,7 @@ if exist(edgef, 'file')
             title([pluginConfig.sensorName ' measurement']);
         
             axis tight           
+            grid on
         end        
         
     end
