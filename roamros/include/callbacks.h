@@ -23,6 +23,10 @@
 namespace ROAMestimation {
 class FactorGraphFilter;
 }
+namespace ROAMimu {
+class IMUIntegralHandler;
+class IMUIntegrator;
+}
 
 namespace roamros {
 
@@ -126,6 +130,12 @@ void Vector3StampedToGeneric3DOFsensor(
     const ros::MessageEvent<geometry_msgs::Vector3Stamped const>& event,
     const SensorConfiguration *sensor, ROAMestimation::FactorGraphFilter* filter);
 
+/**
+ * Handles a Imu message a imu integral source
+ */
+void ImuToIMUHandler(const ros::MessageEvent<const sensor_msgs::Imu>& event,
+		const SensorConfiguration *sensor,ROAMimu::IMUIntegralHandler* handler);
 }
+
 
 #endif /* CALLBACKS_H_ */

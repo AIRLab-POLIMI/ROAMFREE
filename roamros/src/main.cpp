@@ -11,6 +11,8 @@
 #include <geometry_msgs/PoseStamped.h>
 
 #include "ROAMestimation/ROAMestimation.h"
+#include "ROAMimu/IMUIntegrator.h"
+#include "ROAMimu/IMUIntegralHandler.h"
 
 #include "roamros_config.h"
 #include "solver_configuration.h"
@@ -33,6 +35,10 @@ int main(int argc, char *argv[]) {
 	ROAMestimation::FactorGraphFilter *filter;
 	roamros::setUpSolver(solver, &filter);
 
+	//set up the IMUHandler
+	//the initialization will be performed into setUpSensors, because we need to read the imuRate and poseRate parameters
+	ROAMimu::IMUIntegralHandler* handler;
+
 	// set up the tf transformation broadcaster
 	tf::TransformBroadcaster tf_broadcaster;
 
@@ -44,14 +50,18 @@ int main(int argc, char *argv[]) {
 	ros::Duration(0.1).sleep(); // this does not return until we have something on /clock
 
 	// set up the sensors
-	roamros::setUpSensors(&sensors, solver->base_link_frame_id_, filter);
+	roamros::setUpSensors(&sensors, solver->base_link_frame_id_, filter, &handler);
 
+	ROS_INFO("sensors ready");
 	// initialize the filter
-	roamros::initializeSolver(filter);
+	roamros::initializeSolver(filter, handler);
+
+	ROS_INFO("Sensor noise 0,0 %f", handler->getSensorNoises()(0,0));
+
 
 	// and subscribe to sensor topics
 	std::vector<ros::Subscriber> subscribers;
-	roamros::setUpSubscriptions(&sensors, filter, &subscribers);
+	roamros::setUpSubscriptions(&sensors, filter, &subscribers, handler);
 
 	// main loop
 	ROS_INFO("Running.");
@@ -59,11 +69,13 @@ int main(int argc, char *argv[]) {
 	ros::Rate r(solver->frequency_);
 
 	while (filter->getWindowLenght() < 2.0*solver->pose_window_length_) {
+		ROS_INFO("within get windows lenght");
 		ros::spinOnce();
 		r.sleep();
 	}
 
 	while (ros::ok()) {
+		ROS_INFO("while ros ok");
 		// handle all the callbacks up to now
 		// all the sensor readings up to this time are
 		ros::spinOnce();
