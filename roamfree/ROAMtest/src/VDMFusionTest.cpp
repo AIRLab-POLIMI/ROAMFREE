@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
   PoseVertexWrapper_Ptr firstPose = f->setInitialPose(x0, t);
   
    
-  ifstream infile( "VDM_data.txt" );
+  ifstream infile( argv[1] );
   
   int cntVdm = 0;
   int vdmRate = 50;
