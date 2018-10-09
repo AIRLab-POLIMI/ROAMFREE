@@ -97,11 +97,16 @@ int main(int argc, char *argv[]) {
   
   
   
-  Eigen::MatrixXd vdmCov(4, 4); // covariance of Accelerometer readings
-  vdmCov =  1*Eigen::MatrixXd::Identity(6, 6);
+  Eigen::MatrixXd vdmCov(6, 6); // covariance of Accelerometer readings
+  vdmCov.setZero();
+  vdmCov.block(0,0,3,3) = 1*Eigen::MatrixXd::Identity(3,3);
+  vdmCov.block(3,3,3,3) = 1*Eigen::MatrixXd::Identity(3,3);
   
   Eigen::MatrixXd posCov(6, 6);
-  posCov =  1*Eigen::MatrixXd::Identity(6, 6);
+  posCov.setZero();
+  posCov.block(0,0,3,3) = std::pow(0.01,2)*Eigen::MatrixXd::Identity(3,3);
+  posCov.block(3,3,3,3) = std::pow(0.001,2)*Eigen::MatrixXd::Identity(3,3);
+  
   
   Eigen::VectorXd x0(7), x1(7);
   x0 << 0,0,0,1,0,0,0;
@@ -114,9 +119,11 @@ int main(int argc, char *argv[]) {
   ifstream infile( argv[1] );
   
   int cntVdm = 0;
-  int vdmRate = 50;
+  int vdmRate = 100;
   bool firstEstimate = true;
   double priorTime = -numeric_limits< double >::infinity();
+  
+  
   
   
    while (infile)
@@ -132,6 +139,7 @@ int main(int argc, char *argv[]) {
     
     // Add Measurement
     f->addSequentialMeasurement("VDM", time, zw, vdmCov);
+   
     if(cntVdm==0)
     {
       f->getNewestPose()->setEstimate(x1);
@@ -161,24 +169,21 @@ int main(int argc, char *argv[]) {
 	
       }     
       
-      
-      
       if(oldest->getTimestamp() > priorTime)
       {
 	f->addPriorOnPose(oldest,oldest->getEstimate(),posCov);    
 	f->addPriorOnPose(secondoldest,secondoldest->getEstimate(),posCov);
 	priorTime = oldest->getTimestamp();
-	
       }
       
       
       cerr << oldest->getTimestamp() << " " << oldest->getEstimate().transpose() <<endl;
       cerr <<  secondoldest->getTimestamp() << " " << secondoldest->getEstimate().transpose() <<endl;
       
-      if(!f->estimate(10))
+      if(!f->estimate(5))
 	return 1;
       
-//       f->forgetOldNodes(2.5);
+      f->forgetOldNodes(2.5);
        
     }
     
