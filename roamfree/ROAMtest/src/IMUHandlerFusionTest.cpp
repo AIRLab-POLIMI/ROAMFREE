@@ -75,13 +75,13 @@ int main(int argc, char *argv[]) {
   double ba_dy = 0.0;
   double ba_dz = 0.0;
 
-  double ba_fx = 0.05; // frequency of the sinusoidal bias on the accelerometer
-  double ba_fy = 0.025;
-  double ba_fz = 0.0125;
+  double ba_fx = 0.00; // frequency of the sinusoidal bias on the accelerometer
+  double ba_fy = 0.000;
+  double ba_fz = 0.0000;
 
-  double ba_Ax = 0.010; // amplitude of the sinusoidal bias on the accelerometer
-  double ba_Ay = 0.0200;
-  double ba_Az = 0.0300;
+  double ba_Ax = 0.000; // amplitude of the sinusoidal bias on the accelerometer
+  double ba_Ay = 0.0000;
+  double ba_Az = 0.0000;
 
   double bw_x = 0.0; // biases on the gyroscope measurements
   double bw_y = 0.0;
@@ -129,14 +129,14 @@ int main(int argc, char *argv[]) {
   Eigen::MatrixXd gaussMarkovNoiseVar = 1e-4 * Eigen::MatrixXd::Identity(3, 3);
   Eigen::VectorXd gaussMarkovBeta = 1 / 30.0 * Eigen::VectorXd::Ones(3);
 
-  ParameterWrapper_Ptr bw_par =
-      StochasticProcessFactory::addEucl3DGaussMarkovPlusRandomConstant(f,
-          "IMUintegralDeltaP_Bw", gyroBias0_RC, gyroBias0_GM, gaussMarkovBeta,
-          gaussMarkovNoiseVar, 1.0); // 1.0 -> keep one sample every 1.0s
+//   ParameterWrapper_Ptr bw_par =
+//       StochasticProcessFactory::addEucl3DGaussMarkovPlusRandomConstant(f,
+//           "IMUintegralDeltaP_Bw", gyroBias0_RC, gyroBias0_GM, gaussMarkovBeta,
+//           gaussMarkovNoiseVar, 1.0); // 1.0 -> keep one sample every 1.0s
 
-//  ParameterWrapper_Ptr bw_par =
-//      StochasticProcessFactory::addEucl3DRandomConstant(f,
-//          "IMUintegralDeltaP_Bw", gyroBias0_RC);
+ ParameterWrapper_Ptr bw_par =
+     StochasticProcessFactory::addEucl3DRandomConstant(f,
+         "IMUintegralDeltaP_Bw", gyroBias0_RC);
 
 //  bw_par->setFixed(true);
 //  ba_par->setFixed(true);
@@ -152,8 +152,10 @@ int main(int argc, char *argv[]) {
   // -- white noise on accelerometer and gyro
 
   Eigen::Matrix<double, 6, 6> & sensorNoises = hndl.getSensorNoises();
+  sensorNoises.setZero();
   sensorNoises.diagonal() << 0.0016, 0.0016, 0.0016, 1.15172e-05, 1.15172e-05, 1.15172e-05;
-
+  
+   
   // -- GPS Sensor
 
   Eigen::VectorXd T_OS_GPS(7); // Transformation between GPS and robot frame
@@ -171,7 +173,7 @@ int main(int argc, char *argv[]) {
   Eigen::VectorXd x0(7), x1(7);
 
   {
-#   include "../generated/Otto_x0.cppready"
+#   include "../generated/AnalyticTraj_UniformlyAcceleratedCircularMotion_x0.cppready"
   }
 
   hndl.init(true, 0.0, x0);
@@ -184,7 +186,7 @@ int main(int argc, char *argv[]) {
       1e-4 * Eigen::MatrixXd::Identity(3, 3));
   //*/
 
-  // on the gyro gauss markov process
+  /* on the gyro gauss markov process
   f->addPriorOnTimeVaryingParameter(Euclidean3DPrior, "IMUintegralDeltaP_Bw_GM",
       f->getOldestPose()->getTimestamp(), gyroBias0_GM,
       1e-6 * Eigen::MatrixXd::Identity(3, 3));
@@ -194,6 +196,14 @@ int main(int argc, char *argv[]) {
   f->addPriorOnConstantParameter(Euclidean3DPrior, "IMUintegralDeltaP_Bw_RC",
       gyroBias0_RC, 1.0 * Eigen::MatrixXd::Identity(3, 3));
   //*/
+  
+  Eigen::MatrixXd priorCov(6, 6);
+  priorCov.setZero();
+  priorCov.diagonal() << pow(0.01 / 3, 2), pow(0.01 / 3, 2), pow(0.01 / 3,2), 1, 1, 1;
+
+  PoseVertexWrapper_Ptr firstPose = f->getOldestPose();
+  f->addPriorOnPose(firstPose, x0, priorCov);
+  
 
   /* ---------------------- Main loop ---------------------- */
 
@@ -210,7 +220,7 @@ int main(int argc, char *argv[]) {
     Eigen::VectorXd za(3), zw(3);
 
     {
-#     include "../generated/Otto_w.cppready"
+#     include "../generated/AnalyticTraj_UniformlyAcceleratedCircularMotion_w.cppready"
 
       zw(0) += bw_x + bw_dx * t + bw_Ax * sin(2 * M_PI * bw_fx * t);
       zw(1) += bw_y + bw_dy * t + bw_Ay * sin(2 * M_PI * bw_fy * t);
@@ -218,7 +228,7 @@ int main(int argc, char *argv[]) {
     }
 
     {
-#     include "../generated/Otto_a.cppready"
+#     include "../generated/AnalyticTraj_UniformlyAcceleratedCircularMotion_a.cppready"
 
       za(0) += ba_x + ba_dx * t + ba_Ax * sin(2 * M_PI * ba_fx * t);
       za(1) += ba_y + ba_dy * t + ba_Ay * sin(2 * M_PI * ba_fy * t);
@@ -238,10 +248,11 @@ int main(int argc, char *argv[]) {
         {
           double t = x1->getTimestamp(); // shadows global t
 
-#         include "../generated/Otto_gps.cppready"
+#         include "../generated/AnalyticTraj_UniformlyAcceleratedCircularMotion_gps.cppready"
         }
 
         f->addMeasurement("GPS", x1->getTimestamp(), zgps, GPSCov, x1);
+	
         cntGps++;
       }
 
@@ -249,7 +260,6 @@ int main(int argc, char *argv[]) {
       cntImu++;
 
       if (t > 20.0 && cntImu % gpsDivisor == 0) { // after 5s of data, then each gps
-
         keepOn = f->estimate(10);
 
         if (!keepOn) {

@@ -50,15 +50,15 @@ int main(int argc, char *argv[]) {
   double ba_y = 0.0;
   double ba_z = 0.0;
 
-  double ba_dx = 0.0; // increments on the accelerometer biases in m/s^3
+  double ba_dx = 0.000; // increments on the accelerometer biases in m/s^3
   double ba_dy = 0.0;
   double ba_dz = 0.0;
 
-  double ba_fx = 0.00; // frequency of the sinusoidal bias on the accelerometer
+  double ba_fx = 0.05; // frequency of the sinusoidal bias on the accelerometer
   double ba_fy = 0.000;
   double ba_fz = 0.0000;
 
-  double ba_Ax = 0.000; // amplitude of the sinusoidal bias on the accelerometer
+  double ba_Ax = 0.001; // amplitude of the sinusoidal bias on the accelerometer
   double ba_Ay = 0.0000;
   double ba_Az = 0.0000;
 
@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
 
   /* ---------------------- Configure sensors ---------------------- */
 
-  bool isbafixed = true, isbwfixed = true;
+  bool isbafixed = false, isbwfixed = true;
 
   // Accelerometer sensor
   Eigen::VectorXd R_OS_ACC(7); // Transformation between Accelerometer and robot frame
@@ -135,7 +135,7 @@ int main(int argc, char *argv[]) {
   Eigen::VectorXd gyroBias0(3);
   gyroBias0 << 0.0, 0.0, 0.0;
 
-  Eigen::Matrix3d gyroBias0Cov = 1e-4 * Eigen::MatrixXd::Identity(3, 3);
+  Eigen::Matrix3d gyroBias0Cov = 1e-6 * Eigen::MatrixXd::Identity(3, 3);
 
   /*
    f->addConstantParameter(Euclidean3D, "Gyroscope_B", gyroBias0, true);
@@ -173,13 +173,13 @@ int main(int argc, char *argv[]) {
     Eigen::VectorXd &x = x0;
     double t = 0.0;
 
-#   include "../generated/Otto_GT.cppready"
+#   include "../generated/AnalyticTraj_UniformlyAcceleratedCircularMotion_GT.cppready"
   }
   {
     Eigen::VectorXd &x = x1;
     double t = 1 / imuRate;
 
-#   include "../generated/Otto_GT.cppready"
+#   include "../generated/AnalyticTraj_UniformlyAcceleratedCircularMotion_GT.cppready"
   }
 
   double t = 0.0;
@@ -205,7 +205,7 @@ int main(int argc, char *argv[]) {
     // generate synthetic accelerometer and gyroscope reading
 
     {
-#     include "../generated/Otto_w.cppready"
+#     include "../generated/AnalyticTraj_UniformlyAcceleratedCircularMotion_w.cppready"
 
       zw(0) += bw_x + bw_dx * t + bw_Ax * sin(2 * M_PI * bw_fx * t);
       zw(1) += bw_y + bw_dy * t + bw_Ay * sin(2 * M_PI * bw_fy * t);
@@ -213,7 +213,7 @@ int main(int argc, char *argv[]) {
     }
 
     {
-#     include "../generated/Otto_a.cppready"
+#     include "../generated/AnalyticTraj_UniformlyAcceleratedCircularMotion_a.cppready"
 
       za(0) += ba_x + ba_dx * t + ba_Ax * sin(2 * M_PI * ba_fx * t);
       za(1) += ba_y + ba_dy * t + ba_Ay * sin(2 * M_PI * ba_fy * t);
@@ -223,6 +223,15 @@ int main(int argc, char *argv[]) {
     f->addSequentialMeasurement("Gyroscope", t, zw, gyroscopeCov);
 
     f->addSequentialMeasurement("Accelerometer", t, za, accelerometerCov);
+    
+    
+//     {
+//       Eigen::VectorXd x(7);
+// 
+//   #   include "../generated/AnalyticTraj_UniformlyAcceleratedCircularMotion_GT.cppready"
+//       
+//       f->getNewestPose()->setEstimate(x);
+//     }
 
     if (cntImu == 0) {
       // the first time the measurement is not added since there is just a pose
@@ -237,20 +246,19 @@ int main(int argc, char *argv[]) {
       /*
        PoseVertexWrapper_Ptr first = f->getNthOldestPose(0);
        first->setFixed(true);
-       */
+      //*/
 
       /*
        PoseVertexWrapper_Ptr second = f->getNthOldestPose(1);
        second->setEstimate(x1);
        second->setFixed(true);
-       */
+      //*/
 
-      /* or to put a gaussian prior on it, with:
+      // or to put a gaussian prior on it, with:
       Eigen::MatrixXd priorCov(6, 6);
       priorCov.setZero();
-//      priorCov.diagonal() << pow(0.01 / 3, 2), pow(0.01 / 3, 2), pow(0.01 / 3,
-//          2), 1, 1, 1;
-      priorCov.diagonal() << 1e12, 1e12, 1e12, 1e12, 1e12, 1;
+      priorCov.diagonal() << pow(0.01 / 3, 2), pow(0.01 / 3, 2), pow(0.01 / 3,2), 1, 1, 1;
+//       priorCov.diagonal() << 1e12, 1e12, 1e12, 1e12, 1e12, 1;
 
       f->addPriorOnPose(firstPose, x0, priorCov);
       //*/
@@ -263,13 +271,13 @@ int main(int argc, char *argv[]) {
 
       Eigen::VectorXd zgps(3);
       {
-#       include "../generated/Otto_gps.cppready"
+#       include "../generated/AnalyticTraj_UniformlyAcceleratedCircularMotion_gps.cppready"
       }
 
       MeasurementEdgeWrapperVector_Ptr edges = f->addSequentialMeasurement(
           "GPS", t, zgps, GPSCov);
 
-      /* initialize the connected vertex with GPS measurement
+      // initialize the connected vertex with GPS measurement
        assert (edges->size() > 0);
 
        PoseVertexWrapper_Ptr pose = (*edges)[0]->getConnectedPose(0);
@@ -289,8 +297,10 @@ int main(int argc, char *argv[]) {
 
     // do the estimation
 
-    if (t > 2.0 && cntImu % ((int) imuRate) == 0) { // after 1s of data, then each time
+    if (t > 1.0 && cntImu % ((int) imuRate) == 0) { // after 1s of data, then each time
+//      f->setSolverMethod(ROAMestimation::LevenbergMarquardt);      
       keepOn = f->estimate(10);
+//       return 0;
 
       if (!keepOn) {
         return 1;

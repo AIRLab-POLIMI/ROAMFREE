@@ -1,0 +1,17 @@
+double tmp0 = std::pow(t,2);
+double tmp1 = 0.0025*tmp0;
+double tmp2 = std::sin(tmp1);
+double tmp3 = std::cos(tmp1);
+double tmp4 = std::pow(tmp3,2);
+double tmp5 = std::pow(tmp2,2);
+double tmp6 = tmp4 + tmp5;
+double tmp7 = 1/std::sqrt(tmp6);
+double tmp8 = -0.0001*tmp0*tmp3;
+double tmp9 = -0.02*tmp2;
+double tmp10 = tmp8 + tmp9;
+double tmp11 = 0.02*tmp3;
+double tmp12 = -0.0001*tmp0*tmp2;
+double tmp13 = tmp11 + tmp12;
+za(1+_OFF) = 0. - 1.*tmp10*tmp2*tmp7 + tmp3*tmp13*tmp7;
+za(2+_OFF) = 0. - 1.*tmp3*tmp10*tmp7 - 1.*tmp2*tmp13*tmp7;
+za(3+_OFF) = 9.8;
