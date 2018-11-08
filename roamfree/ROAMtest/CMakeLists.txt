@@ -19,6 +19,16 @@ target_link_libraries(IMUHandlerFusionTest
     ROAMestimation ROAMimu 
 )
 
+# ----------- PerfectIMUTest
+
+add_executable(PerfectIMUTest
+    src/PerfectIMUTest.cpp
+)
+
+target_link_libraries(PerfectIMUTest
+    ROAMestimation ROAMimu 
+)
+
 # ----------- CameraIMUTest
 
 add_executable(CameraIMUTest
