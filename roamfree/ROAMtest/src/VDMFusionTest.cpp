@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
   
   //Copter properties parameter
   Eigen::VectorXd cpParams(2); // Initial parameters for Copter Properties
-  cpParams << 0.727*2, 0.40;  
+  cpParams << 1.454, 0.40;  
   f->addConstantParameter(Euclidean2D, "VDM_Cp", cpParams, true);
   
   
@@ -104,8 +104,8 @@ int main(int argc, char *argv[]) {
   posCov =  1*Eigen::MatrixXd::Identity(6, 6);
   
   Eigen::VectorXd x0(7), x1(7);
-  x0 << 0,0,0,1,0,0,0;
-  x1 << 0,0,0,1,0,0,0;
+  x0 << 0,0,0,0.707107019200454,0.0,0,0.707107019200454;
+  x1 << 0,0,0,0.707107019200454,0.0,0,0.707107019200454;
  
   double t = -0.01;
   PoseVertexWrapper_Ptr firstPose = f->setInitialPose(x0, t);
@@ -122,16 +122,30 @@ int main(int argc, char *argv[]) {
    while (infile)
    {   
   
+    if(!infile.is_open() || infile.eof())
+    {
+      break; 
+    }
     
-    string s;
-    getline( infile, s );    
-    double time;
-    Eigen::VectorXd zw(4);
-    getMeasurement(time,zw,s);
+    try 
+    {
     
+      string s;
+      getline( infile, s );    
+      double time;
+      Eigen::VectorXd zw(4);
+      getMeasurement(time,zw,s);
+      f->addSequentialMeasurement("VDM", time, zw, vdmCov);
+
+    }
+    catch (const std::invalid_argument& e)
+    {
+      cout<< e.what() << endl;
+      break;
+      
+    }
     
     // Add Measurement
-    f->addSequentialMeasurement("VDM", time, zw, vdmCov);
     if(cntVdm==0)
     {
       f->getNewestPose()->setEstimate(x1);
@@ -143,7 +157,7 @@ int main(int argc, char *argv[]) {
       Eigen::VectorXd predcitedPose(7);
       predcitedPose.head(3) = p1.head(3)+(p1.head(3)-p2.head(3));
       predcitedPose.tail(4) = p1.tail(4);
-      f->getNewestPose()->setEstimate(predcitedPose);
+//       f->getNewestPose()->setEstimate(predcitedPose);
 //      cerr << time << " " << predcitedPose.transpose()<<endl;
     }
 
@@ -178,7 +192,7 @@ int main(int argc, char *argv[]) {
       if(!f->estimate(10))
 	return 1;
       
-//       f->forgetOldNodes(2.5);
+       f->forgetOldNodes(2.5);
        
     }
     

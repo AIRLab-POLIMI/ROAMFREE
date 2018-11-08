@@ -146,7 +146,7 @@ def fixMathFunctions(l):
 
 		end = pt				
 
-		l = l[:occ]+'(0.0 < '+l[start:end-1]+' - '+l[start:end-1]+' < 0.0)'+l[end:]
+		l = l[:occ]+'((0.0 < '+l[start:end-1]+') - ('+l[start:end-1]+' < 0.0))'+l[end:]
 		
 		cnt = occ + 4
 		
