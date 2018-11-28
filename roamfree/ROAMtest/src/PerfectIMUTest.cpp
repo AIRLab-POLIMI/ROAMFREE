@@ -28,8 +28,8 @@ const static int _OFF = -1;
 
 int main(int argc, char *argv[]) {
 
-  double imuRate = 100; // Hz rate of the IMU readings
-  int gpsDivisor = 100; // One GPS reading every x IMU readings
+  int imuRate = 345; // Hz rate of the IMU readings
+  int GPSRate = 1; // One GPS reading every x IMU readings
 
   double leverArm = 0.25; // translation from R to GPS along y;
 
@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
   ParameterWrapper_Ptr ba_par = f->addConstantParameter(Euclidean3D, "Accelerometer_B", accBias0, true);
 
   Eigen::MatrixXd accelerometerCov(3, 3); // covariance of Accelerometer readings
-  accelerometerCov = 0.0016 * Eigen::MatrixXd::Identity(3, 3);
+  accelerometerCov = 0.0016 * Eigen::MatrixXd::Identity(3, 3) * (imuRate/100);
 
    
   // Gyroscope sensor
@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
   f->addConstantParameter(Euclidean3D, "Gyroscope_B", gyroBias0, true);
 
   Eigen::MatrixXd gyroscopeCov(3, 3); // covariance of Gyroscope readings
-  gyroscopeCov = 1.15172e-05 * Eigen::MatrixXd::Identity(3, 3);
+  gyroscopeCov = 1.15172e-05 * Eigen::MatrixXd::Identity(3, 3) * (imuRate/100);
 
   // GPS Sensor
 
@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
   f->setSensorFrame("GPS", R_OS_GPS);
 
   Eigen::MatrixXd GPSCov(3, 3);
-  GPSCov = pow(1, 2) * Eigen::MatrixXd::Identity(3, 3);
+  GPSCov = pow(1, 2) * Eigen::MatrixXd::Identity(3, 3)*0.65;
   
   /* ---------------------- Initialize ---------------------- */
 
@@ -149,6 +149,16 @@ int main(int argc, char *argv[]) {
 
     f->addSequentialMeasurement("Accelerometer", t, za, accelerometerCov);
     
+    
+    {
+      Eigen::VectorXd x(7);      
+
+#     include "../generated/AnalyticTraj_UniformlyAcceleratedCircularMotion_GT.cppready"
+      
+      f->getNewestPose()->setEstimate(x);
+    }
+    
+    
     f->getNewestPose()->setComputeUncertainty(true);
     
     if (cntImu == 0) {
@@ -183,12 +193,13 @@ int main(int argc, char *argv[]) {
 
     }
 
-    if (cntImu % gpsDivisor == 0) {
+    if (cntImu % (imuRate/GPSRate) == 0) {
 
       // generate synthetic gps reading
 
       Eigen::VectorXd zgps(3);
       {
+	
 #       include "../generated/AnalyticTraj_UniformlyAcceleratedCircularMotion_gps.cppready"
       }
 
@@ -217,8 +228,10 @@ int main(int argc, char *argv[]) {
 
     // do the estimation
 
-    if (t > 1.0 && cntImu/5 % ((int) imuRate) == 0) { // after 1s of data, then each time
+//     if (t > 1.0 && cntImu % (5 * (int) imuRate) == 0) { // after 1s of data, then each time
+    if (cntImu == 5*imuRate) {
 //       f->setSolverMethod(ROAMestimation::LevenbergMarquardt);      
+      f->setSolverMethod(ROAMestimation::GaussNewton);      
       keepOn = f->estimate(10);      
       f->writeFinalHessian();
       return 1;
