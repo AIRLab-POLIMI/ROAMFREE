@@ -31,7 +31,7 @@ public:
   static const bool _usedComponents[];
 
   static const std::string _paramsNames[];
-  static const int _nParams = 2;
+  static const int _nParams = 3;
 
   static const unsigned int _ORDER = 2;
 
@@ -62,6 +62,7 @@ public:
 
     Eigen::Map<Eigen::VectorXd> g(params[0], 3);
     Eigen::Map<Eigen::VectorXd> b(params[1], 3);
+    Eigen::Map<Eigen::VectorXd> gravity(params[2], 1);
 
     Eigen::MatrixBase<T> & err = const_cast<Eigen::MatrixBase<T>&>(const_ret);
 
@@ -79,44 +80,49 @@ public:
 
     Eigen::Map<Eigen::VectorXd> g(params[0], 3);
     Eigen::Map<Eigen::VectorXd> b(params[1], 3);
+    Eigen::Map<Eigen::VectorXd> gravity(params[2], 1);
 
     Eigen::MatrixBase<T> & J = const_cast<Eigen::MatrixBase<T>&>(const_ret);
 
     const static int _OFF = -1;
 
     switch (wrt) {
-    case -2: // jacobian wrt to q
+    case -2: // jacobian wrt q
     {
 #     include "generated/Acceleration_JErrQ.cppready"
       return true;
       break;
     }
-    case -5: // jacobian wrt to a
+    case -5: // jacobian wrt a
     {
 #     include "generated/Acceleration_JErrA.cppready"
       return true;
       break;
     }
-    case 0: // jacobian wrt to noises
+    case 0: // jacobian wrt noises
     {
       // it is the identity matrix
       // #include "generated/Acceleration_JErrNoises.cppready"
       return false;
       break;
     }
-    case 1: // jacobian wrt to Gain
+    case 1: // jacobian wrt Gain
     {
 #     include "generated/Acceleration_JErrG.cppready"
       return true;
       break;
     }
-    case 2: // jacobian wrt to bias
+    case 2: // jacobian wrt bias
     {
 #     include "generated/Acceleration_JErrB.cppready"
       return false; // it is the identity matrix
       break;
     }
-
+    case 3: // jacobian wrt gravity
+    {
+      // no gravity estimation for now
+      assert(false);
+    }
     }
 
     assert(false);
