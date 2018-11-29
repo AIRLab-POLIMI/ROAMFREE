@@ -61,6 +61,7 @@ enum ParameterTypes {
 
 enum PriorEdgeTypes {
   Euclidean1DPrior,
+  Euclidean2DPrior,
   Euclidean3DPrior,
   SE3Prior,
   FHPPriorOnHomogeneousPoint

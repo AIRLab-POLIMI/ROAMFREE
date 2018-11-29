@@ -512,6 +512,9 @@ MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnConstantParameter(
   case Euclidean1DPrior:
     priorif = new Eucl1DPriorEdge;
     break;
+  case Euclidean2DPrior:
+    priorif = new Eucl2DPriorEdge;
+    break;
   case Euclidean3DPrior:
     priorif = new Eucl3DPriorEdge;
     break;
@@ -1393,7 +1396,7 @@ GenericEdgeInterface *FactorGraphFilter_Impl::addMeasurement_i(
   _optimizer->addEdge(oe);
 
 #   ifdef DEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES
-  Eigen::IOFormat basicFormat(3, Eigen::DontAlignCols, ", ", ", ", "", "", "{",
+  Eigen::IOFormat basicFormat(6, Eigen::DontAlignCols, ", ", ", ", "", "", "{",
       "}");
 
   cerr
