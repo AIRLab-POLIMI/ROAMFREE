@@ -24,6 +24,7 @@ Contributors:
 #include "AngularVelocity.h"
 #include "LinearVelocityM.h"
 #include "Acceleration.h"
+#include "AccelerationInEarthFrame.h"
 #include "TriskarKinematicM.h"
 #include "DifferentialDriveKinematicM.h"
 #include "GenericOdometerM.h"
