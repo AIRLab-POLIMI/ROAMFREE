@@ -57,7 +57,7 @@ public:
 
 		Eigen::Map<Eigen::VectorXd> wnd(params[0], 3);
 		Eigen::Map<Eigen::VectorXd> drag(params[1], 3);
-		Eigen::Map<Eigen::VectorXd> mc(params[2], 3);
+		Eigen::Map<Eigen::VectorXd> mc(params[2], 2);
 		Eigen::Map<Eigen::VectorXd> cp(params[3], 2);
 		Eigen::Map<Eigen::VectorXd> ibd(params[4], 3);
 		Eigen::Map<Eigen::VectorXd> ibod(params[5], 3);
@@ -78,7 +78,7 @@ public:
 
     Eigen::Map<Eigen::VectorXd> wnd(params[0], 3);
     Eigen::Map<Eigen::VectorXd> drag(params[1], 3);
-    Eigen::Map<Eigen::VectorXd> mc(params[2], 3);
+    Eigen::Map<Eigen::VectorXd> mc(params[2], 2);
     Eigen::Map<Eigen::VectorXd> cp(params[3], 2);
     Eigen::Map<Eigen::VectorXd> ibd(params[4], 3);
     Eigen::Map<Eigen::VectorXd> ibod(params[5], 3);
