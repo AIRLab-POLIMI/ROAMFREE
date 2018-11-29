@@ -89,6 +89,12 @@ public:
     const static int _OFF = -1;
 
     switch (wrt) {
+    case -1: // jacobian wrt x
+    {
+#     include "generated/AccelerationInEarthFrame_JErrPOSE.cppready"
+      return false; // approximation: it is almost zero (but I need the position to be evaluated)
+      break;
+    }
     case -2: // jacobian wrt q
     {
 #     include "generated/AccelerationInEarthFrame_JErrQ.cppready"
