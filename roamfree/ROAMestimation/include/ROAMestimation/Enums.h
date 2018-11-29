@@ -26,6 +26,7 @@ enum MeasTypes {
   AbsolutePose,
   LinearVelocity,
   AngularVelocity,
+  AngularVelocityInEarthFrame,
   LinearAcceleration,
   LinearAccelerationInEarthFrame,
   AckermannOdometer,

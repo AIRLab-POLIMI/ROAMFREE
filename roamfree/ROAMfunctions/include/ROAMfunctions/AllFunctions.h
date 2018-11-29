@@ -22,6 +22,7 @@ Contributors:
 #include "AbsolutePositionM.h"
 #include "AbsolutePoseM.h"
 #include "AngularVelocity.h"
+#include "AngularVelocityInEarthFrame.h"
 #include "LinearVelocityM.h"
 #include "Acceleration.h"
 #include "AccelerationInEarthFrame.h"

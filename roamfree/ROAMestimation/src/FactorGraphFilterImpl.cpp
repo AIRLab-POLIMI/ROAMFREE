@@ -170,6 +170,9 @@ bool FactorGraphFilter_Impl::addSensor(const string& name, MeasTypes type,
   case AngularVelocity:
     s.order = AngularVelocityM::_ORDER;
     break;
+  case AngularVelocityInEarthFrame:
+    s.order = AngularVelocityM::_ORDER;
+    break;
   case LinearAcceleration:
     s.order = AccelerationM::_ORDER;
     break;
@@ -1267,6 +1270,9 @@ GenericEdgeInterface *FactorGraphFilter_Impl::addMeasurement_i(
     break;
   case AngularVelocity:
     e = new QuaternionGenericEdge<AngularVelocityM>;
+    break;
+  case AngularVelocityInEarthFrame:
+    e = new QuaternionGenericEdge<AngularVelocityInEarthFrameM>;
     break;
   case LinearAcceleration:
     e = new QuaternionGenericEdge<AccelerationM>;
