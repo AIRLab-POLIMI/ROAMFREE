@@ -64,6 +64,7 @@ public:
     Eigen::Map<Eigen::VectorXd> b(params[1], 3);
     Eigen::Map<Eigen::VectorXd> gravity(params[2], 1);
     Eigen::Map<Eigen::VectorXd> earthrate(params[3], 1);
+    Eigen::Map<Eigen::VectorXd> ep(params[4], 2);
 
     Eigen::MatrixBase<T> & err = const_cast<Eigen::MatrixBase<T>&>(const_ret);
 
@@ -83,6 +84,7 @@ public:
     Eigen::Map<Eigen::VectorXd> b(params[1], 3);
     Eigen::Map<Eigen::VectorXd> gravity(params[2], 1);
     Eigen::Map<Eigen::VectorXd> earthrate(params[3], 1);
+    Eigen::Map<Eigen::VectorXd> ep(params[4], 2);
 
     Eigen::MatrixBase<T> & J = const_cast<Eigen::MatrixBase<T>&>(const_ret);
 
@@ -139,9 +141,14 @@ public:
     }
     case 4: // jacobian wrt earthrate
     {
-      // no earth rate estimation for now
+      // no earth rate estimation...
       assert(false);
     }
+    case 5: // jacobian wrt ellipsoid parameters
+    {
+      // no ep estimation...
+      assert(false);
+    }    
     }
 
     assert(false);

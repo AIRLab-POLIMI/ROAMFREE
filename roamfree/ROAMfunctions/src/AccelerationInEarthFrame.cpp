@@ -23,6 +23,6 @@ namespace ROAMfunctions {
 const bool AccelerationInEarthFrameM::_usedComponents[] = { false, true, true, false, true,
 		false, false, false, false, false };
 
-const std::string AccelerationInEarthFrameM::_paramsNames[] = { "G", "B", "Gravity", "EarthRate" };
+const std::string AccelerationInEarthFrameM::_paramsNames[] = { "G", "B", "Gravity", "EarthRate", "EP" };
 
 }
