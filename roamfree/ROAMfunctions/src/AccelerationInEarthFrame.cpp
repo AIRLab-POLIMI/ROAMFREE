@@ -16,13 +16,13 @@ Contributors:
  *      Author: davide
  */
 
-#include "Acceleration.h"
+#include "AccelerationInEarthFrame.h"
 
 namespace ROAMfunctions {
 
-const bool AccelerationM::_usedComponents[] = { false, true, false, false, true,
+const bool AccelerationInEarthFrameM::_usedComponents[] = { false, true, true, false, true,
 		false, false, false, false, false };
 
-const std::string AccelerationM::_paramsNames[] = { "G", "B", "Gravity" };
+const std::string AccelerationInEarthFrameM::_paramsNames[] = { "G", "B", "Gravity", "EarthRate", "EP" };
 
 }

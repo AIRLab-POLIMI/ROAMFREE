@@ -10,19 +10,18 @@ Contributors:
 */
 
 /*
- * Acceleration.cpp
+ * AngularVelocity.cpp
  *
- *  Created on: Mar 28, 2013
+ *  Created on: Nov 29, 2018
  *      Author: davide
  */
 
-#include "Acceleration.h"
+#include "AngularVelocityInEarthFrame.h"
 
 namespace ROAMfunctions {
+const bool AngularVelocityInEarthFrameM::_usedComponents[] = { false, true, false, true,
+		false, false, false, false, false, false };
 
-const bool AccelerationM::_usedComponents[] = { false, true, false, false, true,
-		false, false, false, false, false };
-
-const std::string AccelerationM::_paramsNames[] = { "G", "B", "Gravity" };
+const std::string AngularVelocityInEarthFrameM::_paramsNames[] = { "G", "B", "EarthRate" };
 
 }

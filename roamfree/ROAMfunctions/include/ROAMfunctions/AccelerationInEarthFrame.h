@@ -10,28 +10,28 @@ Contributors:
 */
 
 /*
- * Acceleration.h
+ * AccelerationInEarthFrame.h
  *
- *  Created on: Mar 28, 2013
+ *  Created on: Nov, 29 2018
  *      Author: davide
  */
 
-#ifndef ACCELERATION_H_
-#define ACCELERATION_H_
+#ifndef ACCELERATIONINEARTHFRAME_H_
+#define ACCELERATIONINEARTHFRAME_H_
 
 #include <string>
 #include <Eigen/Dense>
 
 namespace ROAMfunctions {
 
-class AccelerationM {
+class AccelerationInEarthFrameM {
 private:
 
 public:
   static const bool _usedComponents[];
 
   static const std::string _paramsNames[];
-  static const int _nParams = 3;
+  static const int _nParams = 4;
 
   static const unsigned int _ORDER = 2;
 
@@ -51,7 +51,7 @@ public:
 
     const static int _OFF = -1;
 
-#   include "generated/Acceleration_predictor.cppready"
+#   include "generated/AccelerationInEarthFrame_predictor.cppready"
 
     return true;
   }
@@ -63,12 +63,14 @@ public:
     Eigen::Map<Eigen::VectorXd> g(params[0], 3);
     Eigen::Map<Eigen::VectorXd> b(params[1], 3);
     Eigen::Map<Eigen::VectorXd> gravity(params[2], 1);
+    Eigen::Map<Eigen::VectorXd> earthrate(params[3], 1);
+    Eigen::Map<Eigen::VectorXd> ep(params[4], 2);
 
     Eigen::MatrixBase<T> & err = const_cast<Eigen::MatrixBase<T>&>(const_ret);
 
     const static int _OFF = -1;
 
-#   include "generated/Acceleration_Err.cppready"
+#   include "generated/AccelerationInEarthFrame_Err.cppready"
 
     return false;
   }
@@ -81,40 +83,54 @@ public:
     Eigen::Map<Eigen::VectorXd> g(params[0], 3);
     Eigen::Map<Eigen::VectorXd> b(params[1], 3);
     Eigen::Map<Eigen::VectorXd> gravity(params[2], 1);
+    Eigen::Map<Eigen::VectorXd> earthrate(params[3], 1);
+    Eigen::Map<Eigen::VectorXd> ep(params[4], 2);
 
     Eigen::MatrixBase<T> & J = const_cast<Eigen::MatrixBase<T>&>(const_ret);
 
     const static int _OFF = -1;
 
     switch (wrt) {
+    case -1: // jacobian wrt x
+    {
+#     include "generated/AccelerationInEarthFrame_JErrPOSE.cppready"
+      return false; // approximation: it is almost zero (but I need the position to be evaluated)
+      break;
+    }
     case -2: // jacobian wrt q
     {
-#     include "generated/Acceleration_JErrQ.cppready"
+#     include "generated/AccelerationInEarthFrame_JErrQ.cppready"
+      return true;
+      break;
+    }
+    case -3: // jacobian wrt v
+    {
+#     include "generated/AccelerationInEarthFrame_JErrV.cppready"
       return true;
       break;
     }
     case -5: // jacobian wrt a
     {
-#     include "generated/Acceleration_JErrA.cppready"
+#     include "generated/AccelerationInEarthFrame_JErrA.cppready"
       return true;
       break;
     }
     case 0: // jacobian wrt noises
     {
       // it is the identity matrix
-      // #include "generated/Acceleration_JErrNoises.cppready"
+      // #include "generated/AccelerationInEarthFrame_JErrNoises.cppready"
       return false;
       break;
     }
     case 1: // jacobian wrt Gain
     {
-#     include "generated/Acceleration_JErrG.cppready"
+#     include "generated/AccelerationInEarthFrame_JErrG.cppready"
       return true;
       break;
     }
     case 2: // jacobian wrt bias
     {
-#     include "generated/Acceleration_JErrB.cppready"
+#     include "generated/AccelerationInEarthFrame_JErrB.cppready"
       return false; // it is the identity matrix
       break;
     }
@@ -123,6 +139,16 @@ public:
       // no gravity estimation for now
       assert(false);
     }
+    case 4: // jacobian wrt earthrate
+    {
+      // no earth rate estimation...
+      assert(false);
+    }
+    case 5: // jacobian wrt ellipsoid parameters
+    {
+      // no ep estimation...
+      assert(false);
+    }    
     }
 
     assert(false);
@@ -131,4 +157,4 @@ public:
 };
 
 } /* namespace ROAMfunctions */
-#endif /* ACCELERATION_H_ */
+#endif /* ACCELERATIONINEARTHFRAME_H_ */

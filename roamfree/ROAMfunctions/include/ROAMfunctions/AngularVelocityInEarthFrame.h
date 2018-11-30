@@ -10,30 +10,28 @@ Contributors:
 */
 
 /*
- * Acceleration.h
+ * AngularVelocity.h
  *
- *  Created on: Mar 28, 2013
+ *  Created on: Nov, 29 2018
  *      Author: davide
  */
 
-#ifndef ACCELERATION_H_
-#define ACCELERATION_H_
+#ifndef ANGULARVELOCITYINEARTHFRAME_H_
+#define ANGULARVELOCITYINEARTHFRAME_H_
 
-#include <string>
 #include <Eigen/Dense>
 
 namespace ROAMfunctions {
 
-class AccelerationM {
-private:
+class AngularVelocityInEarthFrameM {
 
 public:
   static const bool _usedComponents[];
 
   static const std::string _paramsNames[];
-  static const int _nParams = 3;
+  static const int _nParams = 2;
 
-  static const unsigned int _ORDER = 2;
+  static const unsigned int _ORDER = 1;
 
   static const unsigned int _ERROR_SIZE = 3;
   static const unsigned int _NOISE_SIZE = 3;
@@ -48,12 +46,10 @@ public:
 
   bool predict(const Eigen::VectorXd &x, double **params,
       const Eigen::VectorXd& z, double dt, Eigen::VectorXd &xhat) {
-
-    const static int _OFF = -1;
-
-#   include "generated/Acceleration_predictor.cppready"
+    xhat = x; // TODO: dummy predictor
 
     return true;
+
   }
 
   template<typename T>
@@ -62,13 +58,13 @@ public:
 
     Eigen::Map<Eigen::VectorXd> g(params[0], 3);
     Eigen::Map<Eigen::VectorXd> b(params[1], 3);
-    Eigen::Map<Eigen::VectorXd> gravity(params[2], 1);
+    Eigen::Map<Eigen::VectorXd> earthrate(params[2], 1);
 
     Eigen::MatrixBase<T> & err = const_cast<Eigen::MatrixBase<T>&>(const_ret);
 
     const static int _OFF = -1;
 
-#   include "generated/Acceleration_Err.cppready"
+#   include "generated/AngularVelocityInEarthFrame_Err.cppready"
 
     return false;
   }
@@ -80,48 +76,49 @@ public:
 
     Eigen::Map<Eigen::VectorXd> g(params[0], 3);
     Eigen::Map<Eigen::VectorXd> b(params[1], 3);
-    Eigen::Map<Eigen::VectorXd> gravity(params[2], 1);
+    Eigen::Map<Eigen::VectorXd> earthrate(params[2], 1);
 
     Eigen::MatrixBase<T> & J = const_cast<Eigen::MatrixBase<T>&>(const_ret);
 
     const static int _OFF = -1;
 
     switch (wrt) {
-    case -2: // jacobian wrt q
+    case -4: // jacobian wrt w
     {
-#     include "generated/Acceleration_JErrQ.cppready"
+#     include "generated/AngularVelocityInEarthFrame_JErrW.cppready"
       return true;
       break;
     }
-    case -5: // jacobian wrt a
+    case -2: // jacobian wrt q
     {
-#     include "generated/Acceleration_JErrA.cppready"
+#     include "generated/AngularVelocityInEarthFrame_JErrQ.cppready"
       return true;
       break;
     }
     case 0: // jacobian wrt noises
     {
       // it is the identity matrix
-      // #include "generated/Acceleration_JErrNoises.cppready"
+//#     include "generated/AngularVelocityInEarthFrame_JErrNoises.cppready"
       return false;
       break;
     }
     case 1: // jacobian wrt Gain
     {
-#     include "generated/Acceleration_JErrG.cppready"
+#     include "generated/AngularVelocityInEarthFrame_JErrG.cppready"
       return true;
       break;
     }
     case 2: // jacobian wrt bias
     {
-#     include "generated/Acceleration_JErrB.cppready"
+#     include "generated/AngularVelocityInEarthFrame_JErrB.cppready"
       return false; // it is the identity matrix
       break;
     }
-    case 3: // jacobian wrt gravity
+    case 3: // jacobian wrt earthrate
     {
-      // no gravity estimation for now
+      // no earth rate estimation...
       assert(false);
+      break;
     }
     }
 
@@ -129,6 +126,5 @@ public:
     return false;
   }
 };
-
 } /* namespace ROAMfunctions */
-#endif /* ACCELERATION_H_ */
+#endif /* ANGULARVELOCITYINEARTHFRAME_H_ */
