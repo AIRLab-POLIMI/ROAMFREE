@@ -116,7 +116,7 @@ public:
     }
     case 3: // jacobian wrt earthrate
     {
-      // no earth rate estimation for now
+      // no earth rate estimation...
       assert(false);
       break;
     }
