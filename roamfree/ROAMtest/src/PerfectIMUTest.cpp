@@ -58,6 +58,12 @@ int main(int argc, char *argv[]) {
   accGain0 << 1.0, 1.0, 1.0;
 
   f->addConstantParameter(Euclidean3D, "Accelerometer_G", accGain0, true);
+  
+  //gravity parameter
+  Eigen::VectorXd gravity(1); // Initial gain and bias calibration parameters for accelerometer
+  gravity << 9.8;
+
+  f->addConstantParameter(Euclidean1D, "Accelerometer_Gravity", gravity, true);
 
   //bias calibration parameter
   Eigen::VectorXd accBias0(3);
