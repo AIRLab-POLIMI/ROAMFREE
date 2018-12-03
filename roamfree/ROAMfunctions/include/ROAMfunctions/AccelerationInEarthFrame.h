@@ -31,7 +31,7 @@ public:
   static const bool _usedComponents[];
 
   static const std::string _paramsNames[];
-  static const int _nParams = 5;
+  static const int _nParams = 6;
 
   static const unsigned int _ORDER = 2;
 
@@ -65,6 +65,7 @@ public:
     Eigen::Map<Eigen::VectorXd> gravity(params[2], 1);
     Eigen::Map<Eigen::VectorXd> earthrate(params[3], 1);
     Eigen::Map<Eigen::VectorXd> ep(params[4], 2);
+    Eigen::Map<Eigen::VectorXd> epshift(params[5], 3);
 
     Eigen::MatrixBase<T> & err = const_cast<Eigen::MatrixBase<T>&>(const_ret);
 
@@ -85,6 +86,7 @@ public:
     Eigen::Map<Eigen::VectorXd> gravity(params[2], 1);
     Eigen::Map<Eigen::VectorXd> earthrate(params[3], 1);
     Eigen::Map<Eigen::VectorXd> ep(params[4], 2);
+    Eigen::Map<Eigen::VectorXd> epshift(params[5], 3);
 
     Eigen::MatrixBase<T> & J = const_cast<Eigen::MatrixBase<T>&>(const_ret);
 
@@ -148,7 +150,13 @@ public:
     {
       // no ep estimation...
       assert(false);
+    }
+    case 6: // jacobian wrt shift in earth frame
+    {
+      // no shift estimation...
+      assert(false);
     }    
+
     }
 
     assert(false);
