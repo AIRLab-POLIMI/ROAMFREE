@@ -1,3 +1,5 @@
+file(COPY data DESTINATION .)
+
 # ----------- IMUGPSFusionTest
 
 add_executable(IMUGPSFusionTest
@@ -26,6 +28,16 @@ add_executable(PerfectIMUTest
 )
 
 target_link_libraries(PerfectIMUTest
+    ROAMestimation ROAMimu 
+)
+
+# ----------- PerfectIMUInEarthFrameTest
+
+add_executable(PerfectIMUInEarthFrameTest
+    src/PerfectIMUInEarthFrameTest.cpp
+)
+
+target_link_libraries(PerfectIMUInEarthFrameTest
     ROAMestimation ROAMimu 
 )
 
