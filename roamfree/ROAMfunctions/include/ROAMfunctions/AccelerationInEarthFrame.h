@@ -31,7 +31,7 @@ public:
   static const bool _usedComponents[];
 
   static const std::string _paramsNames[];
-  static const int _nParams = 4;
+  static const int _nParams = 5;
 
   static const unsigned int _ORDER = 2;
 
