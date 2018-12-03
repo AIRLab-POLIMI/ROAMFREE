@@ -55,13 +55,13 @@ int main(int argc, char *argv[]) {
   
   //gravity parameter
   Eigen::VectorXd gravity(1); 
-  gravity << 10*9.80665;
+  gravity << 9.80665;
 
   f->addConstantParameter(Euclidean1D, "Accelerometer_Gravity", gravity, true);
   
   //earthrate parameter
   Eigen::VectorXd earthrate(1);
-  earthrate << 100*7.292115e-5;
+  earthrate << 7.292115e-5;
 
   f->addConstantParameter(Euclidean1D, "Accelerometer_EarthRate", earthrate, true);
 
@@ -70,6 +70,12 @@ int main(int argc, char *argv[]) {
   ep << 6378137.0, 6356752.3142;
 
   f->addConstantParameter(Euclidean2D, "Accelerometer_EP", ep, true);
+  
+  //shift in earth frame
+  Eigen::VectorXd epshift(3);
+  epshift << 4368089.0, 502828.0, 4605403.0;
+    
+  f->addConstantParameter(Euclidean3D, "Accelerometer_EPShift", epshift, true);
 
   //bias calibration parameter
   Eigen::VectorXd accBias0(3);
@@ -80,7 +86,7 @@ int main(int argc, char *argv[]) {
 
   Eigen::MatrixXd accelerometerCov(3, 3); // covariance of Accelerometer readings
   // TODO: find another way to get the IMU rate
-  accelerometerCov = 0.0016 * Eigen::MatrixXd::Identity(3, 3); //* (imuRate/100); // scaling of the covariance based on the frequency
+  accelerometerCov = 0.0016 * Eigen::MatrixXd::Identity(3, 3) * 2; // scaling of the covariance based on the frequency
    
   /* ---------------------- Configure gyroscope -------------------- */
 
@@ -188,7 +194,7 @@ int main(int argc, char *argv[]) {
     // perfect initialization
     PoseVertexWrapper_Ptr lastPose = f->getNewestPose();    
     if (fabs(tgt-lastPose->getTimestamp()) < 1e-9) {
-	lastPose->setEstimate(gt);
+// 	lastPose->setEstimate(gt);
 	ok = readStampedVector(fgt,7,tgt,gt);
 	if (!ok) {
 	  cerr << "failed to read GT" << endl;
@@ -198,10 +204,10 @@ int main(int argc, char *argv[]) {
     //
     
     
-    if ( ta > 0.0 && fabs(fmod(ta,25.0)) < 1e-9 ) {
-      f->setSolverMethod(LevenbergMarquardt);
-      f->estimate(0);
-      return 1;
+    if ( ta > 0.0 && fabs(fmod(ta,5)) < 1e-9 ) {
+//       f->setSolverMethod(LevenbergMarquardt);
+//       f->estimate(0);
+//       return 1;
       
       keepOn = f->estimate(10);      
       f->writeFinalHessian();
