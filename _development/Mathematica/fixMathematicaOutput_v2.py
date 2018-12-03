@@ -71,6 +71,7 @@ def names(i):
 	return 'tmp{0}'.format(tmps[i.group(1)])
 
 def fixMathFunctions(l):
+	l = re.sub('Power\(E', 'std::pow(M_E', l)
 	l = re.sub('Power\(', 'std::pow(', l)		
 	l = re.sub('Abs\(', 'std::fabs(', l)		
 	l = re.sub('ArcCos\(', 'std::acos(', l)
