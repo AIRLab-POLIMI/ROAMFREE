@@ -33,9 +33,8 @@ int main(int argc, char *argv[]) {
 
   double imuRate = 100; // Hz rate of the IMU readings
   double poseRate = 10; // Hz rate at which pose vertices have to be maintained
-  
-  double GPSrate = 1;
-  
+  int gpsDivisor = 10; // how many IMU constraint (hndl.step(...) == true) for each GPS?
+ 
   double leverArm = 0.25; // translation from R to GPS along y;
 
   /* ---------------------- Set solver properties ---------------------- */
@@ -46,6 +45,7 @@ int main(int argc, char *argv[]) {
 
   int ret = system("mkdir /tmp/roamfree");
   f->setLowLevelLogging(true); // default log folder
+  f->setWriteGraph(true);
 
   /* ---------------------- Configure sensors ---------------------- */
 
@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
   Eigen::VectorXd gyroBias0(3);  // initial value
   gyroBias0 << 0.0, 0.0, 0.0;
 
- ParameterWrapper_Ptr bw_par = f->addConstantParameter(Euclidean3D, "IMUintegralDeltaP_Bw", gyroBias0, true);
+  ParameterWrapper_Ptr bw_par = f->addConstantParameter(Euclidean3D, "IMUintegralDeltaP_Bw", gyroBias0, true);
 
   Eigen::VectorXd T_OS_IMU(7); // Transformation between IMU and robot frame
   T_OS_IMU << 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0;
@@ -107,13 +107,13 @@ int main(int argc, char *argv[]) {
 
   /* ---------------------- Main loop ---------------------- */
 
-  int cntGps = 0, cntImu = 0;
+  int cntImu = 0;
   double t = 0.0;
 
   bool keepOn = true;
   int cnt = 0;
 
-  while (t <= 600.0) {
+  while (t <= 120.0) {
 
     // generate synthetic accelerometer and gyroscope reading
 
@@ -128,30 +128,26 @@ int main(int argc, char *argv[]) {
     }
 
     // make an integration step
-    if (hndl.step(za.data(), zw.data())) { // if we have finished:
+    if (hndl.step(za.data(), zw.data())) { // if we have finished:   
 
-      if (fabs(fmod(t + 1.0/imuRate,GPSrate)) < 1e-9) {
+      if (cntImu % gpsDivisor == 0) {
+	// add a GPS measurement
+	Eigen::VectorXd zgps(3);
 
-        // add a GPS measurement
-        Eigen::VectorXd zgps(3);
+	PoseVertexWrapper_Ptr x1 = f->getNewestPose();
 
-        PoseVertexWrapper_Ptr x1 = f->getNewestPose();
+	{
+	  double t = x1->getTimestamp(); // shadows global t
 
-        {
-          double t = x1->getTimestamp(); // shadows global t
+  #       include "../generated/AnalyticTraj_UniformlyAcceleratedCircularMotion_gps.cppready"
+	}
 
-#         include "../generated/AnalyticTraj_UniformlyAcceleratedCircularMotion_gps.cppready"
-        }
-
-        f->addMeasurement("GPS", x1->getTimestamp(), zgps, GPSCov, x1);
-	
-        cntGps++;
+	f->addMeasurement("GPS", x1->getTimestamp(), zgps, GPSCov, x1);
       }
-
-      // do the estimation
-      cntImu++;
       
-      if (t > 20.0 && fabs(fmod(t + 1.0/imuRate,GPSrate)) < 1e-9) { // after 5s of data, then each gps
+      // do the estimation
+
+      if (t > 19.0 && cntImu % (5*gpsDivisor) == 0) { // after 5s of data, then each gps
         keepOn = f->estimate(10);
 
         if (!keepOn) {
@@ -162,10 +158,10 @@ int main(int argc, char *argv[]) {
 
         //f->marginalizeOldNodes(10);
       }
-      
-      t += 1.0 / imuRate;
-
+      cntImu++;
     }    
+    
+    t += 1.0 / imuRate;
   }
 
   return 0;
