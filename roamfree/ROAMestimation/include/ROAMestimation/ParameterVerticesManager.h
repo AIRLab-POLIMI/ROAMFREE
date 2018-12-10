@@ -20,9 +20,9 @@
 #define PARAMETER_H_
 
 #include <map>
-
+#include <list>
 #include <Eigen/Dense>
-
+#include "interfaceTypes.h"
 #include "g2o/core/optimizable_graph.h"
 
 #include "Enums.h"
@@ -234,6 +234,21 @@ class ParameterVerticesManager {
     inline virtual bool computeCovariance() const {
       return _computeCovariance;
     }
+    /**
+     * \brief returns the list with pointers to parameters to which cross correlation should be calculated
+     */
+    
+    inline virtual std::list<ParameterWrapper_Ptr> getCrossCovariance() {
+      return _crossCovariance; 
+    }
+    /**
+     * \brief true => cross covariance are computed foe that vertex
+     * \brief Makes a list with the pointers of parameters to which the covariance should be calculated
+     */
+    inline virtual void addCrossCovarianceParameter(ParameterWrapper_Ptr paramCross) {
+      _computeCrossCovariance = true;
+      _crossCovariance.push_back(paramCross); 
+    }
 
     /**
      * \brief return the dimension of the internal representation of a parameter
@@ -255,7 +270,9 @@ class ParameterVerticesManager {
     bool _isFixed;
 
     bool _computeCovariance;
-
+    bool _computeCrossCovariance;
+    
+    std::list<ParameterWrapper_Ptr> _crossCovariance;
     // stuff for process models
     ProcessTypes _process; //!< type of the process model for the parameter
 

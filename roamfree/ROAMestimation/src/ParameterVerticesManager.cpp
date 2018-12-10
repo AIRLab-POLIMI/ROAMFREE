@@ -29,7 +29,7 @@ ParameterVerticesManager::ParameterVerticesManager(
     g2o::AutoIDSparseOptimizer *opt, ParameterTypes typ,
     const std::string& name) :
     _optimizer(opt), _name(name), _type(typ), _isFixed(true), _process(None), _computeCovariance(
-        false) {
+        false),_computeCrossCovariance(false) {
 }
 
 ParameterVerticesManager::~ParameterVerticesManager() {
