@@ -1730,20 +1730,20 @@ bool FactorGraphFilter_Impl::estimate_i(g2o::HyperGraph::EdgeSet &eset,
    // --- end of LBW WORKAROUND */
 
 // stuff for estimation time statistics
-  static ofstream ftStats("/tmp/roamfree/timeStats.txt"); // TODO: put the same folder as for _logger
+  static ofstream ftStats(_logFolder+"/timeStats.txt"); 
   ftStats.precision(6);
 
   double tStart = g2o::get_time();
 
 // if logging is enabled, write the current factor graph to a file
   if (_writeGraph == true) {
-    ofstream f("/tmp/roamfree/graph.txt"); // TODO: put the same folder as for _logger
+    ofstream f(_logFolder+"/graph.txt"); 
     assert(f.is_open());
     f << writeFactorGraph();
     f.close();
 
     /* debug graph in dot, useless
-     ofstream fdot("/tmp/roamfree/graph.dot"); // TODO: put the same folder as for _logger
+     ofstream fdot(_logFolder+"/graph.dot"); 
      fdot << writeFactorGraphToDot();
      fdot.close();
      //*/
@@ -1756,7 +1756,7 @@ bool FactorGraphFilter_Impl::estimate_i(g2o::HyperGraph::EdgeSet &eset,
   _optimizer->initializeOptimization(eset);
 
   if (_writeHessianStructure == true) {
-    ofstream fid("/tmp/roamfree/Hstruct.txt"); // TODO: put the same folder as for _logger
+    ofstream fid(_logFolder+"/Hstruct.txt"); 
 
     if (fid.is_open()) {
       fid << writeVertexIdMap();
@@ -2231,7 +2231,7 @@ void FactorGraphFilter_Impl::writeFinalHessian() {
   g2o::LinearSolverCSparse<g2o::BlockSolverX::PoseMatrixType> *cspsolver =
       static_cast<g2o::LinearSolverCSparse<g2o::BlockSolverX::PoseMatrixType> *>(blocksolver->linearSolver());
 
-  g2o::writeCs2Octave("/tmp/roamfree/H.txt", cspsolver->getccsA(), true); // TODO: put the same folder as for _logger
+  g2o::writeCs2Octave((_logFolder+"/H.txt").c_str(), cspsolver->getccsA(), true); 
 }
 
 MeasurementEdgeWrapperVector_Ptr FactorGraphFilter_Impl::handleDeferredMeasurements() {
@@ -2373,6 +2373,9 @@ void FactorGraphFilter_Impl::setLowLevelLogging(bool lowLevelLogging,
       _logger = new ROAMlog::GraphLogger(folder, _optimizer);
     }
   }
+  
+  // TODO: do something if user ever attemps to CHANGE the log folder
+  _logFolder = folder;
 
   _lowLevelLogging = lowLevelLogging;
 }
