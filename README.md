@@ -1,5 +1,5 @@
 ![ROAMFREE]
-(https://github.com/AIRLab-POLIMI/ROAMFREE/blob/master/doc/images/roamfree02.jpg)
+(https://raw.githubusercontent.com/AIRLab-POLIMI/ROAMFREE/master/doc/images/roamfree02.jpg)
 
 The ROAMFREE sensor fusion library allows to formulate and solve complex pose tracking and sensor parameter self-calibraion estimation problems. It is based on state-of-the-art pose-graph formulation and it relies on the popular g2o solver.
 
