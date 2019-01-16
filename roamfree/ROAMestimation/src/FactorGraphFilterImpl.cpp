@@ -170,8 +170,14 @@ bool FactorGraphFilter_Impl::addSensor(const string& name, MeasTypes type,
   case AngularVelocity:
     s.order = AngularVelocityM::_ORDER;
     break;
+  case AngularVelocityInEarthFrame:
+    s.order = AngularVelocityM::_ORDER;
+    break;
   case LinearAcceleration:
     s.order = AccelerationM::_ORDER;
+    break;
+  case LinearAccelerationInEarthFrame:
+    s.order = AccelerationInEarthFrameM::_ORDER;
     break;
   case AckermannOdometer:
     s.order = AckermannM::_ORDER;
@@ -227,6 +233,9 @@ bool FactorGraphFilter_Impl::addSensor(const string& name, MeasTypes type,
   case PlanarConstraint:
     s.order = PlanarConstraintM::_ORDER;
     break;
+  case QuadDynamicModel:
+      s.order = QuadDynamicModelM::_ORDER;
+      break;
   default:
     cerr << "[FactorGraphFilter] Error: unknown measurement type" << endl;
     break;
@@ -1174,8 +1183,9 @@ GenericEdgeInterface* FactorGraphFilter_Impl::addNonMasterSequentialMeasurement_
     } else {
       cerr << ROAMutils::StringUtils::writeNiceTimestamp(last->getTimestamp());
     }
-#   endif
     cerr << endl;
+#   endif
+
     return NULL;
   }
 
@@ -1261,8 +1271,14 @@ GenericEdgeInterface *FactorGraphFilter_Impl::addMeasurement_i(
   case AngularVelocity:
     e = new QuaternionGenericEdge<AngularVelocityM>;
     break;
+  case AngularVelocityInEarthFrame:
+    e = new QuaternionGenericEdge<AngularVelocityInEarthFrameM>;
+    break;
   case LinearAcceleration:
     e = new QuaternionGenericEdge<AccelerationM>;
+    break;
+  case LinearAccelerationInEarthFrame:
+    e = new QuaternionGenericEdge<AccelerationInEarthFrameM>;
     break;
   case AckermannOdometer:
     e = new QuaternionGenericEdge<AckermannM>;
@@ -1318,6 +1334,9 @@ GenericEdgeInterface *FactorGraphFilter_Impl::addMeasurement_i(
   case PlanarConstraint:
     e = new QuaternionGenericEdge<PlanarConstraintM>;
     break;
+  case QuadDynamicModel:
+      e = new QuaternionGenericEdge<QuadDynamicModelM>;
+      break;
   default:
     cerr << "[FactorGraphFilter] Error: unknown measurement type" << endl;
     return NULL;
@@ -1325,22 +1344,22 @@ GenericEdgeInterface *FactorGraphFilter_Impl::addMeasurement_i(
   }
 
 # ifdef DEBUG_BUILD
-// perform some checks on the provided vector and matrices
-  if (z.rows() != e->measurementDimension() || z.cols() != 1) {
+  // perform some checks on the provided vector and matrices
+  if (z.rows() != e->getMeasurement().rows() || z.cols() != 1) {
     cerr
     << "[FactorGraphFilter] Error: wrong measurement vector size provided: ("
     << z.rows() << "x" << z.cols() << ") instead of ("
-    << e->measurementDimension() << "x1)" << endl;
+    << e->getMeasurement().rows() << "x1)" << endl;
 
     delete e;
     return NULL;
   }
 
-  if (cov.rows() != e->noiseDimension() || cov.cols() != e->noiseDimension()) {
+  if (cov.rows() != e->getNoiseCov().rows() || cov.cols() != e->getNoiseCov().cols()) {
     cerr
     << "[FactorGraphFilter] Error: wrong covariance matrix size provided: ("
     << cov.rows() << "x" << cov.cols() << ") instead of ("
-    << e->noiseDimension() << "x" << e->noiseDimension() << ")"
+    << e->getNoiseCov().rows() << "x" << e->getNoiseCov().cols() << ")"
     << endl;
 
     delete e;

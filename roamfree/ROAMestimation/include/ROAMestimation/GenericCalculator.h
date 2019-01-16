@@ -54,12 +54,20 @@ private:
 		 * and its manifold structure is lost
 		 */
 
+		/* 
+		 * if misalignment guards are used this should never be needed
+		
 		const double& qOS_norm = std::pow(qOS1_raw, 2) + std::pow(qOS2_raw, 2)
 					+ std::pow(qOS3_raw, 2);
 
 		qOS1 = _params[3].value(0) / (qOS_norm > 1.0 ? qOS_norm : 1.0);
 		qOS2 = _params[4].value(0) / (qOS_norm > 1.0 ? qOS_norm : 1.0);
 		qOS3 = _params[5].value(0) / (qOS_norm > 1.0 ? qOS_norm : 1.0);
+		*/
+		
+		qOS1 = _params[3].value(0);
+		qOS2 = _params[4].value(0);
+		qOS3 = _params[5].value(0);		
 	}
 
 protected:

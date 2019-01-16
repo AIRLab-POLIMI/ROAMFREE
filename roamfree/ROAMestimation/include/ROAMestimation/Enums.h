@@ -26,7 +26,9 @@ enum MeasTypes {
   AbsolutePose,
   LinearVelocity,
   AngularVelocity,
+  AngularVelocityInEarthFrame,
   LinearAcceleration,
+  LinearAccelerationInEarthFrame,
   AckermannOdometer,
   AckermannConstraint,
   TriskarOdometer,
@@ -46,8 +48,7 @@ enum MeasTypes {
   IMUintegralDeltaP,
   IMUintegralDeltaQ,
   PlanarConstraint,
-  RotatingPushbroom,
-  IMUHandler
+  QuadDynamicModel
 };
 
 enum ParameterTypes {

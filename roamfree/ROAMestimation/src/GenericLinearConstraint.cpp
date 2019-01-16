@@ -53,7 +53,7 @@ void GenericLinearConstraint::computeError() {
       static Eigen::VectorXd w(1);
       double sign;
 
-#     include "generated/SE3Prior_TestW.cppready"
+#     include "generated/PriorEdges/SE3Prior_TestW.cppready"
 
       if (w(0) < 0) {
         sign = -1.0;
@@ -61,7 +61,7 @@ void GenericLinearConstraint::computeError() {
         sign = 1.0;
       }
 
-#     include "generated/SE3Prior_Err.cppready"
+#     include "generated/PriorEdges/SE3Prior_Err.cppready"
 
     } else if (dynamic_cast<GenericVertex<ROAMfunctions::QuaternionV> *>(v)
         != NULL) {
@@ -69,7 +69,7 @@ void GenericLinearConstraint::computeError() {
       static Eigen::VectorXd w(1);
       double sign;
 
-#     include "generated/QuaternionPrior_TestW.cppready"
+#     include "generated/PriorEdges/QuaternionPrior_TestW.cppready"
 
       if (w(0) < 0) {
         sign = -1.0;
@@ -77,7 +77,7 @@ void GenericLinearConstraint::computeError() {
         sign = 1.0;
       }
 
-#     include "generated/QuaternionPrior_Err.cppready"
+#     include "generated/PriorEdges/QuaternionPrior_Err.cppready"
 
     } else {
       // this is the basic Euclidean case, it is sufficient to do x-z
@@ -125,7 +125,7 @@ void GenericLinearConstraint::linearizeOplus() {
       static Eigen::VectorXd w(1);
       double sign;
 
-#     include "generated/SE3Prior_TestW.cppready"
+#     include "generated/PriorEdges/SE3Prior_TestW.cppready"
 
       if (w(0) < 0) {
         sign = -1.0;
@@ -133,7 +133,7 @@ void GenericLinearConstraint::linearizeOplus() {
         sign = 1.0;
       }
 
-#     include "generated/SE3Prior_JErr.cppready"
+#     include "generated/PriorEdges/SE3Prior_JErr.cppready"
 
       _jacobianOplus[k] = _G.block(0, startE, _G.rows(), v->dimension())
           * _jacobianOplusXi;
@@ -153,7 +153,7 @@ void GenericLinearConstraint::linearizeOplus() {
       static Eigen::VectorXd w(1);
       double sign;
 
-#     include "generated/QuaternionPrior_TestW.cppready"
+#     include "generated/PriorEdges/QuaternionPrior_TestW.cppready"
 
       if (w(0) < 0) {
         sign = -1.0;
@@ -161,7 +161,7 @@ void GenericLinearConstraint::linearizeOplus() {
         sign = 1.0;
       }
 
-#     include "generated/QuaternionPrior_JErr.cppready"
+#     include "generated/PriorEdges/QuaternionPrior_JErr.cppready"
 
       _jacobianOplus[k] = _G.block(0, startE, _G.rows(), v->dimension())
           * _jacobianOplusXi;

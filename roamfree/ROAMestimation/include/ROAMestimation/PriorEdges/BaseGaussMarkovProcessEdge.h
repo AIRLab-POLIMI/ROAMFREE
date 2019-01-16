@@ -59,7 +59,7 @@ class BaseGaussMarkovProcessEdge: public BaseBinaryProcessEdge<D, VertexXi> {
       assert(beta.rows() == D);
 
       for (int i = 0; i < D; i++) {
-        if (beta(i) < 0) {
+        if (beta(i) <= 0) {
           std::cerr
               << "[BaseGaussMarkovProcessEdge] Error: beta has to be > 0, for zero beta use ConstantParameter and None process model"
               << std::endl;
@@ -81,11 +81,12 @@ class BaseGaussMarkovProcessEdge: public BaseBinaryProcessEdge<D, VertexXi> {
       // obtain the discrete time covariance matrix as a function
       // of beta and dt
       for (int i = 0; i < D; i++) {
-        _information(i, i) /= 1.0 / (2.0 * _beta(i))
-            * (1.0 - exp(-2.0 * _beta(i) * _dt));
+    	// From Sensor Orientation coursebook (looks wrong scaling coeff is not unitless)
+    	//_information(i, i) /= 1.0 / (2.0 * _beta(i))*(1.0 - exp(-2.0 * _beta(i) * _dt));
+
+    	_information(i,i) /= (1.0 - exp(-2.0 * _beta(i) * _dt));
       }
       //
-
     }
 
     virtual g2o::OptimizableGraph::Edge *getg2oOptGraphPointer() {

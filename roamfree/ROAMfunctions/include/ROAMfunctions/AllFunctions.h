@@ -22,8 +22,10 @@ Contributors:
 #include "AbsolutePositionM.h"
 #include "AbsolutePoseM.h"
 #include "AngularVelocity.h"
+#include "AngularVelocityInEarthFrame.h"
 #include "LinearVelocityM.h"
 #include "Acceleration.h"
+#include "AccelerationInEarthFrame.h"
 #include "TriskarKinematicM.h"
 #include "DifferentialDriveKinematicM.h"
 #include "GenericOdometerM.h"
@@ -42,6 +44,7 @@ Contributors:
 #include "DisplacementM.h"
 #include "IMUIntegralDeltaPM.h"
 #include "IMUIntegralDeltaQM.h"
+#include "QuadDynamicModelM.h"
 
 #endif /* ALLFUNCTIONS_H_ */
 
