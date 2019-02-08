@@ -179,7 +179,7 @@ int main(int argc, char *argv[]) {
     double t = 0.0;
     Eigen::VectorXd &x = x0;
 
-#   include "../generated/Otto_GT.cppready"
+#   include "../generated/AnalyticTraj_UniformlyAcceleratedCircularMotion_GT.cppready"
   }
 
   hndl.init(true, 0.0, x0);
@@ -199,7 +199,7 @@ int main(int argc, char *argv[]) {
     Eigen::VectorXd za(3), zw(3);
 
     {
-#     include "../generated/Otto_w.cppready"
+#     include "../generated/AnalyticTraj_UniformlyAcceleratedCircularMotion_w.cppready"
 
       zw(0) += bw_x;
       zw(1) += bw_y;
@@ -207,7 +207,7 @@ int main(int argc, char *argv[]) {
     }
 
     {
-#     include "../generated/Otto_a.cppready"
+#     include "../generated/AnalyticTraj_UniformlyAcceleratedCircularMotion_a.cppready"
 
       za(0) += ba_x;
       za(1) += ba_y;
@@ -226,7 +226,7 @@ int main(int argc, char *argv[]) {
         {
           double t = curx_ptr->getTimestamp(); // shadows global t
 
-#         include "../generated/Otto_gps.cppready"
+#         include "../generated/AnalyticTraj_UniformlyAcceleratedCircularMotion_gps.cppready"
         }
 
         f->addMeasurement("GPS", curx_ptr->getTimestamp(), zgps, GPSCov,
@@ -240,7 +240,7 @@ int main(int argc, char *argv[]) {
         double t = curx_ptr->getTimestamp();
         Eigen::VectorXd &x = x_gt;
 
-#       include "../generated/Otto_GT.cppready"
+#       include "../generated/AnalyticTraj_UniformlyAcceleratedCircularMotion_GT.cppready"
       }
 
       for (int n = 0; n < features.size(); n++) {
@@ -283,7 +283,7 @@ int main(int argc, char *argv[]) {
           double t = x_ptr->getTimestamp();
           Eigen::VectorXd x(7);
 
-#         include "../generated/Otto_GT.cppready"
+#         include "../generated/AnalyticTraj_UniformlyAcceleratedCircularMotion_GT.cppready"
 
           x_ptr->setEstimate(x);
           x_ptr->setFixed(true);

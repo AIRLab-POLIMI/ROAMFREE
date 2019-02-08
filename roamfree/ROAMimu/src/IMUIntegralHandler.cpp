@@ -96,6 +96,18 @@ void IMUIntegralHandler::init(bool isMaster, double t0,
 
     assert(_x0);
   }
+  
+  // need to initialize ba_ptr_z1 and bw_ptr_z1 as they are used in the first integral
+  // TODO: a little inefficient thanks to the Eigen interface
+  Eigen::VectorXd ba_tmp(3), bw_tmp(3);
+  
+  _ba_par->getValueAt(ba_tmp, t0);
+  _bw_par->getValueAt(bw_tmp, t0);
+
+  //
+  memcpy(ba_ptr_z1, ba_tmp.data(), 3 * sizeof(double));
+  memcpy(bw_ptr_z1, bw_tmp.data(), 3 * sizeof(double));
+  //*/
 }
 
 // TODO: have this method return the vecotr of edges that have been added

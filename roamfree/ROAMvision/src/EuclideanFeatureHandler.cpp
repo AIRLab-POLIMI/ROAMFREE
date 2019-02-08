@@ -20,6 +20,7 @@
 
 #include <Eigen/Dense>
 #include <opencv2/core/eigen.hpp>
+#include <opencv2/calib3d/calib3d.hpp>
 
 #include "EuclideanFeatureHandler.h"
 
@@ -271,7 +272,7 @@ bool EuclideanFeatureHandler::initialize(const EuclideanTrackDescriptor &track,
   }
 
   // triangulate first and last cameras
-  cv::vector<cv::Point2f> firstObsVec, lastObsVec;
+  vector<cv::Point2f> firstObsVec, lastObsVec;
 
   cv::Vec4f triangulated3DPointInitTemp;
   cv::Point3d triangulated3DPointInit, triangulated3DPoint;

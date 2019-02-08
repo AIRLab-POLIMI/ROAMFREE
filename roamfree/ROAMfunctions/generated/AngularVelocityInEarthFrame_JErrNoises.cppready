@@ -1,0 +1,9 @@
+J(1+_OFF,1+_OFF) = 1;
+J(1+_OFF,2+_OFF) = 0;
+J(1+_OFF,3+_OFF) = 0;
+J(2+_OFF,1+_OFF) = 0;
+J(2+_OFF,2+_OFF) = 1;
+J(2+_OFF,3+_OFF) = 0;
+J(3+_OFF,1+_OFF) = 0;
+J(3+_OFF,2+_OFF) = 0;
+J(3+_OFF,3+_OFF) = 1;

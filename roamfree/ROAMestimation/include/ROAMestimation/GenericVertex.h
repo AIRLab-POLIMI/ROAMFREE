@@ -49,9 +49,6 @@ class GenericVertex: public g2o::BaseVertex<
     using g2o::BaseVertex<Traits::_INCREMENT_SIZE, Eigen::VectorXd>::_fixed;
     using g2o::BaseVertex<Traits::_INCREMENT_SIZE, Eigen::VectorXd>::_uncertainty;
 
-    bool _gtKnown;
-    Eigen::VectorXd _gt;
-
     bool _hasTimestamp;
     double _timestamp;
 
@@ -60,8 +57,6 @@ class GenericVertex: public g2o::BaseVertex<
     // initializes internal structures, needed in constructor
     void init() {
       _estimate.resize(Traits::_INTERNAL_SIZE);
-      _gt.resize(Traits::_INTERNAL_SIZE);
-      _gtKnown = false;
       _hasTimestamp = false;
 
       _uncertainty.setZero();
@@ -81,10 +76,7 @@ class GenericVertex: public g2o::BaseVertex<
       init();
 
       _estimate = v.estimate();
-      _gtKnown = v.hasGT();
-      if (_gtKnown) {
-        _gt = v.accessGt();
-      }
+
       _hasTimestamp = v.hasTimestamp();
       if (_hasTimestamp) {
         _timestamp = v.getTimestamp();
@@ -129,19 +121,6 @@ class GenericVertex: public g2o::BaseVertex<
 
     double *accessEstimateData() {
       return _estimate.data();
-    }
-
-    inline const Eigen::VectorXd &accessGt() const {
-      return _gt;
-    }
-
-    void setGT(const Eigen::VectorXd &gt) {
-      _gt = gt;
-      _gtKnown = true;
-    }
-
-    inline bool hasGT() const {
-      return _gtKnown;
     }
 
     void setTimestamp(double timestamp) {
