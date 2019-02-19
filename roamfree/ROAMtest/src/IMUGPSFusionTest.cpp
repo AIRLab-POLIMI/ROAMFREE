@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
 
   //gravity parameter
   Eigen::VectorXd gravity(1); // Initial gain and bias calibration parameters for accelerometer
-  gravity << 9.80665;
+  gravity << 9.80;
 
   f->addConstantParameter(Euclidean1D, "Accelerometer_Gravity", gravity, true);
 
