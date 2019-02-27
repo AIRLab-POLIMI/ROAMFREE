@@ -107,7 +107,10 @@ public:
       return false;
       break;
     }
-
+    case 3: // jacobian wrt parameter h (magnetic field in world frame)
+#     include "generated/VectorField_JErrH.cppready"      
+      return true;
+      break;
     }
 
     assert(false);
