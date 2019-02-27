@@ -123,7 +123,7 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
         const std::string &name, ParameterWrapperVector_Ptr toblend);
 
     ParameterWrapper_Ptr getParameterByName(const std::string &name);
-
+    
     class MisalignmentGuard: public g2o::HyperGraphAction {
 
       protected:
@@ -197,7 +197,8 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
     bool estimate(int nIterations);
 
     bool estimate(PoseVertexWrapperVector poses, int nIterations);
-
+    
+    void computeCrossCovariances();
     /* --------------------------- OTHER STUFF ---------------------------------------- */
 
     ~FactorGraphFilter_Impl();
@@ -252,6 +253,7 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
 
     //! collection for the parameter descriptors
     std::map<std::string, boost::shared_ptr<ParameterVerticesManager> > _params;
+    
 
     /* --------------------------- STUFF FOR POSES AND MEASUREMENTS ------------------- */
 

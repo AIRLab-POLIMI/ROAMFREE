@@ -523,7 +523,13 @@ class FactorGraphFilter {
      * @param nIterations the number of Gauss-Newton/Levenberg-Marquardt iteration to perform.
      */
     virtual bool estimate(PoseVertexWrapperVector poses, int nIterations) = 0;
-
+    
+    /**
+     *  \brief compytes the cross correlation covariances between the parameters
+     */
+    
+    virtual void computeCrossCovariances() = 0;
+    
     virtual ~FactorGraphFilter() {
     }
 };

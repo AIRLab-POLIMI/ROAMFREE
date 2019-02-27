@@ -25,7 +25,7 @@ if exist(edgef, 'file')
         
         err = edge(:,(23+pluginConfig.measureSize):(23+pluginConfig.measureSize+pluginConfig.errorSize-1));
                 
-        plot(edge(:,1) - edge(1,1),err);
+        plot(edge(:,1),err);
         
         yl = max(std(err));
         
@@ -50,7 +50,7 @@ if exist(edgef, 'file')
             subplot('Position', squeezeArea([area(1) area(2)+area(4)*0.5, area(3) area(4)*0.5],0.02))
             
             meas = edge(:,23:(23+pluginConfig.measureSize-1));
-            plot(edge(:,1) - edge(1,1), meas);
+            plot(edge(:,1), meas);
             
             title([pluginConfig.sensorName ' measurement']);
         

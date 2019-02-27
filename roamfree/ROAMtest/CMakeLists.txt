@@ -1,5 +1,12 @@
-file(COPY data DESTINATION .)
+# ----------- VDMFusionTest
 
+add_executable(VDMFusionTest
+    src/VDMFusionTest.cpp
+)
+
+target_link_libraries(VDMFusionTest
+    ROAMestimation
+)
 # ----------- IMUGPSFusionTest
 
 add_executable(IMUGPSFusionTest

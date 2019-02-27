@@ -518,6 +518,9 @@ MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnConstantParameter(
   case Euclidean1DPrior:
     priorif = new Eucl1DPriorEdge;
     break;
+  case Euclidean2DPrior:
+    priorif = new Eucl2DPriorEdge;
+    break;
   case Euclidean3DPrior:
     priorif = new Eucl3DPriorEdge;
     break;
@@ -1405,7 +1408,7 @@ GenericEdgeInterface *FactorGraphFilter_Impl::addMeasurement_i(
   _optimizer->addEdge(oe);
 
 #   ifdef DEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES
-  Eigen::IOFormat basicFormat(3, Eigen::DontAlignCols, ", ", ", ", "", "", "{",
+  Eigen::IOFormat basicFormat(6, Eigen::DontAlignCols, ", ", ", ", "", "", "{",
       "}");
 
   cerr
@@ -2089,6 +2092,74 @@ void FactorGraphFilter_Impl::computeCovariances() {
 // ----------------------- */
 
 }
+
+void FactorGraphFilter_Impl::computeCrossCovariances() {
+  
+  vector<pair<int, int> > blockIndices;
+  
+  
+  list<pair<g2o::OptimizableGraph::Vertex *,g2o::OptimizableGraph::Vertex *>> verticePairs;
+  vector <string> file_names;
+  
+  for (auto p1_it = _params.begin(); p1_it != _params.end(); ++p1_it) {
+    boost::shared_ptr<ParameterVerticesManager> p1 = p1_it->second;
+    if (p1->fixed() == false && p1->getCrossCovariance().size() > 0) {
+      
+      std::string param_1_name = p1->_name;
+      
+      for (auto v_it = p1->_v.begin(); v_it != p1->_v.end(); ++v_it) {
+	
+        g2o::OptimizableGraph::Vertex *v1 = v_it->second;
+	
+        if (v1->tempIndex() >= 0) { //there might be parameters not involved in current estimation	  
+	  
+	  std::list<ParameterWrapper_Ptr> tmp_list = p1->getCrossCovariance();	  
+	 
+	 for( auto p2_it = tmp_list.begin(); p2_it !=tmp_list.end(); ++p2_it) {
+	   
+	   ParameterVerticesManager *pvm = boost::static_pointer_cast<ParameterWrapper_Impl>(*p2_it)->_param;
+	   std::string param_2_name = pvm->_name;	   
+	   std::string cross_param_file_name = param_1_name+"_"+param_2_name;
+	   file_names.push_back(cross_param_file_name);
+	   for (auto v2_it = pvm->_v.begin(); v2_it != pvm->_v.end(); ++v2_it) {
+	     
+	     g2o::OptimizableGraph::Vertex *v2 = v2_it->second;
+	     if(v2->tempIndex() >=0) {
+		blockIndices.push_back(pair<int, int>(v1->tempIndex(), v2->tempIndex()));
+		verticePairs.push_back(pair<g2o::OptimizableGraph::Vertex *,g2o::OptimizableGraph::Vertex *>(v1,v2));
+	     }
+	     
+	   }   
+	   
+	 } 
+	 
+        }
+      }
+    }
+  }
+  
+// compute the marginals
+  if (blockIndices.size() == 0) {
+    // there are no marginals to compute
+    return;
+  }
+  
+  Eigen::IOFormat CSVFormat(6.0, 0, ", ", "\n","","","","");
+  g2o::SparseBlockMatrix<Eigen::MatrixXd> spinv;
+  _optimizer->computeMarginals(spinv, blockIndices);
+  int iter = 0;
+  for (auto v_it = verticePairs.begin(); v_it != verticePairs.end(); ++v_it) {
+
+    auto v1 = v_it->first;
+    auto v2 = v_it->second;
+    auto gg = spinv.block((v1)->tempIndex(), (v2)->tempIndex());
+    ofstream crossCorrFile("/tmp/roamfree/"+file_names[iter]+".txt");
+    crossCorrFile << gg->format(CSVFormat) ;
+    crossCorrFile.close();
+    iter ++;
+  }
+}
+
 
 bool FactorGraphFilter_Impl::addMisalignmentGuard(const string& sensor) {
   GenericVertex<Eucl1DV> *v1 =
