@@ -166,7 +166,9 @@ bool IMUIntegralHandler::step(double* za, double* zw) {
 #   ifdef DEBUG_PRINT_INFO_MESSAGES
     cerr << "[IMUIntegralHandler] Completed integration, adding poses and low level measurements ..." << endl;
 #   endif
-
+    
+    ret = true;
+    
     // -------------------- STEP 1: z1 = z1 + delta  ---------------------- //
     //  sum the positive part of the integral to z1
 
@@ -289,7 +291,7 @@ bool IMUIntegralHandler::step(double* za, double* zw) {
       _x0 = _x1;
       _x1 = _x2;
 
-      ret = true;
+      // ret = true; before this was the only case in which we were returning true 
     } else {
 
       if (_isMaster == true) {
