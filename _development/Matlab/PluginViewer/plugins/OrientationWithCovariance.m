@@ -9,14 +9,6 @@ if flag == 1
     x = sortByT(x);
     
     i = find(x(:,2) == max(x(:,2)));
-
-    %% decide about position shift    
-    x0 = [0 0 0];    
-    if isfield(pluginConfig, 'plotPositionRelativeToFirst')
-        if pluginConfig.plotPositionRelativeToFirst == true            
-           x0 = x(i(1),3:5);
-        end
-    end
     
     %% decide about drawing covarinace    
     plotStd = false;
@@ -24,20 +16,22 @@ if flag == 1
         plotStd = pluginConfig.plotStd;
     end
     
+    rpy = rad2deg(quat2euler(x(:, 6:9)));
+
     if plotStd
-        vars = x(:, 9+[1 7 12]);
+        vars = x(:, 9+[16 19 21]);
         iv = find(vars(:,1) ~= inf);    
-        stds = sqrt(vars(iv,:))*0.001;    
+        stds = sqrt(vars(iv,:))*0.01;    
     end
     
-    ttls = {'X','Y','Z'};
+    ttls = {'roll','pitch','yaw'};
     for j = 1:3        
         subplot('Position', squeezeArea([area(1) (j-1)*0.33 area(3) area(4)*0.33],0.02))
         hold on
 
         yyaxis left
-        plot(x(i,1), x(i,j+2)-x0(j),'m');
-        plot(x(1:i(1),1), x(1:i(1),j+2)-x0(j),'k');
+        plot(x(i,1), rpy(i,j),'m');
+        plot(x(1:i(1),1), rpy(1:i(1),j),'k');
         
         if plotStd
             yyaxis right
