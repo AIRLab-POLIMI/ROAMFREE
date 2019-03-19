@@ -10,10 +10,20 @@ if flag == 1
     
     i = find(x(:,2) == max(x(:,2)));
     
+    t0 = x(i(1),1);
+    
     %% decide about drawing covarinace    
     plotStd = false;
     if isfield(pluginConfig, 'plotStd')
         plotStd = pluginConfig.plotStd;
+    end
+    
+    %% decide about reference
+    reference = false;
+    if isfield(pluginConfig, 'referenceFile')
+        reference = true;
+        xref = load(pluginConfig.referenceFile);
+        rpyref = rad2deg(quat2euler(xref(:, 5:8)));
     end
     
     rpy = rad2deg(quat2euler(x(:, 6:9)));
@@ -30,17 +40,21 @@ if flag == 1
         hold on
 
         yyaxis left
-        plot(x(i,1), rpy(i,j),'m');
-        plot(x(1:i(1),1), rpy(1:i(1),j),'k');
+        plot(x(i,1)-t0, rpy(i,j));
+        plot(x(1:i(1),1)-t0, rpy(1:i(1),j),'k');
+        
+        if reference
+            plot(xref(:,1)-t0, rpyref(:,j), '-', 'Color', [0.9290, 0.6940, 0.1250])
+        end
         
         if plotStd
             yyaxis right
-            plot(x(iv,1),stds(:,j),'--');
+            plot(x(iv,1)-t0,stds(:,j),'--');
         end
         
         title(ttls{j})
         
-        xlim(x([1 end],1));
+        xlim(x([1 end],1)-t0);
         grid on
     end
 end
