@@ -47,7 +47,7 @@ class ImageFeatureHandler {
      *  @return true if the feature is initialized and ready for estimation, false otherwise     *
      */
     virtual bool addFeatureObservation(long int id, double t,
-        const Eigen::VectorXd &z, const Eigen::MatrixXd &cov) = 0;
+        const Eigen::VectorXd &z, const Eigen::MatrixXd &cov, bool dontInitialize = false) = 0;
 
     virtual bool getFeaturePositionInWorldFrame(long int id,
         Eigen::VectorXd &lw) const = 0;

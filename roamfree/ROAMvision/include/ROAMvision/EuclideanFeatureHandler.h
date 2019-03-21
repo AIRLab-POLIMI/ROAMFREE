@@ -41,7 +41,7 @@ class EuclideanFeatureHandler: public ImageFeatureHandler {
             Eigen::VectorXd::Zero(3), const Eigen::VectorXd & TD =
             Eigen::VectorXd::Zero(2));
     virtual bool addFeatureObservation(long int id, double t,
-        const Eigen::VectorXd &z, const Eigen::MatrixXd &cov);
+        const Eigen::VectorXd &z, const Eigen::MatrixXd &cov, bool dontInitialize = true);
 
     virtual bool getFeaturePositionInWorldFrame(long int id,
         Eigen::VectorXd &lw) const;
@@ -81,6 +81,8 @@ class EuclideanFeatureHandler: public ImageFeatureHandler {
         cv::Mat &projMat);
 
     ROAMestimation::ParameterWrapper_Ptr K_par;
+    
+    ROAMestimation::ParameterWrapper_Ptr Qosx_par, Qosy_par, Qosz_par;
 };
 
 } /* namespace ROAMvision */

@@ -54,7 +54,7 @@ bool FHPFeatureHandler::init(FactorGraphFilter* f, const string &name,
 }
 
 bool FHPFeatureHandler::addFeatureObservation(long int id, double t,
-    const Eigen::VectorXd &z, const Eigen::MatrixXd &cov) {
+    const Eigen::VectorXd &z, const Eigen::MatrixXd &cov, bool dontInitialize) {
 
   const string &sensor = getFeatureSensor(id);
 

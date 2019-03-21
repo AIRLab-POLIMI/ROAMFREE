@@ -29,6 +29,9 @@
 using namespace std;
 using namespace ROAMestimation;
 
+// #define DEBUG_PRINT_VISION_INFO_MESSAGES 1
+// #define DEBUG_OPTIMIZATION_VERBOSE 1
+
 namespace ROAMvision {
 
 EuclideanFeatureHandler::EuclideanFeatureHandler() {
@@ -45,9 +48,9 @@ bool EuclideanFeatureHandler::init(FactorGraphFilter* f, const string &name,
   _filter->addConstantParameter(_sensorName + "_Cam_SOy", T_OS(1), true);
   _filter->addConstantParameter(_sensorName + "_Cam_SOz", T_OS(2), true);
 
-  _filter->addConstantParameter(_sensorName + "_Cam_qOSx", T_OS(4), true);
-  _filter->addConstantParameter(_sensorName + "_Cam_qOSy", T_OS(5), true);
-  _filter->addConstantParameter(_sensorName + "_Cam_qOSz", T_OS(6), true);
+  Qosx_par = _filter->addConstantParameter(_sensorName + "_Cam_qOSx", T_OS(4), true);
+  Qosy_par = _filter->addConstantParameter(_sensorName + "_Cam_qOSy", T_OS(5), true);
+  Qosz_par = _filter->addConstantParameter(_sensorName + "_Cam_qOSz", T_OS(6), true);
 
   K_par = _filter->addConstantParameter(Euclidean3D, _sensorName + "_Cam_CM", K,
       true);
@@ -61,7 +64,7 @@ bool EuclideanFeatureHandler::init(FactorGraphFilter* f, const string &name,
 }
 
 bool EuclideanFeatureHandler::addFeatureObservation(long int id, double t,
-    const Eigen::VectorXd &z, const Eigen::MatrixXd &cov) {
+    const Eigen::VectorXd &z, const Eigen::MatrixXd &cov, bool dontInitialize) {
 
   // there must already exist a pose
   PoseVertexWrapper_Ptr cur_frame = _filter->getNearestPoseByTimestamp(t);
@@ -96,7 +99,11 @@ bool EuclideanFeatureHandler::addFeatureObservation(long int id, double t,
     // TODO: if initialization is succesful
     Eigen::VectorXd Lw(3);
 
-    if (d.zHistory.size() >= 3) {
+    if (!dontInitialize && d.zHistory.size() >= 3) {
+      
+#   ifdef DEBUG_PRINT_VISION_INFO_MESSAGES
+    cerr << "[EuclideanFeatureHandler] Initializing track " << id << endl;
+#   endif
 
       if (initialize(d, K_par->getEstimate(), Lw)) {
 
@@ -121,9 +128,9 @@ bool EuclideanFeatureHandler::addFeatureObservation(long int id, double t,
         // where ||err|| is where we want the weight to start to decrease
 
         // TODO: sigma is hardcoded
-        double beta = 5 / sqrt(1e6 * pow(0.8, 2));
-
-        _filter->setRobustKernel(sensor, true, beta);
+//         double beta = 5 / sqrt(1e8 * pow(0.8, 2));
+// 
+//         _filter->setRobustKernel(sensor, true, beta);
 
         // add parameter vertices
 
@@ -149,10 +156,10 @@ bool EuclideanFeatureHandler::addFeatureObservation(long int id, double t,
         d.zHistory.clear();
         d.isInitialized = true;
 
-#			ifdef DEBUG_PRINT_VISION_INFO_MESSAGES
+#	ifdef DEBUG_PRINT_VISION_INFO_MESSAGES
         cerr << "[EuclideanFeatureHandler] Ready to estimate depth for track " << id
         << endl;
-#			endif
+#	endif
 
         return true;
       }
@@ -307,13 +314,13 @@ bool EuclideanFeatureHandler::initialize(const EuclideanTrackDescriptor &track,
       if (it->second.pose->hasBeenEstimated()) {
         const Eigen::VectorXd & x = it->second.pose->getEstimate();
 
-#       include "../../ROAMfunctions/generated/ImagePlaneProjection_testZ.cppready"
-
-        if (testz(0) < 0) {
-          cerr << "WARNING: point behind camera: z = " << testz(0) << ". Initialization failed" << endl;
-          resGN = -1;
-          break;
-        }
+// #       include "../../ROAMfunctions/generated/ImagePlaneProjection_testZ.cppready"
+// 
+//         if (testz(0) < 0) {
+//           cerr << "WARNING: point behind camera: z = " << testz(0) << ". Initialization failed" << endl;
+//           resGN = -1;
+//           break;
+//         }
       }
     }
   }
@@ -344,62 +351,23 @@ bool EuclideanFeatureHandler::initialize(const EuclideanTrackDescriptor &track,
   return resGN > 0;
 }
 
-void EuclideanFeatureHandler::buildProjectionMatrix(const Eigen::VectorXd &T_WS,
+void EuclideanFeatureHandler::buildProjectionMatrix(const Eigen::VectorXd &two,
     const cv::Mat &K, cv::Mat &projMat) {
 
   cv::Mat T_SW_cv(3, 4, CV_64F);
+  
+  double qosx = Qosx_par->getEstimate()(0);
+  double qosy = Qosy_par->getEstimate()(0);
+  double qosz = Qosz_par->getEstimate()(0);
+  
+  Eigen::Map<Eigen::Matrix<double, 3, 4, Eigen::RowMajor>> Tcw(T_SW_cv.ptr<double>());
 
   // RF eigen pose (x,q) from world to camera is transformed in
   // cv transformation matrix from camera to world.
-
-  double tmp0 = T_WS(4);
-  double tmp1 = T_WS(5);
-  double tmp2 = T_WS(3);
-  double tmp3 = T_WS(6);
-  double tmp4 = tmp0 * tmp1;
-  double tmp5 = tmp2 * tmp3;
-  double tmp6 = tmp4 + tmp5;
-  double tmp7 = -(tmp2 * tmp1);
-  double tmp8 = tmp0 * tmp3;
-  double tmp9 = tmp7 + tmp8;
-  double tmp10 = pow(tmp2, 2);
-  double tmp11 = pow(tmp0, 2);
-  double tmp12 = pow(tmp1, 2);
-  double tmp13 = -tmp12;
-  double tmp14 = pow(tmp3, 2);
-  double tmp15 = -tmp14;
-  double tmp16 = tmp10 + tmp11 + tmp13 + tmp15;
-  double tmp17 = T_WS(0);
-  double tmp18 = -(tmp2 * tmp3);
-  double tmp19 = tmp4 + tmp18;
-  double tmp20 = T_WS(2);
-  double tmp21 = tmp2 * tmp0;
-  double tmp22 = tmp1 * tmp3;
-  double tmp23 = tmp21 + tmp22;
-  double tmp24 = T_WS(1);
-  double tmp25 = -tmp11;
-  double tmp26 = tmp10 + tmp25 + tmp12 + tmp15;
-  double tmp27 = tmp2 * tmp1;
-  double tmp28 = tmp27 + tmp8;
-  double tmp29 = -(tmp2 * tmp0);
-  double tmp30 = tmp29 + tmp22;
-  double tmp31 = tmp10 + tmp25 + tmp13 + tmp14;
-
-  T_SW_cv.at<double>(0, 0) = tmp16;
-  T_SW_cv.at<double>(0, 1) = 2 * tmp6;
-  T_SW_cv.at<double>(0, 2) = 2 * tmp9;
-  T_SW_cv.at<double>(0, 3) = -2 * tmp24 * tmp6 - 2 * tmp20 * tmp9
-      - tmp17 * tmp16;
-  T_SW_cv.at<double>(1, 0) = 2 * tmp19;
-  T_SW_cv.at<double>(1, 1) = tmp26;
-  T_SW_cv.at<double>(1, 2) = 2 * tmp23;
-  T_SW_cv.at<double>(1, 3) = -2 * tmp17 * tmp19 - 2 * tmp20 * tmp23
-      - tmp24 * tmp26;
-  T_SW_cv.at<double>(2, 0) = 2 * tmp28;
-  T_SW_cv.at<double>(2, 1) = 2 * tmp30;
-  T_SW_cv.at<double>(2, 2) = tmp31;
-  T_SW_cv.at<double>(2, 3) = -2 * tmp17 * tmp28 - 2 * tmp24 * tmp30
-      - tmp20 * tmp31;
+  
+  const static int _OFF = -1;
+  
+# include "generated/FromRFtoCV.cppready"
 
   projMat = K * T_SW_cv;
 }
