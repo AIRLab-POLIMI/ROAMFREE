@@ -82,7 +82,7 @@ class EuclideanFeatureHandler: public ImageFeatureHandler {
 
     ROAMestimation::ParameterWrapper_Ptr K_par;
     
-    ROAMestimation::ParameterWrapper_Ptr Qosx_par, Qosy_par, Qosz_par;
+    ROAMestimation::ParameterWrapper_Ptr qOS_par;
 };
 
 } /* namespace ROAMvision */

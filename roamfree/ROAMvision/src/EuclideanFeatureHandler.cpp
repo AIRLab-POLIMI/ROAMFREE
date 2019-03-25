@@ -44,13 +44,11 @@ bool EuclideanFeatureHandler::init(FactorGraphFilter* f, const string &name,
   _filter = f;
   _sensorName = name;
 
-  _filter->addConstantParameter(_sensorName + "_Cam_SOx", T_OS(0), true);
-  _filter->addConstantParameter(_sensorName + "_Cam_SOy", T_OS(1), true);
-  _filter->addConstantParameter(_sensorName + "_Cam_SOz", T_OS(2), true);
-
-  Qosx_par = _filter->addConstantParameter(_sensorName + "_Cam_qOSx", T_OS(4), true);
-  Qosy_par = _filter->addConstantParameter(_sensorName + "_Cam_qOSy", T_OS(5), true);
-  Qosz_par = _filter->addConstantParameter(_sensorName + "_Cam_qOSz", T_OS(6), true);
+  Eigen::VectorXd SO = T_OS.head(3);
+  Eigen::VectorXd qOS = T_OS.tail(4);
+  
+  _filter->addConstantParameter(Euclidean3D, + "_Cam_SO", SO, true);
+  qOS_par = _filter->addConstantParameter(Quaternion, _sensorName + "_Cam_qOS", qOS, true);
 
   K_par = _filter->addConstantParameter(Euclidean3D, _sensorName + "_Cam_CM", K,
       true);
@@ -113,9 +111,8 @@ bool EuclideanFeatureHandler::addFeatureObservation(long int id, double t,
         // we have to share manually the parameters
         // _filter->shareSensorFrame(_sensorName + "_Cam", sensor);
 
-        const string suffixes[] = { "_SOx", "_SOy", "_SOz", "_qOSx", "_qOSy",
-            "_qOSz" };
-        for (int k = 0; k < 6; k++) {
+        const string suffixes[] = { "_SO", "_qOS"};
+        for (int k = 0; k < 2; k++) {
           _filter->shareParameter(_sensorName + "_Cam" + suffixes[k],
               sensor + suffixes[k]);
         }
@@ -356,10 +353,8 @@ void EuclideanFeatureHandler::buildProjectionMatrix(const Eigen::VectorXd &two,
 
   cv::Mat T_SW_cv(3, 4, CV_64F);
   
-  double qosx = Qosx_par->getEstimate()(0);
-  double qosy = Qosy_par->getEstimate()(0);
-  double qosz = Qosz_par->getEstimate()(0);
-  
+  const Eigen::VectorXd &qos = qOS_par->getEstimate();
+
   Eigen::Map<Eigen::Matrix<double, 3, 4, Eigen::RowMajor>> Tcw(T_SW_cv.ptr<double>());
 
   // RF eigen pose (x,q) from world to camera is transformed in
