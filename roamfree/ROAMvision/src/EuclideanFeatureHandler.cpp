@@ -47,7 +47,7 @@ bool EuclideanFeatureHandler::init(FactorGraphFilter* f, const string &name,
   Eigen::VectorXd SO = T_OS.head(3);
   Eigen::VectorXd qOS = T_OS.tail(4);
   
-  _filter->addConstantParameter(Euclidean3D, + "_Cam_SO", SO, true);
+  _filter->addConstantParameter(Euclidean3D, _sensorName + "_Cam_SO", SO, true);
   qOS_par = _filter->addConstantParameter(Quaternion, _sensorName + "_Cam_qOS", qOS, true);
 
   K_par = _filter->addConstantParameter(Euclidean3D, _sensorName + "_Cam_CM", K,
@@ -125,9 +125,9 @@ bool EuclideanFeatureHandler::addFeatureObservation(long int id, double t,
         // where ||err|| is where we want the weight to start to decrease
 
         // TODO: sigma is hardcoded
-//         double beta = 5 / sqrt(1e8 * pow(0.8, 2));
-// 
-//         _filter->setRobustKernel(sensor, true, beta);
+        double beta = 5 / sqrt(1e8 * pow(0.8, 2));
+
+        _filter->setRobustKernel(sensor, true, beta);
 
         // add parameter vertices
 
