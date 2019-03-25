@@ -36,7 +36,7 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
      * a lot of files are empty or near empty
      *
      * @param y is the row [x,q,v,omega,a,alpha,dispx,dispq,imuintdp,imuintdq], y in 0-9
-     * @param x is the col, i.e. the vertex, [x(t), x(t-1), x(t-2), SOx, SOy, SOz, qOSx, qOSy, qOSz]
+     * @param x is the col, i.e. the vertex, [x(t), x(t-1), x(t-2), SO, qOS]
      *          note that depending on the MT::_ORDER of the edge, older poses and dt may be missing.
      */
 
@@ -46,11 +46,11 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
           { // with respect to x(t)
         switch (y) {
         case POSITION: {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugPOSEX2.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugPOSEX2.cppready"
           return true;
         }
         case ORIENTATION: {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugQX2.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugQX2.cppready"
           return true;
         }
         }
@@ -60,27 +60,11 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
       case POSITION: {
         switch (x) {
         case (ORDER + 1): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugPOSESO1.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugPOSESO.cppready"
           return true;
         }
         case (ORDER + 2): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugPOSESO2.cppready"
-          return true;
-        }
-        case (ORDER + 3): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugPOSESO3.cppready"
-          return true;
-        }
-        case (ORDER + 4): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugPOSEqOS1.cppready"
-          return true;
-        }
-        case (ORDER + 5): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugPOSEqOS2.cppready"
-          return true;
-        }
-        case (ORDER + 6): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugPOSEqOS3.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugPOSEqOS.cppready"
           return true;
         }
         }
@@ -90,27 +74,11 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
       case ORIENTATION: {
         switch (x) {
         case (ORDER + 1): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugQSO1.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugQSO.cppready"
           return true;
         }
         case (ORDER + 2): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugQSO2.cppready"
-          return true;
-        }
-        case (ORDER + 3): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugQSO3.cppready"
-          return true;
-        }
-        case (ORDER + 4): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugQqOS1.cppready"
-          return true;
-        }
-        case (ORDER + 5): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugQqOS2.cppready"
-          return true;
-        }
-        case (ORDER + 6): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugQqOS3.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugQqOS.cppready"
           return true;
         }
         }
@@ -132,22 +100,22 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
         switch (y) {
         case LINEARVELOCITY: {
           assert(ORDER > 0);
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugVX2.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugVX2.cppready"
           return true;
         }
         case ANGULARVELOCITY: {
           assert(ORDER > 0);
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugWX2.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugWX2.cppready"
           return true;
         }
         case DELTA_POSITION: {
           assert(ORDER > 0);
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugDispX2.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugDispX2.cppready"
           return true;
         }
         case DELTA_ORIENTATION: {
           assert(ORDER > 0);
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugDispQX2.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugDispQX2.cppready"
           return true;
         }
 
@@ -158,27 +126,27 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
           { // with respect to x(t-1)
         switch (y) {
         case POSITION: {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugPOSEX1.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugPOSEX1.cppready"
           return true;
         }
         case ORIENTATION: {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugQX1.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugQX1.cppready"
           return true;
         }
         case LINEARVELOCITY: {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugVX1.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugVX1.cppready"
           return true;
         }
         case ANGULARVELOCITY: {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugWX1.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugWX1.cppready"
           return true;
         }
         case DELTA_POSITION: {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugDispX1.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugDispX1.cppready"
           return true;
         }
         case DELTA_ORIENTATION: {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugDispQX1.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugDispQX1.cppready"
           return true;
         }
 
@@ -189,27 +157,11 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
       case LINEARVELOCITY: {
         switch (x) {
         case (ORDER + 1): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugVSO1.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugVSO.cppready"
           return true;
         }
         case (ORDER + 2): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugVSO2.cppready"
-          return true;
-        }
-        case (ORDER + 3): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugVSO3.cppready"
-          return true;
-        }
-        case (ORDER + 4): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugVqOS1.cppready"
-          return true;
-        }
-        case (ORDER + 5): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugVqOS2.cppready"
-          return true;
-        }
-        case (ORDER + 6): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugVqOS3.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugVqOS.cppready"
           return true;
         }
         }
@@ -219,27 +171,11 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
       case ANGULARVELOCITY: {
         switch (x) {
         case (ORDER + 1): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugWSO1.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugWSO.cppready"
           return true;
         }
         case (ORDER + 2): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugWSO2.cppready"
-          return true;
-        }
-        case (ORDER + 3): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugWSO3.cppready"
-          return true;
-        }
-        case (ORDER + 4): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugWqOS1.cppready"
-          return true;
-        }
-        case (ORDER + 5): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugWqOS2.cppready"
-          return true;
-        }
-        case (ORDER + 6): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugWqOS3.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugWqOS.cppready"
           return true;
         }
         }
@@ -249,27 +185,11 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
       case DELTA_POSITION: {
         switch (x) {
         case (ORDER + 1): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugDispSO1.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugDispSO.cppready"
           return true;
         }
         case (ORDER + 2): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugDispSO2.cppready"
-          return true;
-        }
-        case (ORDER + 3): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugDispSO3.cppready"
-          return true;
-        }
-        case (ORDER + 4): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugDispqOS1.cppready"
-          return true;
-        }
-        case (ORDER + 5): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugDispqOS2.cppready"
-          return true;
-        }
-        case (ORDER + 6): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugDispqOS3.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugDispqOS.cppready"
           return true;
         }
         }
@@ -279,27 +199,11 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
       case DELTA_ORIENTATION: {
         switch (x) {
         case (ORDER + 1): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugDispQSO1.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugDispQSO.cppready"
           return true;
         }
         case (ORDER + 2): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugDispQSO2.cppready"
-          return true;
-        }
-        case (ORDER + 3): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugDispQSO3.cppready"
-          return true;
-        }
-        case (ORDER + 4): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugDispQqOS1.cppready"
-          return true;
-        }
-        case (ORDER + 5): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugDispQqOS2.cppready"
-          return true;
-        }
-        case (ORDER + 6): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugDispQqOS3.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugDispQqOS.cppready"
           return true;
         }
         }
@@ -321,17 +225,17 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
         switch (y) {
         case ACCELERATION: {
           assert(ORDER > 1);
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugAX2.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugAX2.cppready"
           return true;
         }
         case ANGULARACCELERATION: {
           assert(ORDER > 1);
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugAlphaX2.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugAlphaX2.cppready"
           return true;
         }
         case IMUINT_DELTAPOSE: {
           assert(ORDER > 1);
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugIMUintdPX2.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugIMUintdPX2.cppready"
           return true;
         }
         }
@@ -341,17 +245,17 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
         switch (y) {
         case ACCELERATION: {
           assert(ORDER > 1);
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugAX1.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugAX1.cppready"
           return true;
         }
         case ANGULARACCELERATION: {
           assert(ORDER > 1);
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugAlphaX1.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugAlphaX1.cppready"
           return true;
         }
         case IMUINT_DELTAPOSE: {
           assert(ORDER > 1);
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugIMUintdPX1.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugIMUintdPX1.cppready"
           return true;
         }
         }
@@ -360,42 +264,42 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
       if (x == 2) { // with respect to x(t-2)
         switch (y) {
         case POSITION: {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugPOSEX0.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugPOSEX0.cppready"
           return true;
         }
         case ORIENTATION: {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugQX0.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugQX0.cppready"
           return true;
         }
         case LINEARVELOCITY: {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugVX0.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugVX0.cppready"
           return true;
         }
         case ANGULARVELOCITY: {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugWX0.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugWX0.cppready"
           return true;
         }
         case DELTA_POSITION: {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugDispX0.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugDispX0.cppready"
           return true;
         }
         case DELTA_ORIENTATION: {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugDispQX0.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugDispQX0.cppready"
           return true;
         }
         case ACCELERATION: {
           assert(ORDER > 1);
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugAX0.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugAX0.cppready"
           return true;
         }
         case ANGULARACCELERATION: {
           assert(ORDER > 1);
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugAlphaX0.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugAlphaX0.cppready"
           return true;
         }
         case IMUINT_DELTAPOSE: {
           assert(ORDER > 1);
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugIMUintdPX0.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugIMUintdPX0.cppready"
           return true;
         }
         }
@@ -406,27 +310,11 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
         assert(ORDER > 1);
         switch (x) {
         case (ORDER + 1): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugASO1.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugASO.cppready"
           return true;
         }
         case (ORDER + 2): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugASO2.cppready"
-          return true;
-        }
-        case (ORDER + 3): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugASO3.cppready"
-          return true;
-        }
-        case (ORDER + 4): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugAqOS1.cppready"
-          return true;
-        }
-        case (ORDER + 5): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugAqOS2.cppready"
-          return true;
-        }
-        case (ORDER + 6): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugAqOS3.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugAqOS.cppready"
           return true;
         }
         }
@@ -437,27 +325,11 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
         assert(ORDER > 1);
         switch (x) {
         case (ORDER + 1): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugAlphaSO1.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugAlphaSO.cppready"
           return true;
         }
         case (ORDER + 2): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugAlphaSO2.cppready"
-          return true;
-        }
-        case (ORDER + 3): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugAlphaSO3.cppready"
-          return true;
-        }
-        case (ORDER + 4): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugAlphaqOS1.cppready"
-          return true;
-        }
-        case (ORDER + 5): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugAlphaqOS2.cppready"
-          return true;
-        }
-        case (ORDER + 6): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugAlphaqOS3.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugAlphaqOS.cppready"
           return true;
         }
         }
@@ -468,27 +340,11 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
         assert(ORDER > 1);
         switch (x) {
         case (ORDER + 1): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugIMUintdPSO1.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugIMUintdPSO.cppready"
           return true;
         }
         case (ORDER + 2): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugIMUintdPSO2.cppready"
-          return true;
-        }
-        case (ORDER + 3): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugIMUintdPSO3.cppready"
-          return true;
-        }
-        case (ORDER + 4): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugIMUintdPqOS1.cppready"
-          return true;
-        }
-        case (ORDER + 5): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugIMUintdPqOS2.cppready"
-          return true;
-        }
-        case (ORDER + 6): {
-#         include "generated/BackwardAugmentedStateEstimator_v6_JAugIMUintdPqOS3.cppready"
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugIMUintdPqOS.cppready"
           return true;
         }
         }

@@ -122,7 +122,7 @@ GenericEdge<D>::GenericEdge(int nParams) :
         -std::numeric_limits<double>::infinity()), _Dt01(0), _Dt12(0), _x(33), _frameCounter(
         -1) {
 
-  _paramsPtrs = new double *[_paramsPtrsSize]; // 6 1d parameters plus the eventual others
+  _paramsPtrs = new double *[_paramsPtrsSize]; // 1 Euclidean 3D, 1 Quaternion the possible function specific params
 }
 
 template<int D>
@@ -163,7 +163,7 @@ inline void GenericEdge<D>::handleParamTemporaries() {
 template<int D>
 void GenericEdge<D>::updateParamPtrs() {
   for (int k = 0; k < _paramsPtrsSize; k++) {
-    _paramsPtrs[k] = _params[k + 6].value.data();
+    _paramsPtrs[k] = _params[k + 2].value.data();
   }
 }
 

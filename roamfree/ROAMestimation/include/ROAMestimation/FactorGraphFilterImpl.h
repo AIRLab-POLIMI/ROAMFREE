@@ -93,8 +93,6 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
     bool setRobustKernel(const std::string &sensor, bool enabled,
         double huberWidth);
 
-    bool addMisalignmentGuard(const std::string &sensor);
-
     /* --------------------------- PARAMETER LEVEL METHODS ---------------------------- */
 
     ParameterWrapper_Ptr addConstantParameter(ParameterTypes type,
@@ -124,19 +122,6 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
 
     ParameterWrapper_Ptr getParameterByName(const std::string &name);
     
-    class MisalignmentGuard: public g2o::HyperGraphAction {
-
-      protected:
-        GenericVertex<Eucl1DV> *_v1, *_v2, *_v3;
-
-      public:
-        MisalignmentGuard(GenericVertex<Eucl1DV> *v1,
-            GenericVertex<Eucl1DV> *v2, GenericVertex<Eucl1DV> *v3);
-
-        HyperGraphAction* operator()(const g2o::HyperGraph* graph,
-            g2o::HyperGraphAction::Parameters* parameters = 0);
-    };
-
     /* --------------------------- POSES AND EDGES LEVEL METHODS ---------------------- */
 
     PoseVertexWrapper_Ptr addPose(double t);

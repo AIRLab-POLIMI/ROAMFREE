@@ -76,8 +76,8 @@ protected:
 	//
 	// ROAMmath::SparsePopulator
 
-	Eigen::Matrix<double, 3, 1> _JxArgs3x1;
-	Eigen::Matrix<double, 4, 1> _JxArgs4x1;
+	Eigen::Matrix<double, 3, 3> _JxArgs3x3;
+	Eigen::Matrix<double, 4, 3> _JxArgs4x3;
 	Eigen::Matrix<double, 3, 6> _JxArgs3x6;
 	Eigen::Matrix<double, 4, 6> _JxArgs4x6;
 
@@ -94,7 +94,7 @@ public:
 
 	QuaternionGenericEdge() :
 	GenericEdge<MT::_ERROR_SIZE>(_F.getNParams()), _JxArgs3x6(
-			3, 6), _JxArgs4x6(4, 6), _JxArgs3x1(3, 1), _JxArgs4x1(4, 1) {
+			3, 6), _JxArgs4x6(4, 6), _JxArgs3x3(3, 3), _JxArgs4x3(4, 3) {
 
 		// resize all(almost) that needs to be resized
 		_measurement.resize(MT::_MEASUREMENT_SIZE);
@@ -147,18 +147,15 @@ public:
 		_Dt12 = dt2;
 		_Dt01 = dt1;
 
-		// required vertices: x(t-1), x(t), x(t+1), dt1, dt2, s(O)[0], s(O)[1], s(O)[2], qOS[0], qOS[1], qOS[2]
-		// here the displacement and misalignment parameters are divided in their components so that
-		// we can separately fix & unfix each one depending on the situations (e.g.. 2d roaming)
+		// required vertices: x(t-1), x(t), x(t+1), dt1, dt2, s(O), qOS
 
 		// each sensor has the default displacement and misalignment vertices
 		// and eventually other parameters
-		// we require that there exist 6 Eucl1D vertices in the map (maybe shared) with names
-		// <sensor_name>_SO<n> and <sensor_name>_qOS<n>
+		// we require that there exist 1 Eucl3D and 1 Quaternion vertices in the map (maybe shared) with names
+		// <sensor_name>_SO and <sensor_name>_qOS
 
 		// populate the parameter name vector (C++11)
-		std::vector<std::string> to_serach = {"SOx", "SOy", "SOz", "qOSx", "qOSy",
-			"qOSz"};
+		std::vector<std::string> to_serach = {"SO", "qOS"};
 
 		const std::string *argNames = _F.getParamsList();
 
@@ -199,9 +196,9 @@ public:
 
 		_vertices[0] = xt;
 
-    if (MT::_ORDER > 0) {
-      _vertices[1] = xtm1;
-    }
+		if (MT::_ORDER > 0) {
+		  _vertices[1] = xtm1;
+		}
 
 		if (MT::_ORDER == 2) {
 			_vertices[2] = xtm2;
@@ -242,7 +239,7 @@ public:
 		}
 #		endif
 
-		// --- resize the _jacobianOplus matrices (only for the vertices which are not fixed)
+		// --- resize the _jacobianOplus matrices
 		for (int k = 0; k < _vertices.size(); k++) {
 			g2o::OptimizableGraph::Vertex *ov =
 			static_cast<g2o::OptimizableGraph::Vertex *>(_vertices[k]);
@@ -349,10 +346,10 @@ public:
 		// now we have to evaluate sum_i( J_err/augState_i * J_augState_i/vertex_j ) for each j not fixed
 		// which contributes to the augmented state computation
 
-		// for vertices 0-(MT::_ORDER+1 + 6) (the ones from which we compute the augmented state) compute their jacobian
+		// for vertices 0-(MT::_ORDER+1 + 2) (the ones from which we compute the augmented state) compute their jacobian
 		// remember that we assume that S(O) and qOS are time-invariant parameters
 
-		for (int v = 0; v < MT::_ORDER + 1 + 6; v++) {
+		for (int v = 0; v < MT::_ORDER + 1 + 2; v++) {
 
 			g2o::OptimizableGraph::Vertex *ov =
 			static_cast<g2o::OptimizableGraph::Vertex *>(_vertices[v]);
@@ -372,20 +369,20 @@ public:
 
 						// here we have to map the current value of v to the correct value the computeJacobianBlock expects
 						switch (ov->dimension()) { // this is for the dimension of temporaries
-							case 1:
-							// cols = 1
+							case 3: 
+							// SO or qOS, cols = 3
 							if (k == 1 || k == 7) { // with respect to some quaternion, rows = 4
-								computeJacobianBlock(k, v, _JxArgs4x1);
-								_jacobianOplus[v].noalias() += (*_JErrx[k]) * _JxArgs4x1;
+								computeJacobianBlock(k, v, _JxArgs4x3);
+								_jacobianOplus[v].noalias() += (*_JErrx[k]) * _JxArgs4x3;
 							} else {
 								// rows = 3
-								computeJacobianBlock(k, v, _JxArgs3x1);
-								_jacobianOplus[v].noalias() += (*_JErrx[k]) * _JxArgs3x1;
+								computeJacobianBlock(k, v, _JxArgs3x3);
+								_jacobianOplus[v].noalias() += (*_JErrx[k]) * _JxArgs3x3;
 							}
 							break;
 
-							case 6:
-							// cols = 6
+							case 6:  
+							// pose vertices, cols = 6
 							if (k == 1 || k == 7) { // with respect to q or delta q, rows = 4
 								computeJacobianBlock(k, v, _JxArgs4x6);
 								_jacobianOplus[v].noalias() += (*_JErrx[k]) * _JxArgs4x6;
@@ -410,18 +407,18 @@ public:
 
 		// here we come to the non default parameters of the function
 
-		int cur_vertex = MT::_ORDER + 1 + 6;
+		int cur_vertex = MT::_ORDER + 1 + 2;
 
-		for (int k = 6; k < _params.size(); k++) {
+		for (int k = 2; k < _params.size(); k++) {
 			for (int h = 0; h < _params[k].p->getWindowSize(); h++, cur_vertex++) {
 
 				// if the vertex is fixed avoid wasting time
 
 				if (!static_cast<g2o::OptimizableGraph::Vertex *>(_vertices[cur_vertex])->fixed()) {
 
-					// sixth descriptor in _params is the first non default parameter (indexed with 1 in errorJacobian)
+					// second descriptor in _params is the first non default parameter (indexed with 1 in errorJacobian)
 					// TODO: if the jacobian is the identity matrix there is no need to update this stuff every time
-					_F.errorJacobian(_x, _paramsPtrs, _measurement, k - 5,
+					_F.errorJacobian(_x, _paramsPtrs, _measurement, k - 1,
 							_jacobianOplus[cur_vertex]);
 
 					// there is the nice property that post-multiplying to J(err) wrt parameter k
@@ -535,7 +532,7 @@ public:
 	 * a lot of files are empty or near empty
 	 *
 	 * @param y is the row [x,q,v,omega,a,alpha,dispx,dispq,imuintdp,imuintdq], y in 0-9
-	 * @param x is the col, i.e. the vertex, [x(t), _Dt12, x(t-1), _Dt01, x(t-2), SOx, SOy, SOz, qOSx, qOSy, qOSz]
+	 * @param x is the col, i.e. the vertex, [x(t), x(t-1), x(t-2), SO, qOS]
 	 *          note that depending on the MT::_ORDER of the edge, older poses and dt may be missing.
 	 */
 

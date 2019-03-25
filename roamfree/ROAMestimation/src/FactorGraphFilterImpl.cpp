@@ -261,7 +261,7 @@ bool FactorGraphFilter_Impl::addSensor(const string& name, MeasTypes type,
 
 bool FactorGraphFilter_Impl::setSensorFrame(const string& sensor,
     const Eigen::VectorXd& s) {
-// retrieve the sensor descriptor
+  // retrieve the sensor descriptor
   map<string, struct Sensor>::iterator sensor_it = _sensors.find(sensor);
 
   if (sensor_it == _sensors.end()) {
@@ -269,13 +269,13 @@ bool FactorGraphFilter_Impl::setSensorFrame(const string& sensor,
         << endl;
     return false;
   }
+  
+  // TODO: extra copy, this is because of method signatures 
+  Eigen::VectorXd OS = s.head(3);
+  Eigen::VectorXd qOS = s.tail(4);
 
-  const string suffixes[] =
-      { "_SOx", "_SOy", "_SOz", "_qOSx", "_qOSy", "_qOSz" };
-
-  for (int k = 0; k < 6; k++) {
-    addConstantParameter(sensor + suffixes[k], s(k > 2 ? k + 1 : k), true);
-  }
+  addConstantParameter(Euclidean3D, sensor + "_SO", OS, true);
+  addConstantParameter(Quaternion, sensor + "_qOS", qOS, true);
 
   return true;
 }
@@ -292,10 +292,9 @@ bool FactorGraphFilter_Impl::shareSensorFrame(const string& from,
     return false;
   }
 
-  const string suffixes[] =
-      { "_SOx", "_SOy", "_SOz", "_qOSx", "_qOSy", "_qOSz" };
+  const string suffixes[] = { "_SO", "_qOS"};
 
-  for (int k = 0; k < 6; k++) {
+  for (int k = 0; k < 2; k++) {
     auto toshare = _params.find(from + suffixes[k]);
 
     if (toshare == _params.end()) {
@@ -2160,25 +2159,6 @@ void FactorGraphFilter_Impl::computeCrossCovariances() {
   }
 }
 
-
-bool FactorGraphFilter_Impl::addMisalignmentGuard(const string& sensor) {
-  GenericVertex<Eucl1DV> *v1 =
-      static_cast<GenericVertex<Eucl1DV> *>(_params[sensor + "_qOSx"]->getVertices(
-          0)->second);
-  GenericVertex<Eucl1DV> *v2 =
-      static_cast<GenericVertex<Eucl1DV> *>(_params[sensor + "_qOSy"]->getVertices(
-          0)->second);
-  GenericVertex<Eucl1DV> *v3 =
-      static_cast<GenericVertex<Eucl1DV> *>(_params[sensor + "_qOSz"]->getVertices(
-          0)->second);
-
-  MisalignmentGuard *g = new MisalignmentGuard(v1, v2, v3);
-
-  _optimizer->addPostIterationAction(g);
-
-  return true;
-}
-
 double FactorGraphFilter_Impl::getWindowLenght() {
   if (_initialPoseSet == false) {
     return 0.0;
@@ -2351,28 +2331,6 @@ void FactorGraphFilter_Impl::setWriteGraph(bool writeGraph) {
 void FactorGraphFilter_Impl::setWriteHessianStructure(
     bool writeHessianStructure) {
   _writeHessianStructure = writeHessianStructure;
-}
-
-FactorGraphFilter_Impl::MisalignmentGuard::MisalignmentGuard(
-    GenericVertex<Eucl1DV> *v1, GenericVertex<Eucl1DV> *v2,
-    GenericVertex<Eucl1DV> *v3) :
-    _v1(v1), _v2(v2), _v3(v3) {
-}
-
-g2o::HyperGraphAction* FactorGraphFilter_Impl::MisalignmentGuard::operator ()(
-    const g2o::HyperGraph* graph,
-    g2o::HyperGraphAction::Parameters* parameters) {
-
-  double norm = pow(_v1->estimate()(0), 2) + pow(_v2->estimate()(0), 2)
-      + pow(_v3->estimate()(0), 2);
-
-  if (norm > 1.0) {
-    _v1->estimate()(0) /= norm;
-    _v2->estimate()(0) /= norm;
-    _v3->estimate()(0) /= norm;
-  }
-
-  return this;
 }
 
 string FactorGraphFilter_Impl::writeVertexIdMap() {

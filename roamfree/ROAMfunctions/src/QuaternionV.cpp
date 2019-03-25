@@ -32,7 +32,10 @@ QuaternionVI::~QuaternionVI() {
 void QuaternionVI::oplus(Eigen::VectorXd& newx, const Eigen::VectorXd& dx_in) {
   Eigen::VectorXd x = newx;
 
-  Eigen::VectorXd dx = dx_in;
+  // scaling of the deltas according
+  // Eigen::VectorXd dx = dx_in;
+  Eigen::VectorXd dx(3);
+  dx = dx_in*0.01;
 
   // if norm([0, dx]) > 1 we have to normalize the increment
   double norm = std::pow(dx(0), 2) + std::pow(dx(1), 2) + std::pow(dx(2), 2);
