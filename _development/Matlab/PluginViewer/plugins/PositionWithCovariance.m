@@ -24,6 +24,11 @@ if flag == 1
     plotStd = false;
     if isfield(pluginConfig, 'plotStd')
         plotStd = pluginConfig.plotStd;
+        if isfield(pluginConfig, 'covarianceScaling')
+            covScaling = pluginConfig.covarianceScaling;
+        else
+            covScaling = 1.0;
+        end
     end
     
     %% decide about reference
@@ -36,7 +41,7 @@ if flag == 1
     if plotStd
         vars = x(:, 9+[1 7 12]);
         iv = find(vars(:,1) ~= inf);    
-        stds = sqrt(vars(iv,:))*0.001;    
+        stds = sqrt(vars(iv,:)*covScaling)*0.001;    
     end
     
     ttls = {'X','Y','Z'};

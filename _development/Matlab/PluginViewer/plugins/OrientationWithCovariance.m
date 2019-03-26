@@ -16,6 +16,11 @@ if flag == 1
     plotStd = false;
     if isfield(pluginConfig, 'plotStd')
         plotStd = pluginConfig.plotStd;
+        if isfield(pluginConfig, 'covarianceScaling')
+            covScaling = pluginConfig.covarianceScaling;
+        else
+            covScaling = 1.0;
+        end
     end
     
     %% decide about reference
@@ -31,7 +36,10 @@ if flag == 1
     if plotStd
         vars = x(:, 9+[16 19 21]);
         iv = find(vars(:,1) ~= inf);    
-        stds = sqrt(vars(iv,:))*0.01;    
+        stds = sqrt(vars(iv,:)*covScaling)*0.01; 
+        
+        qstds = [sqrt(1-sum(stds.^2,2)) stds];
+        rpystd = rad2deg(quat2euler(qstds));
     end
     
     ttls = {'roll','pitch','yaw'};
@@ -49,7 +57,7 @@ if flag == 1
         
         if plotStd
             yyaxis right
-            plot(x(iv,1)-t0,stds(:,j),'--');
+            plot(x(iv,1)-t0,rpystd(:,j),'--');
         end
         
         title(ttls{j})
