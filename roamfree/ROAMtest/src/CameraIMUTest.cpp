@@ -147,6 +147,8 @@ int main(int argc, char *argv[]) {
   f->getParameterByName("Camera_Cam_TD")->setFixed(false);
   f->getParameterByName("Camera_Cam_RD")->setFixed(false);
 
+  const Eigen::VectorXd &qos = f->getParameterByName("Camera_Cam_qOS")->getEstimate();
+  
   // generate 3D features on a sphere
   Eigen::Vector3d r; // vector that is rotated to generate features
   r << 10.0, 0.0, 0.0;

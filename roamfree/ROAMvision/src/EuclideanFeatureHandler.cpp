@@ -303,6 +303,9 @@ bool EuclideanFeatureHandler::initialize(const EuclideanTrackDescriptor &track,
 
   if (resGN != -1) {
     // test that the triangulated points lies in front of each camera
+    
+    const Eigen::VectorXd &qos = qOS_par->getEstimate();
+    
     for (auto it = track.zHistory.begin(); it != track.zHistory.end(); ++it) {
 
       Eigen::VectorXd testz(1); // it could be a double, but automated equation generation always works with vectors
@@ -311,13 +314,13 @@ bool EuclideanFeatureHandler::initialize(const EuclideanTrackDescriptor &track,
       if (it->second.pose->hasBeenEstimated()) {
         const Eigen::VectorXd & x = it->second.pose->getEstimate();
 
-// #       include "../../ROAMfunctions/generated/ImagePlaneProjection_testZ.cppready"
-// 
-//         if (testz(0) < 0) {
-//           cerr << "WARNING: point behind camera: z = " << testz(0) << ". Initialization failed" << endl;
-//           resGN = -1;
-//           break;
-//         }
+#       include "../../ROAMfunctions/generated/ImagePlaneProjection_testZ.cppready"
+
+        if (testz(0) < 0) {
+          cerr << "WARNING: point behind camera: z = " << testz(0) << ". Initialization failed" << endl;
+          resGN = -1;
+          break;
+        }
       }
     }
   }
