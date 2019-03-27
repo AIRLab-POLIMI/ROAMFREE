@@ -65,6 +65,7 @@ enum PriorEdgeTypes {
   Euclidean1DPrior,
   Euclidean2DPrior,
   Euclidean3DPrior,
+  QuaternionPrior,
   SE3Prior,
   FHPPriorOnHomogeneousPoint
 };

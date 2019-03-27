@@ -23,6 +23,7 @@ Contributors:
 #include "Eucl2DPriorEdge.h"
 #include "Eucl3DGaussMarkovProcessEdge.h"
 #include "Eucl3DPriorEdge.h"
+#include "QuaternionPriorEdge.h"
 #include "SE3PriorEdge.h"
 #include "Matrix3DPriorEdge.h"
 #include "FHPPriorOnHomogeneousPointEdge.h"

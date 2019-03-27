@@ -523,6 +523,9 @@ MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnConstantParameter(
   case Euclidean3DPrior:
     priorif = new Eucl3DPriorEdge;
     break;
+  case QuaternionPrior:
+    priorif = new QuaternionPriorEdge;
+    break;
   case SE3Prior:
     priorif = new SE3PriorEdge;
     break;
@@ -590,13 +593,16 @@ MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnTimeVaryingParamete
     break;
   case Euclidean3DPrior:
     priorif = new Eucl3DPriorEdge;
-    break;
+    break;    
   case SE3Prior:
     priorif = new SE3PriorEdge;
     break;
   case FHPPriorOnHomogeneousPoint:
     priorif = new FHPPriorOnHomogeneousPointEdge;
     break;
+  default:
+    cerr << "[FactorGraphFilter] Error: prior type not supported" << endl;
+    return MeasurementEdgeWrapper_Ptr();
   }
 
   g2o::OptimizableGraph::Edge *edge = priorif->getg2oOptGraphPointer();
