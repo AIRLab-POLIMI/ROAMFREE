@@ -8,7 +8,7 @@ toPlot = {};
 
 for i=1:length(F)
     if strncmp(F(i).name, pluginConfig.parameterName, length(pluginConfig.parameterName))
-        if ~strncmp(F(i).name(end-7:end),'proc.log',8)
+        if ~strncmp(F(i).name(end-7:end),'proc.log',8) && ~strcmp(F(i).name(end-3:end),'.txt')
             toPlot{end+1} = F(i).name;
         end
     end
