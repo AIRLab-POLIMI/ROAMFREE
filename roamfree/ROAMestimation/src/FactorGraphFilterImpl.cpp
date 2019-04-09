@@ -707,6 +707,15 @@ PoseVertex *FactorGraphFilter_Impl::addInterpolatingPose_i(double t,
 
   before = after;
   --before;
+  
+  if(after->second->getTimestamp() - t < 1e-6)
+  {
+    return after->second;
+  }
+  else if(t - before->second->getTimestamp() < 1e-6)
+  {
+    return before->second;
+  }
 
   PoseVertex *xi = addPose_i(t);
 
