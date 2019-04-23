@@ -72,6 +72,7 @@ bool EuclideanFeatureHandler::addFeatureObservation(long int id, double t,
 
   // time of the message must match the vertex found
   if (fabs(t - cur_frame->getTimestamp()) > _timestampOffsetTreshold) {
+    cerr << "[EuclideanFeatureHandler]: ERROR, frame too fare for feature " << id << endl;
     return false;
   }
 
@@ -81,8 +82,6 @@ bool EuclideanFeatureHandler::addFeatureObservation(long int id, double t,
   }
 # endif
 
-  const string &sensor = getFeatureParameterName(id);
-
   // this implicitly initialize the new track if it was not there
   EuclideanTrackDescriptor &d = _features[id];
 
@@ -91,80 +90,19 @@ bool EuclideanFeatureHandler::addFeatureObservation(long int id, double t,
     // add the current observation to history
     ObservationDescriptor &obs = d.zHistory[t];
     obs.pose = cur_frame;
-    obs.z = z;
     obs.t = t;
-
-    // TODO: if initialization is succesful
-    Eigen::VectorXd Lw(3);
+    obs.z = z;
+    obs.cov = cov;
 
     if (!dontInitialize && d.zHistory.size() >= 3) {
-      
-#   ifdef DEBUG_PRINT_VISION_INFO_MESSAGES
-    cerr << "[EuclideanFeatureHandler] Initializing track " << id << endl;
-#   endif
-
-      if (initialize(d, K_par->getEstimate(), Lw)) {
-
-        _filter->addSensor(sensor, ImagePlaneProjection, false, true);
-
-        // it does not work, there is no sensor called _sensorName + "_Cam"
-        // we have to share manually the parameters
-        // _filter->shareSensorFrame(_sensorName + "_Cam", sensor);
-
-        const string suffixes[] = { "_SO", "_qOS"};
-        for (int k = 0; k < 2; k++) {
-          _filter->shareParameter(_sensorName + "_Cam" + suffixes[k],
-              sensor + suffixes[k]);
-        }
-
-        // TODO: hardcoded
-        // do we want the robust kernel by default?
-
-        // considering a 1.5 sigma plus 1e6 scaling, threshold at 10 pix
-        // beta =  || err || / sigma
-        // where ||err|| is where we want the weight to start to decrease
-
-        // TODO: sigma is hardcoded
-        double beta = 5 / sqrt(1e8 * pow(0.8, 2));
-
-        _filter->setRobustKernel(sensor, true, beta);
-
-        // add parameter vertices
-
-        _filter->shareParameter(_sensorName + "_Cam_CM", sensor + "_CM");
-        _filter->shareParameter(_sensorName + "_Cam_RD", sensor + "_RD");
-        _filter->shareParameter(_sensorName + "_Cam_TD", sensor + "_TD");
-
-        _filter->addConstantParameter(Euclidean3D, sensor + "_Lw",
-            d.zHistory.begin()->first, Lw, false);
-
-        // add all the edges
-
-        for (auto it = d.zHistory.begin(); it != d.zHistory.end(); ++it) {
-          const ObservationDescriptor &obs = it->second;
-
-          MeasurementEdgeWrapper_Ptr ret = _filter->addMeasurement(sensor,
-              obs.t, obs.z, cov, obs.pose);
-
-          assert(ret);
-        }
-
-        // done
-        d.zHistory.clear();
-        d.isInitialized = true;
-
-#	ifdef DEBUG_PRINT_VISION_INFO_MESSAGES
-        cerr << "[EuclideanFeatureHandler] Ready to estimate depth for track " << id
-        << endl;
-#	endif
-
-        return true;
-      }
+      return initializeFeature_i(d, id);
     }
 
     return false;
 
   } else { // it has already been initialized, just add the measurement
+    const string &sensor = getFeatureParameterName(id);
+    
     MeasurementEdgeWrapper_Ptr ret = _filter->addMeasurement(sensor, t, z, cov,
         cur_frame);
 
@@ -172,6 +110,90 @@ bool EuclideanFeatureHandler::addFeatureObservation(long int id, double t,
   }
 
   return true;
+}
+
+bool EuclideanFeatureHandler::initializeFeature(long int id)
+{
+  auto it = _features.find(id);
+  if ( it != _features.end() ) {
+    return initializeFeature_i(it->second, id); 
+  } else {    
+    cerr << "[EuclideanFeatureHandler]: ERROR, feature " << id << " does not exist." << endl;
+    return false;
+  }  
+}
+
+bool EuclideanFeatureHandler::initializeFeature_i(EuclideanTrackDescriptor &d, long int id) {
+  if (d.isInitialized) {
+    cerr << "[EuclideanFeatureHandler] Feature " << id << " is already initialized " << endl;
+    return true;
+  }
+  
+# ifdef DEBUG_PRINT_VISION_INFO_MESSAGES
+    cerr << "[EuclideanFeatureHandler] Initializing track " << id << endl;
+# endif
+
+  // TODO: if initialization is succesful
+  Eigen::VectorXd Lw(3);
+    
+  if (initialize(d, K_par->getEstimate(), Lw)) {
+    
+    const string &sensor = getFeatureParameterName(id);
+
+    _filter->addSensor(sensor, ImagePlaneProjection, false, true);
+
+    // it does not work, there is no sensor called _sensorName + "_Cam"
+    // we have to share manually the parameters
+    // _filter->shareSensorFrame(_sensorName + "_Cam", sensor);
+
+    const string suffixes[] = { "_SO", "_qOS"};
+    for (int k = 0; k < 2; k++) {
+      _filter->shareParameter(_sensorName + "_Cam" + suffixes[k],
+	  sensor + suffixes[k]);
+    }
+
+    // TODO: hardcoded
+    // do we want the robust kernel by default?
+
+    // considering a 1.5 sigma plus 1e6 scaling, threshold at 10 pix
+    // beta =  || err || / sigma
+    // where ||err|| is where we want the weight to start to decrease
+
+    // TODO: sigma is hardcoded
+    double beta = 5 / sqrt(1e8 * pow(0.8, 2));
+
+    _filter->setRobustKernel(sensor, true, beta);
+
+    // add parameter vertices
+
+    _filter->shareParameter(_sensorName + "_Cam_CM", sensor + "_CM");
+    _filter->shareParameter(_sensorName + "_Cam_RD", sensor + "_RD");
+    _filter->shareParameter(_sensorName + "_Cam_TD", sensor + "_TD");
+
+    _filter->addConstantParameter(Euclidean3D, sensor + "_Lw", d.zHistory.begin()->first, Lw, false);
+
+    // add all the edges
+
+    for (auto it = d.zHistory.begin(); it != d.zHistory.end(); ++it) {
+      const ObservationDescriptor &obs = it->second;
+
+      MeasurementEdgeWrapper_Ptr ret = _filter->addMeasurement(sensor,
+	  obs.t, obs.z, obs.cov, obs.pose);
+
+      assert(ret);
+    }
+
+    // done
+    d.zHistory.clear();
+    d.isInitialized = true;
+
+#   ifdef DEBUG_PRINT_VISION_INFO_MESSAGES
+      cerr << "[EuclideanFeatureHandler] Ready to estimate depth for track " << id  << endl;
+#   endif
+
+    return true;
+  }
+  return false;
 }
 
 void EuclideanFeatureHandler::fixOlderPosesWRTVisibleFeatures() {
@@ -317,7 +339,7 @@ bool EuclideanFeatureHandler::initialize(const EuclideanTrackDescriptor &track,
 #       include "../../ROAMfunctions/generated/ImagePlaneProjection_testZ.cppready"
 
         if (testz(0) < 0) {
-          cerr << "WARNING: point behind camera: z = " << testz(0) << ". Initialization failed" << endl;
+          cerr << "[EuclideanFeatureHandler]: point behind camera: z = " << testz(0) << ". Initialization failed" << endl;
           resGN = -1;
           break;
         }

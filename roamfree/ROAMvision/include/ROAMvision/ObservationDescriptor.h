@@ -32,6 +32,7 @@ public:
 	double t;
 	ROAMestimation::PoseVertexWrapper_Ptr pose;
 	Eigen::Vector2d z;
+	Eigen::Matrix2d cov;
 
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 };
