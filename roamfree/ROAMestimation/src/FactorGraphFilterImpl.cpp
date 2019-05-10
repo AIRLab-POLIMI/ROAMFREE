@@ -2114,41 +2114,74 @@ void FactorGraphFilter_Impl::computeCrossCovariances() {
   list<pair<g2o::OptimizableGraph::Vertex *,g2o::OptimizableGraph::Vertex *>> verticePairs;
   vector<string> file_names;
   
-  for (auto p1_it = _params.begin(); p1_it != _params.end(); ++p1_it) {
-    boost::shared_ptr<ParameterVerticesManager> p1 = p1_it->second;
+ for (auto p1_it = _params.begin(); p1_it != _params.end(); ++p1_it) {
+     boost::shared_ptr<ParameterVerticesManager> p1 = p1_it->second;
     
-    if (p1->fixed() == false && p1->getCrossCovariance().size() > 0) {
+     if (p1->fixed() == false && p1->getCrossCovariance().size() > 0) {
       
-      const std::string &param_1_name = p1->_name;
-      
-      for (auto v_it = p1->_v.begin(); v_it != p1->_v.end(); ++v_it) {
-	
-        g2o::OptimizableGraph::Vertex *v1 = v_it->second;
-	
-        if (v1->tempIndex() >= 0) { //there might be parameters not involved in current estimation	  
-	  
-	  const std::list<ParameterWrapper_Ptr> &tmp_list = p1->getCrossCovariance();	  
+         const std::string &param_1_name = p1->_name;
+         
+         
+         int iter_self_1 = 0;
+         for(auto v_it = p1->_v.begin(); v_it != p1->_v.end(); ++v_it) {
+             
+            g2o::OptimizableGraph::Vertex *v1 = v_it->second; 
+           
+            if (v1->tempIndex() >= 0) {
+                
+                int iter_self_2 = 0;
+                for(auto v2_it = p1->_v.begin(); v2_it != p1->_v.end(); ++v2_it) {
+                
+                    g2o::OptimizableGraph::Vertex *v2 = v2_it->second;
+                    if(v2->tempIndex()>=0){
+                        
+                        if(v2->tempIndex() > v1->tempIndex()) {
+                            file_names.emplace_back(param_1_name+"_"+param_1_name+"("+to_string(iter_self_1)+","+to_string(iter_self_2)+")");
+                            blockIndices.push_back(pair<int, int>(v1->tempIndex(), v2->tempIndex()));
+                            verticePairs.push_back(pair<g2o::OptimizableGraph::Vertex *,g2o::OptimizableGraph::Vertex *>(v1,v2));                           
+                        }
+                        iter_self_2++;
+                    }
+                }
+                
+                iter_self_1++;
+            }
+           
+         }
+         
+         
+         
+         const std::list<ParameterWrapper_Ptr> &tmp_list = p1->getCrossCovariance();	  
 
-	  for( auto p2_it = tmp_list.begin(); p2_it !=tmp_list.end(); ++p2_it) {
+         for( auto p2_it = tmp_list.begin(); p2_it !=tmp_list.end(); ++p2_it) {
+          
+             ParameterVerticesManager *pvm = boost::static_pointer_cast<ParameterWrapper_Impl>(*p2_it)->_param;
 	    
-	    ParameterVerticesManager *pvm = boost::static_pointer_cast<ParameterWrapper_Impl>(*p2_it)->_param;
-	    
-	    const std::string &param_2_name = pvm->_name;	   	   
-	    file_names.emplace_back(param_1_name+"_"+param_2_name);
-	    
-	    for (auto v2_it = pvm->_v.begin(); v2_it != pvm->_v.end(); ++v2_it) {
-	      
-	      g2o::OptimizableGraph::Vertex *v2 = v2_it->second;
-	      if(v2->tempIndex() >=0) {
-		blockIndices.push_back(pair<int, int>(v1->tempIndex(), v2->tempIndex()));
-		verticePairs.push_back(pair<g2o::OptimizableGraph::Vertex *,g2o::OptimizableGraph::Vertex *>(v1,v2));
-	      }
-	      
-	    }	   
-	  }	 
-        }
-      }
-    }
+             const std::string &param_2_name = pvm->_name;	   	   
+             int iter_1 =0;
+             for (auto v_it = p1->_v.begin(); v_it != p1->_v.end(); ++v_it) {
+	
+                 g2o::OptimizableGraph::Vertex *v1 = v_it->second;
+                
+                 if (v1->tempIndex() >= 0) { //there might be parameters not involved in current estimation	  
+                    
+                     int iter_2 = 0;
+                     for (auto v2_it = pvm->_v.begin(); v2_it != pvm->_v.end(); ++v2_it) {
+                        
+                         g2o::OptimizableGraph::Vertex *v2 = v2_it->second;
+                         if(v2->tempIndex() >=0) {
+                             file_names.emplace_back(param_1_name+"_"+param_2_name+"("+to_string(iter_1)+","+to_string(iter_2)+")");
+                             blockIndices.push_back(pair<int, int>(v1->tempIndex(), v2->tempIndex()));
+                             verticePairs.push_back(pair<g2o::OptimizableGraph::Vertex *,g2o::OptimizableGraph::Vertex *>(v1,v2));
+                             iter_2++;
+                         }	      
+                     }
+                     
+                     iter_1++;
+                 }	 
+             }
+         }
+     }
   }
   
   // compute the marginals
@@ -2156,7 +2189,7 @@ void FactorGraphFilter_Impl::computeCrossCovariances() {
     // there are no marginals to compute
     return;
   }
-  
+  cerr<<" * Writing the cross covariance ......"<<endl;
   Eigen::IOFormat CSVFormat(6.0, 0, ", ", "\n","","","","");
   g2o::SparseBlockMatrix<Eigen::MatrixXd> spinv;
   _optimizer->computeMarginals(spinv, blockIndices);
