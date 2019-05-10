@@ -42,6 +42,10 @@ class EuclideanFeatureHandler: public ImageFeatureHandler {
             Eigen::VectorXd::Zero(2));
     virtual bool addFeatureObservation(long int id, double t,
         const Eigen::VectorXd &z, const Eigen::MatrixXd &cov, bool dontInitialize = true);
+    
+    virtual bool initializeFeature(long int id);
+    
+    virtual bool initializeFeature_i(EuclideanTrackDescriptor &d, long int id);
 
     virtual bool getFeaturePositionInWorldFrame(long int id,
         Eigen::VectorXd &lw) const;
