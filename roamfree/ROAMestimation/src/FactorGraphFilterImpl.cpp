@@ -2205,7 +2205,7 @@ void FactorGraphFilter_Impl::computeCrossCovariances() {
     auto v2 = v_it->second;
     auto gg = spinv.block((v1)->tempIndex(), (v2)->tempIndex());
     
-    ofstream crossCorrFile("/tmp/roamfree/"+file_names[iter]+".txt");
+    ofstream crossCorrFile(_logFolder+"/"+file_names[iter]+".txt");
     crossCorrFile << gg->format(CSVFormat) ;
     crossCorrFile.close();
     iter ++;
