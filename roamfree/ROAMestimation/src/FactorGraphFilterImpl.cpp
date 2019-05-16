@@ -1751,6 +1751,8 @@ bool FactorGraphFilter_Impl::estimate_i(g2o::HyperGraph::EdgeSet &eset,
 
 // ----------- END
 
+  _optimizer->_statistics = new g2o::G2OBatchStatistics[nIterations];
+
   _optimizer->initializeOptimization(eset);
 
   if (_writeHessianStructure == true) {
@@ -1768,9 +1770,9 @@ bool FactorGraphFilter_Impl::estimate_i(g2o::HyperGraph::EdgeSet &eset,
 
   bool ret = _optimizer->optimize(nIterations) || nIterations == 0;
   if (ret == false) {
-# 	ifdef DEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES
+#   ifdef DEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES
     cerr << "[FactorGraphFilter] Error: estimation failed." << endl;
-# 	endif
+#   endif
 
     return false;
   }
@@ -1799,6 +1801,10 @@ bool FactorGraphFilter_Impl::estimate_i(g2o::HyperGraph::EdgeSet &eset,
   ftStats << (tInitialized - tStart) << ", " << (tOptimized - tInitialized)
       << ", " << (tCovariancesAndSpatial - tOptimized) << ", "
       << (tLogging - tCovariancesAndSpatial) << endl;
+      
+# ifdef DEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES      
+  std::cerr << _optimizer->_statistics[nIterations-1] << std::endl;
+# endif  
 
   return true;
 }
