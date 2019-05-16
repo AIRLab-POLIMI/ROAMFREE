@@ -65,8 +65,8 @@ for i = 1:length(pluginConfig.parameters)
                
                cross_corr_file_name =  strcat(globalConfig.logPath, pluginConfig.parameters(i).name,'_', pluginConfig.parameters(j).name,'(',num2str(a-1),',',num2str(b-1),').txt');
                 
-               if(~isfile(cross_corr_file_name))
-                   cross_corr_file_name =  strcat(globalConfig.logPath, pluginConfig.parameters(j).name,'_', pluginConfig.parameters(i).name,'(',num2str(a-1),',',num2str(b-1),').txt');
+               if ~exist(cross_corr_file_name, 'file')
+                   cross_corr_file_name =  strcat(globalConfig.logPath, pluginConfig.parameters(j).name,'_', pluginConfig.parameters(i).name,'(',num2str(b-1),',',num2str(a-1),').txt');
                    tmp_block =  load(cross_corr_file_name); 
                    tmp_block =  tmp_block';
                    
