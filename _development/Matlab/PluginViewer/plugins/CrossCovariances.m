@@ -63,7 +63,17 @@ for i = 1:length(pluginConfig.parameters)
            
             for b=1:1:n_v_2
                
-               tmp_block =  load(strcat(globalConfig.logPath, pluginConfig.parameters(i).name,'_', pluginConfig.parameters(j).name,'(',num2str(a-1),',',num2str(b-1),').txt')); 
+               cross_corr_file_name =  strcat(globalConfig.logPath, pluginConfig.parameters(i).name,'_', pluginConfig.parameters(j).name,'(',num2str(a-1),',',num2str(b-1),').txt');
+                
+               if(~isfile(cross_corr_file_name))
+                   cross_corr_file_name =  strcat(globalConfig.logPath, pluginConfig.parameters(j).name,'_', pluginConfig.parameters(i).name,'(',num2str(a-1),',',num2str(b-1),').txt');
+                   tmp_block =  load(cross_corr_file_name); 
+                   tmp_block =  tmp_block';
+                   
+               else
+                   tmp_block =  load(cross_corr_file_name); 
+               end
+               
                blocks{i,j}(thsz*(a-1)+1:thsz*a,tvsz*(b-1)+1:tvsz*b) = tmp_block;
                blocks{j,i}(tvsz*(b-1)+1:tvsz*b,thsz*(a-1)+1:thsz*a) = tmp_block'; 
                
