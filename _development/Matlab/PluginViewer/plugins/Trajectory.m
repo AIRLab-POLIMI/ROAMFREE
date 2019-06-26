@@ -53,7 +53,7 @@ if flag == 1
     subplot('Position', squeezeArea(area,0.02))
     hold on       
 
-    plot3(x(i,3)-x0,x(i,4)-y0,x(i,5)-z0,'m');
+    plot3(x(i,3)-x0,x(i,4)-y0,x(i,5)-z0,'Color', [0 0.4470 0.7410]);
     plot3(x(1:i(1),3)-x0,x(1:i(1),4)-y0,x(1:i(1),5)-z0,'k');
     xlabel('E [m]');
     ylabel('N [m]');
@@ -68,7 +68,7 @@ if flag == 1
     if size(gT,1) > 0
         igt = find(gT(:,1) >= x(1,1) & gT(:,1) <= x(end,1));
         if (size(igt,1) > 0)
-            plot3(gT(igt,2)-x0, gT(igt,3)-y0, gT(igt,4)-z0,'-')   
+            plot3(gT(igt,2)-x0, gT(igt,3)-y0, gT(igt,4)-z0,'-', 'Color', [0.6350 0.0780 0.1840])   
         end
     end
     
@@ -79,32 +79,61 @@ if flag == 1
             [e, flag] = stubbornLoad(edgef);
 
             if flag == 1
-                plot3(e(:,23)-x0, e(:,24)-y0, e(:,25)-z0,'rx');
+                plot3(e(:,23)-x0, e(:,24)-y0, e(:,25)-z0,'x', 'Color', [0.8500 0.3250 0.0980]);
 
                 %plot predicted
-                plot3(e(:,23)+e(:,26)-x0, e(:,24)+e(:,27)-y0, e(:,25)+e(:,28)-z0,'bo');
+                % plot3(e(:,23)+e(:,26)-x0, e(:,24)+e(:,27)-y0, e(:,25)+e(:,28)-z0,'bo');
             end
         end
     end
+    
+    iT = []; % image timestamps
+    Lw = []; % landmarks
     
     if isfield(pluginConfig, 'euclideanFeatureSensors')
         F = dir(globalConfig.logPath);
         
         for i = 1:length(F)            
-            % assume it is a _Lw log, get feature id
-            n = sscanf(F(i).name(length(pluginConfig.euclideanFeatureSensors)+6:end), '%d');
             
-            parf = sprintf('%s_feat%d_Lw.log', pluginConfig.euclideanFeatureSensors, n);          
-            
-            if (strcmp(F(i).name, parf)== true)                 
-                [p, flag] = stubbornLoad([globalConfig.logPath parf]);
+            % if it is a landmark position parameter
+            if (length(F(i).name) > 7 && strcmp(F(i).name(end-6:end), '_Lw.log'))                
+                % get feature id
+                n = sscanf(F(i).name(length(pluginConfig.euclideanFeatureSensors)+6:end), '%d');
                 
-                if flag == 1 && size(p,1) > 0 % sometimes I got an empty p
-                    plot3(p(1,3)-x0,p(1,4)-y0,p(1,5)-z0,'b.');
-%                     text(p(1,3)-x0,p(1,4)-y0,p(1,5)-z0,sprintf('%d',n));
-                end                
+                parf = sprintf('%s/%s_feat%d_Lw.log', globalConfig.logPath, pluginConfig.euclideanFeatureSensors, n);                
+                obsf = sprintf('%s/%s_feat%d.log', globalConfig.logPath, pluginConfig.euclideanFeatureSensors, n);
+                
+                p = load(parf);
+
+                Lw = [Lw; [p(1,3)-x0,p(1,4)-y0,p(1,5)-z0] ];
+                
+                if exist(obsf, 'file')
+                    o = load(obsf);
+                    iT = [iT; o(:,1)];
+                end
             end            
         end
+        
+        iT = unique(iT);
+        
+        % find the poses that match the image timestamps
+        ipT = zeros(length(iT),1);
+        jT = 1;
+        for j = 1:size(x,1)
+            if (abs(x(j,1)-iT(jT)) < 1e-6)
+                ipT(jT) = j;
+                jT = jT + 1;
+                if jT > length(iT)
+                    break
+                end
+            end
+        end
+        
+        % plot trigger points
+        plot3(x(ipT,3)-x0, x(ipT,4)-y0, x(ipT,5), 'o', 'MarkerEdgeColor', [0.4940 0.1840 0.5560], 'MarkerFaceColor', [0.4940 0.1840 0.5560]);
+        
+        % plot landmakrs all together
+        plot3(Lw(:,1), Lw(:,2), Lw(:,3), '.', 'Color', [0.85 0.85 0.85]);
     end
 
     if isfield(pluginConfig, 'FHPFeatureSensors')
