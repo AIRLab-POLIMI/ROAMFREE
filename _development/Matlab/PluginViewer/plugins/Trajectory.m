@@ -43,7 +43,7 @@ if flag == 1
     
     %% decide about orientation plot
     
-    orstep = 20;
+    orstep = nan;
     if isfield(pluginConfig, 'drawOrientationEvery')
         orstep = pluginConfig.drawOrientationEvery;
     end
@@ -59,8 +59,10 @@ if flag == 1
     ylabel('N [m]');
     zlabel('U [m]');
 
-    for j = 1:orstep:size(x,1)
-      plotAxis(x(j,3:5)'-[x0 y0 z0]',x(j,6:9),pluginConfig.axesLenght)       
+    if ~isnan(orstep)
+        for j = 1:orstep:size(x,1)
+          plotAxis(x(j,3:5)'-[x0 y0 z0]',x(j,6:9),pluginConfig.axesLenght)       
+        end
     end
     
     if size(gT,1) > 0
