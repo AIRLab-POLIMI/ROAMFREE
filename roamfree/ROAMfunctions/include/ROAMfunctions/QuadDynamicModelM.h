@@ -68,7 +68,8 @@ public:
 		const static int _OFF = -1;
 
 #   include "generated/QuadDynamicModel_Err.cppready"
-
+        
+        err.tail(3) << 0,0,0;
 		return false;
 	}
 

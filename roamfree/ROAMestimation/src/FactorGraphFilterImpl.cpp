@@ -236,6 +236,9 @@ bool FactorGraphFilter_Impl::addSensor(const string& name, MeasTypes type,
   case QuadDynamicModel:
       s.order = QuadDynamicModelM::_ORDER;
       break;
+  case PlaneDynamicModel:
+      s.order = PlaneDynamicModelM::_ORDER;
+      break;
   default:
     cerr << "[FactorGraphFilter] Error: unknown measurement type" << endl;
     break;
@@ -1312,6 +1315,9 @@ GenericEdgeInterface *FactorGraphFilter_Impl::addMeasurement_i(
   case GenericOdometer:
     e = new QuaternionGenericEdge<GenericOdometerM>;
     break;
+  case PlaneDynamicModel:
+    e = new QuaternionGenericEdge<PlaneDynamicModelM>;
+    break;
   case Displacement:
     e = new QuaternionGenericEdge<DisplacementM>;
     break;
@@ -1354,6 +1360,7 @@ GenericEdgeInterface *FactorGraphFilter_Impl::addMeasurement_i(
   case QuadDynamicModel:
       e = new QuaternionGenericEdge<QuadDynamicModelM>;
       break;
+    
   default:
     cerr << "[FactorGraphFilter] Error: unknown measurement type" << endl;
     return NULL;

@@ -26,5 +26,7 @@ Contributors:
 #include "Eucl3DV.h"
 #include "MagParamsV.h"
 #include "Matrix3DV.h"
+#include "PlaneDynamicModelM.h"
+#include "PlaneDynamicModelParamsV.h"
 
 #endif /* ALLVARIABLES_H_ */
