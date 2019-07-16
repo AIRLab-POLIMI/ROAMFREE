@@ -15,14 +15,28 @@ close all
 figure(1)
 set(1,'OuterPosition', config.global.figureOuterPosition)
 
-%% run
+%% if a compressed log file is given 
 
-global stopAll
+if isfield(config.global, 'logFile')
+    if exist('/tmp/log', 'file') == 7  
+        rmdir('/tmp/log', 's');
+    end
+    
+    mkdir('/tmp/log');
+    fprintf('* uncompressing ... ');
+    system(['tar xzf ''' config.global.logFile ''' -C /tmp/log']);
+    fprintf('done\n');
 
-stopAll = 1;
-pause(1);   
-stopAll = 0;
+    config.global.logPath = '/tmp/log/';
+    
+    runPlugins(config)
+else
+    global stopAll
 
-watchFile(config);
+    stopAll = 1;
+    pause(1);   
+    stopAll = 0;
 
+    watchFile(config);
+end
     
