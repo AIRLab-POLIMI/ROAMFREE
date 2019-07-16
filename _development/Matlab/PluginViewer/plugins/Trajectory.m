@@ -1,5 +1,9 @@
 function Trajectory(area, globalConfig, pluginConfig)
 
+%% TODO:
+% apply transform to orientations
+% apply transform to gT
+
 %% initialize local gT variable
 
 persistent gT;
@@ -20,12 +24,10 @@ end
 posef = [globalConfig.logPath 'PoseSE3(W).log'];
 [x, flag] = stubbornLoad(posef);
 
-if flag == 1
+if flag == 1 
     
-    
-    x = sortByT(x);
-    
-    i = find(x(:,2) == max(x(:,2)));
+    x = sortByT(x);    
+    i = find(x(:,2) == max(x(:,2))); % select the active part during last estimation
 
     %% decide about position shift
     
@@ -39,6 +41,13 @@ if flag == 1
            y0 = x(i(1),4);
            z0 = x(i(1),5);        
         end
+    end
+    
+    %% decide if I have to apply a global transformation
+    if isfield(pluginConfig, 'applyTransform')
+        T = pluginConfig.applyTransform;   
+        tmp = (T*[x(:,3:5)'; ones(1, size(x,1))])';
+        x(:,3:5) = tmp(:,1:3);
     end
     
     %% decide about orientation plot
@@ -79,6 +88,13 @@ if flag == 1
             [e, flag] = stubbornLoad(edgef);
 
             if flag == 1
+                
+                if isfield(pluginConfig, 'applyTransform')
+                    T = pluginConfig.applyTransform;        
+                    tmp = (T*[e(:,23:25)'; ones(1, size(e,1))])';
+                    e(:,23:25) = tmp(:,1:3);
+                end
+                
                 plot3(e(:,23)-x0, e(:,24)-y0, e(:,25)-z0,'x', 'Color', [0.8500 0.3250 0.0980]);
 
                 %plot predicted
@@ -89,9 +105,10 @@ if flag == 1
     
     iT = []; % image timestamps
     Lw = []; % landmarks
+    Lw_gcps = []; % gcp
     
     if isfield(pluginConfig, 'euclideanFeatureSensors')
-        F = dir(globalConfig.logPath);
+        F = dir(globalConfig.logPath);        
         
         for i = 1:length(F)            
             
@@ -104,8 +121,12 @@ if flag == 1
                 obsf = sprintf('%s/%s_feat%d.log', globalConfig.logPath, pluginConfig.euclideanFeatureSensors, n);
                 
                 p = load(parf);
-
-                Lw = [Lw; [p(1,3)-x0,p(1,4)-y0,p(1,5)-z0] ];
+                
+                if n < 1000
+                    Lw_gcps = [Lw_gcps; [p(1,3)-x0,p(1,4)-y0,p(1,5)-z0] ];
+                else
+                    Lw = [Lw; [p(1,3)-x0,p(1,4)-y0,p(1,5)-z0] ];
+                end
                 
                 if exist(obsf, 'file')
                     o = load(obsf);
@@ -133,7 +154,17 @@ if flag == 1
         plot3(x(ipT,3)-x0, x(ipT,4)-y0, x(ipT,5), 'o', 'MarkerEdgeColor', [0.4940 0.1840 0.5560], 'MarkerFaceColor', [0.4940 0.1840 0.5560]);
         
         % plot landmakrs all together
-        plot3(Lw(:,1), Lw(:,2), Lw(:,3), '.', 'Color', [0.85 0.85 0.85]);
+        if isfield(pluginConfig, 'applyTransform')
+            T = pluginConfig.applyTransform;        
+            tmp = (T*[Lw'; ones(1, size(Lw,1))])';
+            Lw = tmp(:,1:3);
+            
+            tmp = (T*[Lw_gcps'; ones(1, size(Lw_gcps,1))])';
+            Lw_gcps = tmp(:,1:3);
+        end
+        
+        plot3(Lw(:,1), Lw(:,2), Lw(:,3), '.', 'Color', [0.75 0.75 0.75]);
+        plot3(Lw_gcps(:,1), Lw_gcps(:,2), Lw_gcps(:,3), '^', 'MarkerEdgeColor', [0.8500, 0.3250, 0.0980], 'MarkerFaceColor', [0.8500, 0.3250, 0.0980]);
     end
 
     if isfield(pluginConfig, 'FHPFeatureSensors')
