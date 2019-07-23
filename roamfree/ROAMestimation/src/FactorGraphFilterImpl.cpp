@@ -397,7 +397,7 @@ ParameterWrapper_Ptr FactorGraphFilter_Impl::addLimitedBandwithParameter(
     ParameterTypes type, const string& name, const Eigen::VectorXd& x0,
     bool isFixed, double bandwith, int a) {
 
-  if (type != Euclidean3D && type != Euclidean1D && type != Euclidean2D) {
+  if (type != Euclidean3D && type != Euclidean1D && type != Euclidean2D && type!=Euclidean4D) {
     cerr
         << "[FactorGraphFilter] Error: currently, only EuclideanXD limited bandwidth parameters are supported"
         << endl;
@@ -425,7 +425,7 @@ ParameterWrapper_Ptr FactorGraphFilter_Impl::addLinearlyInterpolatedParameter(
     ParameterTypes type, const std::string& name, const Eigen::VectorXd& x0,
     bool isFixed, double spacing) {
 
-  if (type != Euclidean3D && type != Euclidean1D && type != Euclidean2D) {
+  if (type != Euclidean3D && type != Euclidean1D && type != Euclidean2D && type!=Euclidean4D) {
     cerr
         << "[FactorGraphFilter] Error: currently, only EuclideanXD linearly interpolated parameters are supported"
         << endl;
@@ -525,6 +525,9 @@ MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnConstantParameter(
     break;
   case Euclidean3DPrior:
     priorif = new Eucl3DPriorEdge;
+    break;
+  case Euclidean4DPrior:
+    priorif = new Eucl4DPriorEdge;
     break;
   case QuaternionPrior:
     priorif = new QuaternionPriorEdge;

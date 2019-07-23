@@ -24,6 +24,7 @@ Contributors:
 #include "Eucl1DV.h"
 #include "Eucl2DV.h"
 #include "Eucl3DV.h"
+#include "Eucl4DV.h"
 #include "MagParamsV.h"
 #include "Matrix3DV.h"
 #include "PlaneDynamicModelM.h"

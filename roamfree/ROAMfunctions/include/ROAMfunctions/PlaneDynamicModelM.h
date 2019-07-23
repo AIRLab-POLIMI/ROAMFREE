@@ -29,7 +29,7 @@ public:
   static const bool _usedComponents[];
 
   static const std::string _paramsNames[];
-  static const int _nParams = 4;
+  static const int _nParams = 14;
 
   static const unsigned int _ORDER = 2;
 
@@ -58,10 +58,20 @@ public:
   bool error(const Eigen::VectorXd &x, double **params,
       const Eigen::VectorXd& z, Eigen::MatrixBase<T> const &const_ret) {
 
-    Eigen::Map<Eigen::Matrix<double, 3, 1> > set1(params[0]);
-    Eigen::Map<Eigen::Matrix<double, 30, 1> > set2(params[1]);
-    Eigen::Map<Eigen::Matrix<double, 3, 1> > wind(params[2]);
-    Eigen::Map<Eigen::Matrix<double, 1, 1> > gravity(params[3]);
+    Eigen::Map<Eigen::Matrix<double, 3, 1> > airDensity(params[0]);
+    Eigen::Map<Eigen::Matrix<double, 3, 1> > fThrust(params[1]);
+    Eigen::Map<Eigen::Matrix<double, 4, 1> > fDrag(params[2]);
+    Eigen::Map<Eigen::Matrix<double, 1, 1> > fLat(params[3]);
+    Eigen::Map<Eigen::Matrix<double, 2, 1> > fLift(params[4]);
+    Eigen::Map<Eigen::Matrix<double, 4, 1> > mRoll(params[5]);
+    Eigen::Map<Eigen::Matrix<double, 4, 1> > mPitch(params[6]);
+    Eigen::Map<Eigen::Matrix<double, 3, 1> > mYaw(params[7]);
+    Eigen::Map<Eigen::Matrix<double, 1, 1> > cBar(params[8]);
+    Eigen::Map<Eigen::Matrix<double, 4, 1> > cp(params[9]);
+    Eigen::Map<Eigen::Matrix<double, 3, 1> > ibd(params[10]);
+    Eigen::Map<Eigen::Matrix<double, 3, 1> > ibod(params[11]);
+    Eigen::Map<Eigen::Matrix<double, 3, 1> > wind(params[12]);
+    Eigen::Map<Eigen::Matrix<double, 1, 1> > gravity(params[13]);
 
 
     Eigen::MatrixBase<T> & err = const_cast<Eigen::MatrixBase<T>&>(const_ret);
@@ -93,10 +103,20 @@ public:
       const Eigen::VectorXd& z, int wrt,
       Eigen::MatrixBase<T> const &const_ret) {
 
-    Eigen::Map<Eigen::Matrix<double, 3, 1> > set1(params[0]);
-    Eigen::Map<Eigen::Matrix<double, 30, 1> > set2(params[1]);
-    Eigen::Map<Eigen::Matrix<double, 3, 1> > wind(params[2]);
-    Eigen::Map<Eigen::Matrix<double, 1, 1> > gravity(params[3]);
+    Eigen::Map<Eigen::Matrix<double, 3, 1> > airDensity(params[0]);
+    Eigen::Map<Eigen::Matrix<double, 3, 1> > fThrust(params[1]);
+    Eigen::Map<Eigen::Matrix<double, 4, 1> > fDrag(params[2]);
+    Eigen::Map<Eigen::Matrix<double, 1, 1> > fLat(params[3]);
+    Eigen::Map<Eigen::Matrix<double, 2, 1> > fLift(params[4]);
+    Eigen::Map<Eigen::Matrix<double, 4, 1> > mRoll(params[5]);
+    Eigen::Map<Eigen::Matrix<double, 4, 1> > mPitch(params[6]);
+    Eigen::Map<Eigen::Matrix<double, 3, 1> > mYaw(params[7]);
+    Eigen::Map<Eigen::Matrix<double, 1, 1> > cBar(params[8]);
+    Eigen::Map<Eigen::Matrix<double, 4, 1> > cp(params[9]);
+    Eigen::Map<Eigen::Matrix<double, 3, 1> > ibd(params[10]);
+    Eigen::Map<Eigen::Matrix<double, 3, 1> > ibod(params[11]);
+    Eigen::Map<Eigen::Matrix<double, 3, 1> > wind(params[12]);
+    Eigen::Map<Eigen::Matrix<double, 1, 1> > gravity(params[13]);
 
     Eigen::MatrixBase<T> & J = const_cast<Eigen::MatrixBase<T>&>(const_ret);
 
@@ -154,21 +174,80 @@ public:
       break;
     }
 
-    case 1: // jacobian wrt set1
+    case 1: // jacobian wrt AirDensity
     {
-#  	include "generated/PlaneDynamicModel_JErrSet1.cppready"
+#  	include "generated/PlaneDynamicModel_JErrAirDensity.cppready"
       return true;
       break;
     }
 
-    case 2: // jacobian wrt set2
+    case 2: // jacobian wrt FThrust
     {
-#  	include "generated/PlaneDynamicModel_JErrSet2.cppready"
+#  	include "generated/PlaneDynamicModel_JErrFThrust.cppready"
       return true;
       break;
     }
-
-    case 3: // jacobian wrt wind
+    case 3: // jacobian wrt FDrag
+    {
+#  	include "generated/PlaneDynamicModel_JErrFDrag.cppready"
+      return true;
+      break;
+    }
+    case 4: // jacobian wrt FLat
+    {
+#  	include "generated/PlaneDynamicModel_JErrFLat.cppready"
+      return true;
+      break;
+    }
+    case 5: // jacobian wrt FLift
+    {
+#  	include "generated/PlaneDynamicModel_JErrFLift.cppready"
+      return true;
+      break;
+    }
+    case 6: // jacobian wrt MRoll
+    {
+#  	include "generated/PlaneDynamicModel_JErrMRoll.cppready"
+      return true;
+      break;
+    }
+    case 7: // jacobian wrt MPitch
+    {
+#  	include "generated/PlaneDynamicModel_JErrMPitch.cppready"
+      return true;
+      break;
+    }
+    case 8: // jacobian wrt MYaw
+    {
+#  	include "generated/PlaneDynamicModel_JErrMYaw.cppready"
+      return true;
+      break;
+    }
+    case 9: // jacobian wrt CBar
+    {
+#  	include "generated/PlaneDynamicModel_JErrCBar.cppready"
+      return true;
+      break;
+    }
+    case 10: // jacobian wrt Cp
+    {
+#  	include "generated/PlaneDynamicModel_JErrCp.cppready"
+      return true;
+      break;
+    }
+    case 11: // jacobian wrt Ibd
+    {
+#  	include "generated/PlaneDynamicModel_JErrIbd.cppready"
+      return true;
+      break;
+    }
+    case 12: // jacobian wrt Ibod
+    {
+#  	include "generated/PlaneDynamicModel_JErrIbod.cppready"
+      return true;
+      break;
+    }
+    case 13: // jacobian wrt wind
     {
 #   include "generated/PlaneDynamicModel_JErrWind.cppready"
       return true;
