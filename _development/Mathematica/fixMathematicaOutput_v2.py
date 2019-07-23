@@ -91,7 +91,7 @@ def fixMathFunctions(l):
 	
 	#pi
 	l = re.sub('Pi', 'M_PI', l)  
-	
+	l = re.sub('mM_PItch', 'mPitch', l) 
 	
 	# we have to swap the two arguments of the ArcTan because of odd Mathematica conventions
 
