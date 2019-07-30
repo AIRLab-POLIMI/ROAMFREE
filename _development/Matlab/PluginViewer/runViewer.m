@@ -18,6 +18,10 @@ set(1,'OuterPosition', config.global.figureOuterPosition)
 %% if a compressed log file is given 
 
 if isfield(config.global, 'logFile')
+    if ~exist(config.global.logFile, 'file')
+        error('* Error: %s does not exist', config.global.logFile);        
+    end
+    
     if exist('/tmp/log', 'file') == 7  
         rmdir('/tmp/log', 's');
     end
