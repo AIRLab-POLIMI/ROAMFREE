@@ -101,6 +101,19 @@ subplot('Position', squeezeArea(area,0.05))
 
 imshow(corr, 'initialMagnification', 'fit');
 
+% generate labels
+
+lbls = {};
+for i = 1:length(pluginConfig.parameters)    
+    id = sscanf(pluginConfig.parameters(i).name, 'Camera_feat%d_Lw');
+    if ~isempty(id)
+        lbls{end+1} = sprintf('%d',id);
+    else
+        idx = find(pluginConfig.parameters(i).name=='_',1,'last');
+        lbls{end+1} = pluginConfig.parameters(i).name(idx+1:end);
+    end
+end
+
 % generate ticks
 
 tks = zeros(size(blocks,1),1);
@@ -119,8 +132,12 @@ a.YTickLabelRotation = 90;
 a.TickLabelInterpreter = 'none';
 a.XTick = tks;
 a.YTick = tks;
-a.XTickLabel = {pluginConfig.parameters.name};
-a.YTickLabel = {pluginConfig.parameters.name};
+
+% a.XTickLabel = {pluginConfig.parameters.name};
+% a.YTickLabel = {pluginConfig.parameters.name};
+a.XTickLabel = lbls;
+a.YTickLabel = lbls;
+
 
 x = 0.5;
 for i = 1:size(blocks,2)

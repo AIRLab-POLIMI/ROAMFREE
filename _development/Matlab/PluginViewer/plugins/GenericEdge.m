@@ -29,7 +29,7 @@ if exist(edgef, 'file')
         
         yl = max(std(err));
         
-        title([pluginConfig.sensorName ' residual']);        
+        title([pluginConfig.sensorName ' res']);        
         
         xlim([0, edge(end,1)-edge(1,1)])
         ylim([-3*yl-eps 3*yl+eps]);
@@ -52,7 +52,7 @@ if exist(edgef, 'file')
             meas = edge(:,23:(23+pluginConfig.measureSize-1));
             plot(edge(:,1), meas);
             
-            title([pluginConfig.sensorName ' measurement']);
+%             title([pluginConfig.sensorName ' z']);
         
             axis tight           
             grid on

@@ -19,7 +19,7 @@ for i = 1:length(F)
     % assume it is a Euclidean feature edge log, get feature id
     F(i).name(length(pluginConfig.sensorName)+6:end);
     n = sscanf(F(i).name(length(pluginConfig.sensorName)+6:end), '%d');
-
+    
     parf = sprintf('%s_feat%d.log', pluginConfig.sensorName, n);    
     
     if (strcmp(F(i).name, parf)== true)
@@ -37,13 +37,13 @@ for i = 1:length(F)
             subplot('Position', squeezeArea([area(1:3) area(4)*0.5],0.02))
             title('x')
             hold on
-            plot(edge(:,1), err(:,1), '-.');
+            plot(edge(:,1), err(:,1), '-x');
             xlim([mt Mt])
             
             subplot('Position', squeezeArea([area(1) area(2)+area(4)*0.5, area(3) area(4)*0.5],0.02))
             title('y')
             hold on
-            plot(edge(:,1), err(:,2), '-.');
+            plot(edge(:,1), err(:,2), '-x');
             xlim([mt Mt])
             
             %d = sqrt(sum(err.^2,2));                
