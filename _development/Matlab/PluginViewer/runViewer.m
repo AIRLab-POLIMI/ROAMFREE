@@ -22,14 +22,33 @@ if isfield(config.global, 'logFile')
         error('* Error: %s does not exist', config.global.logFile);        
     end
     
-    if exist('/tmp/log', 'file') == 7  
-        rmdir('/tmp/log', 's');
+    mustUncompress = true;
+    logFile = config.global.logFile;
+    logDate = dir(config.global.logFile).datenum;
+    
+    if exist('/tmp/log', 'file') == 7
+      if exist('/tmp/log/meta.mat', 'file') == 2
+        oldLog = load('/tmp/log/meta.mat');
+        
+        if strcmp(oldLog.logFile, logFile) && logDate == oldLog.logDate
+          fprintf('* uncompressed folder up to date\n');
+          mustUncompress = false;
+        endif        
+      end
+    end
+
+    if mustUncompress == true
+      system('rm -rf /tmp/log');
+      
+      mkdir('/tmp/log');
+      fprintf('* uncompressing ... ');
+      system(['tar xzf ''' config.global.logFile ''' -C /tmp/log']);
+      fprintf('done\n');
+      
+      save('/tmp/log/meta.mat', 'logFile', 'logDate');
     end
     
-    mkdir('/tmp/log');
-    fprintf('* uncompressing ... ');
-    system(['tar xzf ''' config.global.logFile ''' -C /tmp/log']);
-    fprintf('done\n');
+    clear('logFile', 'logDate', 'mustUncompress')
 
     config.global.logPath = '/tmp/log/';
     
