@@ -1,4 +1,4 @@
-function genericEdge( area, globalConfig, pluginConfig )
+function GenericEdge( area, globalConfig, pluginConfig )
 
 edgef = sprintf('%s%s.log',globalConfig.logPath, pluginConfig.sensorName);
 
