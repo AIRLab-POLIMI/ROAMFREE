@@ -722,13 +722,24 @@ PoseVertex *FactorGraphFilter_Impl::addInterpolatingPose_i(double t,
   if (xi == NULL) {
     return NULL;
   }
+  
+  ParameterVerticesManager *dp = getParameterByName_i("SE3IntDelay");
+  if (dp == NULL) {
+   cerr << "[FactorGraphFilter] Error: could not find 'SE3IntDealy' parameter" << endl;
+   return NULL;
+  }
+  if (dp->getWindowSize() != 1) {
+    cerr << "[FactorGraphFilter] Error: 'SE3IntDealy' must not be time varying." << endl;
+  }
 
   SE3InterpolationEdge *edge = new SE3InterpolationEdge;
 
   edge->vertices()[0] = before->second;
   edge->vertices()[1] = xi;
   edge->vertices()[2] = after->second;
-
+  
+  dp->getVerticesPointers(t, edge->vertices(), 3);
+ 
   ROAMmath::invDiagonal(pseudoObsCov, edge->information());
 
   edge->init();
