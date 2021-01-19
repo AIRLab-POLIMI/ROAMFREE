@@ -51,7 +51,7 @@ class ParameterWrapper_Impl: public ParameterWrapper {
     }
     
     inline virtual std::list<ParameterWrapper_Ptr> getCrossCovariance() {
-      _param->getCrossCovariance(); 
+      return (_param->getCrossCovariance()); 
     }
     
      inline virtual void addCrossCovarianceParameter(ParameterWrapper_Ptr paramCross) {
