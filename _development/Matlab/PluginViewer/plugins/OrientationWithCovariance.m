@@ -35,7 +35,7 @@ if flag == 1
 
     if plotStd
         vars = x(:, 9+[16 19 21]);
-        iv = find(vars(:,1) ~= inf);    
+        iv = find(x(:,10) ~= inf);    
         stds = sqrt(vars(iv,:)*covScaling)*0.01; 
         
         qstds = [sqrt(1-sum(stds.^2,2)) stds];
