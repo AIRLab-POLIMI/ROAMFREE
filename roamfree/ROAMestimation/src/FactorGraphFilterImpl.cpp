@@ -2088,7 +2088,8 @@ void FactorGraphFilter_Impl::computeCovariances() {
   }
 
   g2o::SparseBlockMatrix<Eigen::MatrixXd> spinv;
-  _optimizer->computeMarginals(spinv, blockIndices);
+  //  _optimizer->computeMarginals(spinv, blockIndices);
+  _optimizer->computeMarginalsDirect(spinv, blockIndices);
 
 // store the marginals into the vertices
 // TODO: maybe it is possible to compute the marginals DIRECTLY into the vertices uncertainty storage
@@ -2097,7 +2098,7 @@ void FactorGraphFilter_Impl::computeCovariances() {
     PoseVertex *pose = *it;
     pose->setUncertainty(*(spinv.block(pose->tempIndex(), pose->tempIndex())));
   }
-
+  
 // ----------------------- TMP
 // do the same for the parameters
 
@@ -2106,17 +2107,15 @@ void FactorGraphFilter_Impl::computeCovariances() {
         (spinv.block((*v_it)->tempIndex(), (*v_it)->tempIndex()))->data());
 
 #		ifdef DEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES
-    Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
+          Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
 
-    g2o::OptimizableGraph::Vertex *v = *v_it;
-    GenericVertexInterface *gv = dynamic_cast<GenericVertexInterface *>(v);
+          g2o::OptimizableGraph::Vertex *v = *v_it;
+          GenericVertexInterface *gv = dynamic_cast<GenericVertexInterface *>(v);
 
-    Eigen::Map<Eigen::MatrixXd> cov(v->uncertaintyData(), v->dimension(),
-        v->dimension());
+          Eigen::Map<Eigen::MatrixXd> cov(v->uncertaintyData(), v->dimension(), v->dimension());
 
-    cerr << "[FactorGraphFilter] Info: uncertainty for "
-    << gv->getCategory() << ":" << endl << cov.format(CleanFmt)
-    << endl;
+          cerr << "[FactorGraphFilter] Info: uncertainty for " << gv->getCategory()
+            << ":" << endl << cov.format(CleanFmt) << endl;
 #		endif
   }
 
@@ -2206,10 +2205,13 @@ void FactorGraphFilter_Impl::computeCrossCovariances() {
     // there are no marginals to compute
     return;
   }
-  cerr<<" * Writing the cross covariance ......"<<endl;
-  Eigen::IOFormat CSVFormat(6.0, 0, ", ", "\n","","","","");
+
   g2o::SparseBlockMatrix<Eigen::MatrixXd> spinv;
-  _optimizer->computeMarginals(spinv, blockIndices);
+//  _optimizer->computeMarginals(spinv, blockIndices);
+  _optimizer->computeMarginalsDirect(spinv, blockIndices);
+
+  Eigen::IOFormat CSVFormat(6.0, 0, ", ", "\n","","","","");
+
   int iter = 0;
   for (auto v_it = verticePairs.begin(); v_it != verticePairs.end(); ++v_it) {
     auto v1 = v_it->first;
