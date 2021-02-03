@@ -13,7 +13,12 @@ for i = 1:length(pluginConfig.parameters)
     
     % load
     tmp = load(sprintf('%s%s.log',globalConfig.logPath, pluginConfig.parameters(i).name));
-    tmp = tmp(:,3+thsz:end);
+    
+    % get the estimate size
+    es = size(tmp,2) - 2 - thsz - thsz*(thsz-1)/2;
+    
+    % cut away everything but covariance part
+    tmp = tmp(:,(2+es+1):end);
     
     n_v_1 = size(tmp,1);
     vert_num(i) = n_v_1;
@@ -128,16 +133,13 @@ for i = 1:length(tks)
 end
 
 a = gca();
-a.YTickLabelRotation = 90;
-a.TickLabelInterpreter = 'none';
-a.XTick = tks;
-a.YTick = tks;
 
-% a.XTickLabel = {pluginConfig.parameters.name};
-% a.YTickLabel = {pluginConfig.parameters.name};
-a.XTickLabel = lbls;
-a.YTickLabel = lbls;
-
+set(a, 'YTickLabelRotation', 90);
+set(a, 'TickLabelInterpreter', 'none');
+set(a, 'XTick', tks);
+set(a, 'YTick', tks);
+set(a, 'XTickLabel', lbls);
+set(a, 'YTickLabel', lbls);
 
 x = 0.5;
 for i = 1:size(blocks,2)
