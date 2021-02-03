@@ -1788,6 +1788,8 @@ bool FactorGraphFilter_Impl::estimate_i(g2o::HyperGraph::EdgeSet &eset,
     return false;
   }
 
+  cerr << " * Optimization done" << endl;
+
   double tOptimized = g2o::get_time();
 
   updatePosesAndEdgesMetadata();
@@ -2025,63 +2027,42 @@ void FactorGraphFilter_Impl::computeCovariances() {
 
   // iterate through the vertices and collect their tempIndex
 
-  vector<pair<int, int> > blockIndices;
+  std::set<int> tempIndices;
   for (list<PoseVertex *>::iterator it = active.begin(); it != active.end();
       ++it) {
-    blockIndices.push_back(
-        pair<int, int>((*it)->tempIndex(), (*it)->tempIndex()));
+    tempIndices.insert((*it)->tempIndex());
   }
 
-  // iterate trough parameters and collect vertices for which covariances have
-  // to be calculated
+  // iterate trough parameters and collect vertices for which covariances have to be calculated
 
   set<g2o::OptimizableGraph::Vertex *> otherVertices;
 
   for (auto p_it = _params.begin(); p_it != _params.end(); ++p_it) {
     boost::shared_ptr<ParameterVerticesManager> p = p_it->second;
     if (p->fixed() == false && p->computeCovariance()) {
+      cerr << p_it->first << endl;
+
       for (auto v_it = p->_v.begin(); v_it != p->_v.end(); ++v_it) {
         g2o::OptimizableGraph::Vertex *v = v_it->second;
         if (v->tempIndex() >= 0) { //there might be parameters not involved in current estimation
-          otherVertices.insert(v);
+          cerr << v_it->first << " " << v_it->second << " " << v->tempIndex();
 
-          blockIndices.push_back(
-              pair<int, int>(v->tempIndex(), v->tempIndex()));
+          tempIndices.insert(v->tempIndex());
+
+          otherVertices.insert(v);
         }
       }
     }
   }
 
-  /* ----------------------- TMP
-   // Always compute covariance for parameters that are not fixed
+  // create the blockIndices pairs
 
-   for (auto p_it = _params.begin(); p_it != _params.end(); ++p_it) {
-   if (p_it->second->fixed() == false) {
-   // it holds only for constant parameters (which are the only one available in bespin
-   g2o::OptimizableGraph::Vertex *v = p_it->second->getVertices(0.0)->second;
+  vector<pair<int, int> > blockIndices;
+  for (auto it = tempIndices.begin(); it != tempIndices.end(); ++it) {
+    blockIndices.push_back(pair<int, int>(*it, *it));
+  }
 
-   if (v->tempIndex() >= 0) { //there might be parameters not involved in current estimation
-   otherVertices.insert(v);
-
-   blockIndices.push_back(
-   pair<int, int>(v->tempIndex(), v->tempIndex()));
-
-   # 	  	ifdef DEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES
-   GenericVertexInterface *gi = dynamic_cast<GenericVertexInterface *>(v);
-   assert(gi != NULL);
-
-   cerr << "[FactorGraphFilter] Info: computing covariance for "
-   << p_it->first << "{"
-   << ROAMutils::StringUtils::writeNiceTimestamp(gi->getTimestamp())
-   << "}" << v->fixed() << " " << v->tempIndex() << endl;
-   #		  endif
-   }
-   }
-   }
-
-   // ----------------------- */
-
-// compute the marginals
+  // compute the marginals
   if (blockIndices.size() == 0) {
     // there are no marginals to compute
     return;
@@ -2091,16 +2072,17 @@ void FactorGraphFilter_Impl::computeCovariances() {
   //  _optimizer->computeMarginals(spinv, blockIndices);
   _optimizer->computeMarginalsDirect(spinv, blockIndices);
 
-// store the marginals into the vertices
-// TODO: maybe it is possible to compute the marginals DIRECTLY into the vertices uncertainty storage
+  // store the marginals into the vertices
+  // TODO: maybe it is possible to compute the marginals DIRECTLY into the vertices uncertainty storage
   for (list<PoseVertex *>::iterator it = active.begin(); it != active.end();
       ++it) {
     PoseVertex *pose = *it;
     pose->setUncertainty(*(spinv.block(pose->tempIndex(), pose->tempIndex())));
   }
   
-// ----------------------- TMP
-// do the same for the parameters
+  // ----------------------- TMP
+  // do the same for the parameters
+  // TODO: many copies repeated in case parameters are shared
 
   for (auto v_it = otherVertices.begin(); v_it != otherVertices.end(); ++v_it) {
     (*v_it)->setUncertainty(
