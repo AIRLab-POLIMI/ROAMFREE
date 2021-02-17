@@ -100,6 +100,20 @@ else()
 	set(BUILD_TYPE_MSG "Release")
 endif()
 
+
+# -------------------------------------------------------------
+
+add_subdirectory(g2o)
+
+add_subdirectory(ROAMestimation)
+add_subdirectory(ROAMfunctions)
+add_subdirectory(ROAMutils)
+add_subdirectory(ROAMmath)
+add_subdirectory(ROAMlog)
+add_subdirectory(ROAMtest)
+add_subdirectory(ROAMimu)
+add_subdirectory(ROAMvision)
+
 # ------------------------ MESSAGES ----------------------------
 
 message(STATUS "Using catkin?    : " ${CATKIN_MSG})
@@ -116,15 +130,4 @@ message(STATUS "opencv found?    : " ${OpenCV_FOUND})
 message(STATUS "opencv includes  : " ${OpenCV_INCLUDE_DIR})
 message(STATUS "opencv libs      : " ${OpenCV_LIBS})
 
-# -------------------------------------------------------------
-
-add_subdirectory(g2o)
-
-add_subdirectory(ROAMestimation)
-add_subdirectory(ROAMfunctions)
-add_subdirectory(ROAMutils)
-add_subdirectory(ROAMmath)
-add_subdirectory(ROAMlog)
-add_subdirectory(ROAMtest)
-add_subdirectory(ROAMimu)
-add_subdirectory(ROAMvision)
+message(STATUS "eigen includes   : " ${EIGEN3_INCLUDE_DIR})

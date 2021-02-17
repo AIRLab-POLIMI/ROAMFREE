@@ -13,7 +13,12 @@ for i = 1:length(pluginConfig.parameters)
     
     % load
     tmp = load(sprintf('%s%s.log',globalConfig.logPath, pluginConfig.parameters(i).name));
-    tmp = tmp(:,3+thsz:end);
+    
+    % get the estimate size
+    es = size(tmp,2) - 2 - thsz - thsz*(thsz-1)/2;
+    
+    % cut away everything but covariance part
+    tmp = tmp(:,(2+es+1):end);
     
     n_v_1 = size(tmp,1);
     vert_num(i) = n_v_1;
@@ -65,8 +70,8 @@ for i = 1:length(pluginConfig.parameters)
                
                cross_corr_file_name =  strcat(globalConfig.logPath, pluginConfig.parameters(i).name,'_', pluginConfig.parameters(j).name,'(',num2str(a-1),',',num2str(b-1),').txt');
                 
-               if(~isfile(cross_corr_file_name))
-                   cross_corr_file_name =  strcat(globalConfig.logPath, pluginConfig.parameters(j).name,'_', pluginConfig.parameters(i).name,'(',num2str(a-1),',',num2str(b-1),').txt');
+               if ~exist(cross_corr_file_name, 'file')
+                   cross_corr_file_name =  strcat(globalConfig.logPath, pluginConfig.parameters(j).name,'_', pluginConfig.parameters(i).name,'(',num2str(b-1),',',num2str(a-1),').txt');
                    tmp_block =  load(cross_corr_file_name); 
                    tmp_block =  tmp_block';
                    
@@ -101,6 +106,19 @@ subplot('Position', squeezeArea(area,0.05))
 
 imshow(corr, 'initialMagnification', 'fit');
 
+% generate labels
+
+lbls = {};
+for i = 1:length(pluginConfig.parameters)    
+    id = sscanf(pluginConfig.parameters(i).name, 'Camera_feat%d_Lw');
+    if ~isempty(id)
+        lbls{end+1} = sprintf('%d',id);
+    else
+        idx = find(pluginConfig.parameters(i).name=='_',1,'last');
+        lbls{end+1} = pluginConfig.parameters(i).name(idx+1:end);
+    end
+end
+
 % generate ticks
 
 tks = zeros(size(blocks,1),1);
@@ -115,12 +133,13 @@ for i = 1:length(tks)
 end
 
 a = gca();
-a.YTickLabelRotation = 90;
-a.TickLabelInterpreter = 'none';
-a.XTick = tks;
-a.YTick = tks;
-a.XTickLabel = {pluginConfig.parameters.name};
-a.YTickLabel = {pluginConfig.parameters.name};
+
+set(a, 'YTickLabelRotation', 90);
+set(a, 'TickLabelInterpreter', 'none');
+set(a, 'XTick', tks);
+set(a, 'YTick', tks);
+set(a, 'XTickLabel', lbls);
+set(a, 'YTickLabel', lbls);
 
 x = 0.5;
 for i = 1:size(blocks,2)

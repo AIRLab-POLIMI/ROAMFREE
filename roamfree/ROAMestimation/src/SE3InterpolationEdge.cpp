@@ -25,22 +25,27 @@ using namespace std;
 namespace ROAMestimation {
 
 SE3InterpolationEdge::SE3InterpolationEdge() {
-  resize(3); // this edge is incident in three vertices
+  resize(4); // this edge is incident in three vertices
 
   _jacobianOplus[0].resize(6,6);
   _jacobianOplus[1].resize(6,6);
   _jacobianOplus[2].resize(6,6);
+  _jacobianOplus[3].resize(6,1);
 }
 
 void SE3InterpolationEdge::init() {
   PoseVertex *x1v = static_cast<PoseVertex *>(_vertices[0]);
   PoseVertex *xiv = static_cast<PoseVertex *>(_vertices[1]);
   PoseVertex *x2v = static_cast<PoseVertex *>(_vertices[2]);
-
+  
+  GenericVertex<ROAMfunctions::Eucl1DV> *delayv = static_cast<GenericVertex<ROAMfunctions::Eucl1DV> *>(_vertices[3]); 
+  
   const Eigen::VectorXd & x1 = x1v->estimate();
   const Eigen::VectorXd & x2 = x2v->estimate();
   Eigen::VectorXd x(7);
-
+  
+  double delay = delayv->estimate()(0);
+  
   double t1 = x1v->getTimestamp();
   double ti = xiv->getTimestamp();
   double t2 = x2v->getTimestamp();
@@ -54,10 +59,14 @@ void SE3InterpolationEdge::computeError() {
   PoseVertex *x1v = static_cast<PoseVertex *>(_vertices[0]);
   PoseVertex *xiv = static_cast<PoseVertex *>(_vertices[1]);
   PoseVertex *x2v = static_cast<PoseVertex *>(_vertices[2]);
+  
+  GenericVertex<ROAMfunctions::Eucl1DV> *delayv = static_cast<GenericVertex<ROAMfunctions::Eucl1DV> *>(_vertices[3]); 
 
   const Eigen::VectorXd & x1 = x1v->estimate();
   const Eigen::VectorXd & xi = xiv->estimate();
   const Eigen::VectorXd & x2 = x2v->estimate();
+  
+  double delay = delayv->estimate()(0);
 
   double t1 = x1v->getTimestamp();
   double ti = xiv->getTimestamp();
@@ -70,10 +79,14 @@ void SE3InterpolationEdge::linearizeOplus() {
   PoseVertex *x1v = static_cast<PoseVertex *>(_vertices[0]);
   PoseVertex *xiv = static_cast<PoseVertex *>(_vertices[1]);
   PoseVertex *x2v = static_cast<PoseVertex *>(_vertices[2]);
+  
+  GenericVertex<ROAMfunctions::Eucl1DV> *delayv = static_cast<GenericVertex<ROAMfunctions::Eucl1DV> *>(_vertices[3]); 
 
   const Eigen::VectorXd & x1 = x1v->estimate();
   const Eigen::VectorXd & xi = xiv->estimate();
   const Eigen::VectorXd & x2 = x2v->estimate();
+  
+  double delay = delayv->estimate()(0);
 
   double t1 = x1v->getTimestamp();
   double ti = xiv->getTimestamp();
@@ -95,6 +108,12 @@ void SE3InterpolationEdge::linearizeOplus() {
     Eigen::MatrixXd &J = _jacobianOplus[2];
 
 #   include "generated/SE3InterpolationEdge_JErrX2.cppready"
+  }
+  
+  {
+    Eigen::MatrixXd &J = _jacobianOplus[3];
+
+#   include "generated/SE3InterpolationEdge_JErrdelay.cppready"
   }
 }
 

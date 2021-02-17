@@ -1,4 +1,4 @@
-function EuclideanFeatures( area, globalConfig, pluginConfig )
+function EuclideanFeaturesStats( area, globalConfig, pluginConfig )
 
 subplot('Position', squeezeArea(area,0.02))
 hold on
@@ -14,10 +14,10 @@ for i = 1:length(F)
     % assume it is a Euclidean feature edge log, get feature id
     F(i).name(length(pluginConfig.sensorName)+6:end);
     n = sscanf(F(i).name(length(pluginConfig.sensorName)+6:end), '%d');
-
+    
     parf = sprintf('%s_feat%d.log', pluginConfig.sensorName, n);    
 
-    if (strcmp(F(i).name, parf)== true)
+    if (strcmp(F(i).name, parf) == true)
         [edge, flag] = stubbornLoad([globalConfig.logPath parf]);
 
         if flag == 1 && size(edge,1) > 0 % sometimes I got an empty p

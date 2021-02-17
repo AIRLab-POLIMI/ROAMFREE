@@ -211,6 +211,7 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
 
     bool _lowLevelLogging, _writeGraph, _writeHessianStructure;
     ROAMlog::GraphLogger *_logger; //!< the object which handles low level logging
+    std::string _logFolder;
 
     SpatialIndex *_spatialIndex; //!< the object which maintains spatial informations about poses.
 

@@ -1,4 +1,4 @@
-function Trajectory(area, globalConfig, pluginConfig)
+function PositionWithCovariance(area, globalConfig, pluginConfig)
 
 %% load data
 posef = [globalConfig.logPath 'PoseSE3(W).log'];
@@ -49,18 +49,25 @@ if flag == 1
         subplot('Position', squeezeArea([area(1) (j-1)*0.33 area(3) area(4)*0.33],0.02))
         hold on
 
-        yyaxis left
-        plot(x(i,1)-t0, x(i,j+2)-x0(j));
-        plot(x(1:i(1),1)-t0, x(1:i(1),j+2)-x0(j),'k');
-        
-        if reference
-            plot(xref(:,1)-t0, xref(:,j+1)-x0(j), '-', 'Color', [0.9290, 0.6940, 0.1250])
-        end
-        
+%        yyaxis left
+%        plot(x(i,1)-t0, x(i,j+2)-x0(j));
+%        plot(x(1:i(1),1)-t0, x(1:i(1),j+2)-x0(j),'k');
+%        
+%        if reference
+%            plot(xref(:,1)-t0, xref(:,j+1)-x0(j), '-', 'Color', [0.9290, 0.6940, 0.1250])
+%        end
+%        
+%        if plotStd
+%            yyaxis right
+%            plot(x(iv,1)-t0,stds(:,j),'--');
+%        end
+
         if plotStd
-            yyaxis right
-            plot(x(iv,1)-t0,stds(:,j),'--');
-        end
+          plotyy(x(i,1)-t0, x(i,j+2)-x0(j), x(iv,1)-t0,stds(:,j))          
+        else
+          plot(x(i,1)-t0, x(i,j+2)-x0(j));
+          plot(x(1:i(1),1)-t0, x(1:i(1),j+2)-x0(j),'k');
+        endif
         
         title(ttls{j})
         

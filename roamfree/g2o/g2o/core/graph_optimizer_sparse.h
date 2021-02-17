@@ -115,6 +115,7 @@ namespace g2o {
      * @returns false if the operation is not supported by the solver
      */
     bool computeMarginals(SparseBlockMatrix<MatrixXd>& spinv, const std::vector<std::pair<int, int> >& blockIndices);
+    bool computeMarginalsDirect(SparseBlockMatrix<MatrixXd>& spinv, const std::vector<std::pair<int, int> >& blockIndices);
 
     //! finds a gauge in the graph to remove the undefined dof.
     // The gauge should be fixed() and then the optimization can work (if no additional dof are in

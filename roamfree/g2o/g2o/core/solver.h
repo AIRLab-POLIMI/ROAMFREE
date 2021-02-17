@@ -71,6 +71,7 @@ namespace g2o {
        * and stores them in the nodes of the graph.
        */
       virtual bool computeMarginals(SparseBlockMatrix<MatrixXd>& spinv, const std::vector<std::pair<int, int> >& blockIndices) = 0;
+      virtual bool computeMarginalsDirect(SparseBlockMatrix<MatrixXd>& spinv, const std::vector<std::pair<int, int> >& blockIndices) = 0;
 
       /**
        * update the system while performing Levenberg, i.e., modifying the diagonal

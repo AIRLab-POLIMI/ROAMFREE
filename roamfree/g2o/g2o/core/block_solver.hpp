@@ -494,6 +494,59 @@ bool BlockSolver<Traits>::computeMarginals(SparseBlockMatrix<MatrixXd>& spinv, c
   return ok;
 }
 
+template <typename Traits>
+bool BlockSolver<Traits>::computeMarginalsDirect(SparseBlockMatrix<MatrixXd>& spinv, const std::vector<std::pair<int, int> >& blockIndices)
+{
+  double t = get_time();
+  
+  // initialize spinv
+  const std::vector<int>& rbi = _Hpp->rowBlockIndices();
+  
+  spinv = SparseBlockMatrix<MatrixXd>(& rbi[0], 
+				      & rbi[0], 
+				      rbi.size(),
+				      rbi.size(), true);  
+  
+
+  bool ok = true;
+  
+  for (int cb = 0; cb < blockIndices.size(); ++cb ) {
+  
+	  const std::pair<int, int> &c  = blockIndices[cb];
+
+	  int start_row = c.first > 0 ? rbi[c.first-1] : 0;
+	  int end_row = rbi[c.first]-1;
+
+	  int start_col = c.second > 0 ? rbi[c.second-1] : 0;
+	  int end_col = rbi[c.second]-1;
+
+	  // cerr << "computing block index (" << c.first << "," << c.second << "), rows " << start_row << ":" << end_row << " cols " << start_col << ":" << end_col <<std::endl;
+
+	  double *b = new double[vectorSize()];
+	  memset(b, 0, vectorSize()*sizeof(double));
+
+	  double *x = new double[vectorSize()];
+	  for (int cc = start_col; cc <= end_col; ++cc) {
+		  b[cc] = 1;
+
+		  ok = ok && _linearSolver->solve(*_Hpp, x, b);
+
+		  Eigen::MatrixXd *ret = spinv.block(c.first, c.second);
+
+		  assert(ret->rows() == end_row-start_row+1);
+
+		  ret->col(cc-start_col) = Eigen::Map<Eigen::VectorXd>(&x[start_row], ret->rows());
+
+		  b[cc] = 0;
+	  }
+  }
+  
+  if (globalStats) {
+    globalStats->timeMarginals = get_time() - t;
+  }
+  return ok;
+}
+
 
 
 template <typename Traits>

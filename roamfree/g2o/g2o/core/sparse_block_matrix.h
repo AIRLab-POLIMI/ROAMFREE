@@ -172,6 +172,8 @@ class SparseBlockMatrix {
      * @param upperTriangle does this matrix store only the upper triangular blocks
      */
     bool writeOctave(const char* filename, bool upperTriangle = true) const;
+    
+    bool writeOctaveBinary(const char* filename, bool upperTriangle) const;
 
     /*
      * write every coefficient of every block into the proper position

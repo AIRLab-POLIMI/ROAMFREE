@@ -22,7 +22,7 @@
 #include <map>
 #include <vector>
 
-#include <opencv/cv.h>
+#include <opencv2/core.hpp>
 
 #include "ImageFeatureHandler.h"
 

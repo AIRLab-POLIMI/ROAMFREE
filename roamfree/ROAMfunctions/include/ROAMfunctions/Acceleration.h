@@ -120,8 +120,9 @@ public:
     }
     case 3: // jacobian wrt gravity
     {
-      // no gravity estimation for now
-      assert(false);
+#     include "generated/Acceleration_JErrGravity.cppready"      
+      return false;
+      break;
     }
     }
 

@@ -728,13 +728,24 @@ PoseVertex *FactorGraphFilter_Impl::addInterpolatingPose_i(double t,
   if (xi == NULL) {
     return NULL;
   }
+  
+  ParameterVerticesManager *dp = getParameterByName_i("SE3IntDelay");
+  if (dp == NULL) {
+   cerr << "[FactorGraphFilter] Error: could not find 'SE3IntDealy' parameter" << endl;
+   return NULL;
+  }
+  if (dp->getWindowSize() != 1) {
+    cerr << "[FactorGraphFilter] Error: 'SE3IntDealy' must not be time varying." << endl;
+  }
 
   SE3InterpolationEdge *edge = new SE3InterpolationEdge;
 
   edge->vertices()[0] = before->second;
   edge->vertices()[1] = xi;
   edge->vertices()[2] = after->second;
-
+  
+  dp->getVerticesPointers(t, edge->vertices(), 3);
+ 
   ROAMmath::invDiagonal(pseudoObsCov, edge->information());
 
   edge->init();
@@ -1740,20 +1751,20 @@ bool FactorGraphFilter_Impl::estimate_i(g2o::HyperGraph::EdgeSet &eset,
    // --- end of LBW WORKAROUND */
 
 // stuff for estimation time statistics
-  static ofstream ftStats("/tmp/roamfree/timeStats.txt"); // TODO: put the same folder as for _logger
+  static ofstream ftStats(_logFolder+"/timeStats.txt"); 
   ftStats.precision(6);
 
   double tStart = g2o::get_time();
 
 // if logging is enabled, write the current factor graph to a file
   if (_writeGraph == true) {
-    ofstream f("/tmp/roamfree/graph.txt"); // TODO: put the same folder as for _logger
+    ofstream f(_logFolder+"/graph.txt"); 
     assert(f.is_open());
     f << writeFactorGraph();
     f.close();
 
     /* debug graph in dot, useless
-     ofstream fdot("/tmp/roamfree/graph.dot"); // TODO: put the same folder as for _logger
+     ofstream fdot(_logFolder+"/graph.dot"); 
      fdot << writeFactorGraphToDot();
      fdot.close();
      //*/
@@ -1761,10 +1772,12 @@ bool FactorGraphFilter_Impl::estimate_i(g2o::HyperGraph::EdgeSet &eset,
 
 // ----------- END
 
+  _optimizer->_statistics = new g2o::G2OBatchStatistics[nIterations];
+
   _optimizer->initializeOptimization(eset);
 
   if (_writeHessianStructure == true) {
-    ofstream fid("/tmp/roamfree/Hstruct.txt"); // TODO: put the same folder as for _logger
+    ofstream fid(_logFolder+"/Hstruct.txt"); 
 
     if (fid.is_open()) {
       fid << writeVertexIdMap();
@@ -1778,9 +1791,9 @@ bool FactorGraphFilter_Impl::estimate_i(g2o::HyperGraph::EdgeSet &eset,
 
   bool ret = _optimizer->optimize(nIterations) || nIterations == 0;
   if (ret == false) {
-# 	ifdef DEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES
+#   ifdef DEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES
     cerr << "[FactorGraphFilter] Error: estimation failed." << endl;
-# 	endif
+#   endif
 
     return false;
   }
@@ -1809,6 +1822,10 @@ bool FactorGraphFilter_Impl::estimate_i(g2o::HyperGraph::EdgeSet &eset,
   ftStats << (tInitialized - tStart) << ", " << (tOptimized - tInitialized)
       << ", " << (tCovariancesAndSpatial - tOptimized) << ", "
       << (tLogging - tCovariancesAndSpatial) << endl;
+      
+# ifdef DEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES      
+  std::cerr << _optimizer->_statistics[nIterations-1] << std::endl;
+# endif  
 
   return true;
 }
@@ -2002,8 +2019,10 @@ bool FactorGraphFilter_Impl::testExistance(const PoseVertex* v) const {
 
 void FactorGraphFilter_Impl::computeCovariances() {
 
-  // iterate through the poses and collect the vertices for which I have to evaluate covariance
+  // a map tempIndex() -> vertex avoids duplicates in case of shared parameters
+  std::map<int, g2o::OptimizableGraph::Vertex *> vertexmap;
 
+  // iterate through the poses and collect the vertices for which I have to evaluate covariance
   list<PoseVertex *> active;
   for (PoseMapIterator it = _poses.begin(); it != _poses.end(); ++it) {
 
@@ -2012,117 +2031,49 @@ void FactorGraphFilter_Impl::computeCovariances() {
         static_cast<PoseVertexMetadata *>(pose->userData());
 
     if (meta->computeUncertainty == true && pose->fixed() == false) {
-      active.push_back(pose);
+      vertexmap[pose->tempIndex()] = pose;
     }
   }
 
-  // iterate through the vertices and collect their tempIndex
-
-  vector<pair<int, int> > blockIndices;
-  for (list<PoseVertex *>::iterator it = active.begin(); it != active.end();
-      ++it) {
-    blockIndices.push_back(
-        pair<int, int>((*it)->tempIndex(), (*it)->tempIndex()));
-  }
-
-  // iterate trough parameters and collect vertices for which covariances have
-  // to be calculated
-
-  set<g2o::OptimizableGraph::Vertex *> otherVertices;
-
+  // iterate trough parameters and collect vertices for which covariances have to be calculated
   for (auto p_it = _params.begin(); p_it != _params.end(); ++p_it) {
     boost::shared_ptr<ParameterVerticesManager> p = p_it->second;
     if (p->fixed() == false && p->computeCovariance()) {
       for (auto v_it = p->_v.begin(); v_it != p->_v.end(); ++v_it) {
         g2o::OptimizableGraph::Vertex *v = v_it->second;
         if (v->tempIndex() >= 0) { //there might be parameters not involved in current estimation
-          otherVertices.insert(v);
-
-          blockIndices.push_back(
-              pair<int, int>(v->tempIndex(), v->tempIndex()));
+          vertexmap[v->tempIndex()] = v;
         }
       }
     }
   }
 
-  /* ----------------------- TMP
-   // Always compute covariance for parameters that are not fixed
+  // create the blockIndices pairs
+  vector<pair<int, int> > blockIndices;
+  for (auto it = vertexmap.begin(); it != vertexmap.end(); ++it) {
+    blockIndices.push_back(pair<int, int>(it->first, it->first));
+  }
 
-   for (auto p_it = _params.begin(); p_it != _params.end(); ++p_it) {
-   if (p_it->second->fixed() == false) {
-   // it holds only for constant parameters (which are the only one available in bespin
-   g2o::OptimizableGraph::Vertex *v = p_it->second->getVertices(0.0)->second;
-
-   if (v->tempIndex() >= 0) { //there might be parameters not involved in current estimation
-   otherVertices.insert(v);
-
-   blockIndices.push_back(
-   pair<int, int>(v->tempIndex(), v->tempIndex()));
-
-   # 	  	ifdef DEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES
-   GenericVertexInterface *gi = dynamic_cast<GenericVertexInterface *>(v);
-   assert(gi != NULL);
-
-   cerr << "[FactorGraphFilter] Info: computing covariance for "
-   << p_it->first << "{"
-   << ROAMutils::StringUtils::writeNiceTimestamp(gi->getTimestamp())
-   << "}" << v->fixed() << " " << v->tempIndex() << endl;
-   #		  endif
-   }
-   }
-   }
-
-   // ----------------------- */
-
-// compute the marginals
+  // compute the marginals
   if (blockIndices.size() == 0) {
     // there are no marginals to compute
     return;
   }
 
   g2o::SparseBlockMatrix<Eigen::MatrixXd> spinv;
-  _optimizer->computeMarginals(spinv, blockIndices);
+  //  _optimizer->computeMarginals(spinv, blockIndices);
+  _optimizer->computeMarginalsDirect(spinv, blockIndices);
 
-// store the marginals into the vertices
-// TODO: maybe it is possible to compute the marginals DIRECTLY into the vertices uncertainty storage
-  for (list<PoseVertex *>::iterator it = active.begin(); it != active.end();
-      ++it) {
-    PoseVertex *pose = *it;
-    pose->setUncertainty(*(spinv.block(pose->tempIndex(), pose->tempIndex())));
+  // store the marginals into the vertices
+  for (auto it = vertexmap.begin(); it != vertexmap.end(); ++it) {
+    (it->second)->setUncertainty((spinv.block(it->first, it->first))->data());
   }
-
-// ----------------------- TMP
-// do the same for the parameters
-
-  for (auto v_it = otherVertices.begin(); v_it != otherVertices.end(); ++v_it) {
-    (*v_it)->setUncertainty(
-        (spinv.block((*v_it)->tempIndex(), (*v_it)->tempIndex()))->data());
-
-#		ifdef DEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES
-    Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
-
-    g2o::OptimizableGraph::Vertex *v = *v_it;
-    GenericVertexInterface *gv = dynamic_cast<GenericVertexInterface *>(v);
-
-    Eigen::Map<Eigen::MatrixXd> cov(v->uncertaintyData(), v->dimension(),
-        v->dimension());
-
-    cerr << "[FactorGraphFilter] Info: uncertainty for "
-    << gv->getCategory() << ":" << endl << cov.format(CleanFmt)
-    << endl;
-#		endif
-  }
-
-// ----------------------- */
-
 }
 
 void FactorGraphFilter_Impl::computeCrossCovariances() {
   
-  vector<pair<int, int> > blockIndices;
-  
-  list<pair<g2o::OptimizableGraph::Vertex *,g2o::OptimizableGraph::Vertex *>> verticePairs;
-  vector<string> file_names;
+  // a map tempIndex() -> file_name avoids duplicates in case of shared parameters
+  std::map<std::pair<int, int>, std::string> vertexmap;
   
  for (auto p1_it = _params.begin(); p1_it != _params.end(); ++p1_it) {
      boost::shared_ptr<ParameterVerticesManager> p1 = p1_it->second;
@@ -2130,7 +2081,6 @@ void FactorGraphFilter_Impl::computeCrossCovariances() {
      if (p1->fixed() == false && p1->getCrossCovariance().size() > 0) {
       
          const std::string &param_1_name = p1->_name;
-         
          
          int iter_self_1 = 0;
          for(auto v_it = p1->_v.begin(); v_it != p1->_v.end(); ++v_it) {
@@ -2146,9 +2096,8 @@ void FactorGraphFilter_Impl::computeCrossCovariances() {
                     if(v2->tempIndex()>=0){
                         
                         if(v2->tempIndex() > v1->tempIndex()) {
-                            file_names.emplace_back(param_1_name+"_"+param_1_name+"("+to_string(iter_self_1)+","+to_string(iter_self_2)+")");
-                            blockIndices.push_back(pair<int, int>(v1->tempIndex(), v2->tempIndex()));
-                            verticePairs.push_back(pair<g2o::OptimizableGraph::Vertex *,g2o::OptimizableGraph::Vertex *>(v1,v2));                           
+                            std::string cur_name = param_1_name+"_"+param_1_name+"("+to_string(iter_self_1)+","+to_string(iter_self_2)+")";
+                            vertexmap[std::pair<int, int>(v1->tempIndex(), v2->tempIndex())] = cur_name;
                         }
                         iter_self_2++;
                     }
@@ -2158,8 +2107,6 @@ void FactorGraphFilter_Impl::computeCrossCovariances() {
             }
            
          }
-         
-         
          
          const std::list<ParameterWrapper_Ptr> &tmp_list = p1->getCrossCovariance();	  
 
@@ -2180,9 +2127,8 @@ void FactorGraphFilter_Impl::computeCrossCovariances() {
                         
                          g2o::OptimizableGraph::Vertex *v2 = v2_it->second;
                          if(v2->tempIndex() >=0) {
-                             file_names.emplace_back(param_1_name+"_"+param_2_name+"("+to_string(iter_1)+","+to_string(iter_2)+")");
-                             blockIndices.push_back(pair<int, int>(v1->tempIndex(), v2->tempIndex()));
-                             verticePairs.push_back(pair<g2o::OptimizableGraph::Vertex *,g2o::OptimizableGraph::Vertex *>(v1,v2));
+                             std::string cur_name = param_1_name+"_"+param_2_name+"("+to_string(iter_1)+","+to_string(iter_2)+")";
+                             vertexmap[std::pair<int, int>(v1->tempIndex(), v2->tempIndex())] = cur_name;
                              iter_2++;
                          }	      
                      }
@@ -2194,25 +2140,27 @@ void FactorGraphFilter_Impl::computeCrossCovariances() {
      }
   }
   
-  // compute the marginals
-  if (blockIndices.size() == 0) {
-    // there are no marginals to compute
-    return;
-  }
-  cerr<<" * Writing the cross covariance ......"<<endl;
-  Eigen::IOFormat CSVFormat(6.0, 0, ", ", "\n","","","","");
+ // create the blockIndices pairs
+ vector<pair<int, int> > blockIndices;
+ for (auto it = vertexmap.begin(); it != vertexmap.end(); ++it) {
+   blockIndices.push_back(pair<int, int>(it->first.first, it->first.second));
+ }
+
   g2o::SparseBlockMatrix<Eigen::MatrixXd> spinv;
-  _optimizer->computeMarginals(spinv, blockIndices);
-  int iter = 0;
-  for (auto v_it = verticePairs.begin(); v_it != verticePairs.end(); ++v_it) {
-    auto v1 = v_it->first;
-    auto v2 = v_it->second;
-    auto gg = spinv.block((v1)->tempIndex(), (v2)->tempIndex());
+//  _optimizer->computeMarginals(spinv, blockIndices);
+  _optimizer->computeMarginalsDirect(spinv, blockIndices);
+
+  Eigen::IOFormat CSVFormat(6.0, 0, ", ", "\n","","","","");
+
+  for (auto p_it = vertexmap.begin(); p_it != vertexmap.end(); ++p_it) {
+    const std::pair<int, int> &tempindices = p_it->first;
+    const std::string &file_name = p_it->second;
+
+    Eigen::MatrixXd *gg = spinv.block(tempindices.first, tempindices.second);
     
-    ofstream crossCorrFile("/tmp/roamfree/"+file_names[iter]+".txt");
+    ofstream crossCorrFile(_logFolder+"/"+file_name+".txt");
     crossCorrFile << gg->format(CSVFormat) ;
     crossCorrFile.close();
-    iter ++;
   }
 }
 
@@ -2235,7 +2183,7 @@ void FactorGraphFilter_Impl::writeFinalHessian() {
   g2o::LinearSolverCSparse<g2o::BlockSolverX::PoseMatrixType> *cspsolver =
       static_cast<g2o::LinearSolverCSparse<g2o::BlockSolverX::PoseMatrixType> *>(blocksolver->linearSolver());
 
-  g2o::writeCs2Octave("/tmp/roamfree/H.txt", cspsolver->getccsA(), true); // TODO: put the same folder as for _logger
+  g2o::writeCs2Octave((_logFolder+"/H.txt").c_str(), cspsolver->getccsA(), true); 
 }
 
 MeasurementEdgeWrapperVector_Ptr FactorGraphFilter_Impl::handleDeferredMeasurements() {
@@ -2377,6 +2325,9 @@ void FactorGraphFilter_Impl::setLowLevelLogging(bool lowLevelLogging,
       _logger = new ROAMlog::GraphLogger(folder, _optimizer);
     }
   }
+  
+  // TODO: do something if user ever attemps to CHANGE the log folder
+  _logFolder = folder;
 
   _lowLevelLogging = lowLevelLogging;
 }
