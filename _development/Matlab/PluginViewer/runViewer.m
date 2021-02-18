@@ -24,7 +24,8 @@ if isfield(config.global, 'logFile')
     
     mustUncompress = true;
     logFile = config.global.logFile;
-    logDate = dir(config.global.logFile).datenum;
+    logDate = dir(config.global.logFile);
+    logDate = logDate.datenum;
     
     if exist('/tmp/log', 'file') == 7
       if exist('/tmp/log/meta.mat', 'file') == 2
@@ -33,7 +34,7 @@ if isfield(config.global, 'logFile')
         if strcmp(oldLog.logFile, logFile) && logDate == oldLog.logDate
           fprintf('* uncompressed folder up to date\n');
           mustUncompress = false;
-        endif        
+        end        
       end
     end
 
