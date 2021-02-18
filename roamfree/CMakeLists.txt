@@ -55,7 +55,7 @@ include_directories(${CSPARSE_INCLUDE_DIR})
 # --- Opencv
 
 find_package(OpenCV REQUIRED)
-include_directories(${OpenCV_INCLUDE_DIR})
+include_directories(${OpenCV_INCLUDE_DIRS})
 
 # ----------------------- GCC FLAGS ----------------------------
 
@@ -127,7 +127,7 @@ message(STATUS "csparse libs     : " ${CSPARSE_LIBRARY})
 message(STATUS "cholmod libs     : " ${CHOLMOD_LIBRARY})
 
 message(STATUS "opencv found?    : " ${OpenCV_FOUND})
-message(STATUS "opencv includes  : " ${OpenCV_INCLUDE_DIR})
+message(STATUS "opencv includes  : " ${OpenCV_INCLUDE_DIRS})
 message(STATUS "opencv libs      : " ${OpenCV_LIBS})
 
 message(STATUS "eigen includes   : " ${EIGEN3_INCLUDE_DIR})
