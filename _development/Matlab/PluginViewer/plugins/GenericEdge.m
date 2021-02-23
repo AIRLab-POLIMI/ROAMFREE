@@ -25,7 +25,7 @@ if exist(edgef, 'file')
         
         err = edge(:,(23+pluginConfig.measureSize):(23+pluginConfig.measureSize+pluginConfig.errorSize-1));
                 
-        plot(edge(:,1),err);
+        plot(edge(:,1)-(isfield(pluginConfig, 'relativeTime') && pluginConfig.relativeTime == true)*edge(1,1),err);
         
         yl = max(std(err));
         
@@ -40,7 +40,7 @@ if exist(edgef, 'file')
         if isfield(pluginConfig, 'events')
             for j = 1:length(pluginConfig.events)
                 if (pluginConfig.events(j) >= edge(1,1) && pluginConfig.events(j) <= edge(end,1))                
-                    plot( (pluginConfig.events(j) - edge(1,1))* [1 1], ylim(), 'Color', [0.4, 0.4, 0.4] );                    
+                    plot( (pluginConfig.events(j) - -(isfield(pluginConfig, 'relativeTime') && pluginConfig.relativeTime == true)*edge(1,1))* [1 1], ylim(), 'Color', [0.4, 0.4, 0.4] );
                 end
             end
         end     
@@ -50,7 +50,7 @@ if exist(edgef, 'file')
             subplot('Position', squeezeArea([area(1) area(2)+area(4)*0.5, area(3) area(4)*0.5],0.02))
             
             meas = edge(:,23:(23+pluginConfig.measureSize-1));
-            plot(edge(:,1), meas);
+            plot(edge(:,1)-(isfield(pluginConfig, 'relativeTime') && pluginConfig.relativeTime == true)*edge(1,1), meas);
             
 %             title([pluginConfig.sensorName ' z']);
         
