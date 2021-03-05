@@ -62,6 +62,13 @@ g2o::OptimizableGraph::Vertex * ParameterVerticesManager::newVertex(
     gv->setTimestamp(tstamp);
   }
     break;
+  case Euclidean4D: {
+    GenericVertex<Eucl4DV> *gv = new GenericVertex<Eucl4DV>;
+    v = gv;
+    v2 = gv;
+    gv->setTimestamp(tstamp);
+  }
+    break;
   case Quaternion: {
     GenericVertex<QuaternionV> *gv = new GenericVertex<QuaternionV>;
     v = gv;

@@ -29,7 +29,7 @@ end
 title('img obs residuals (px)')
 
 errNorm = sqrt(sum(err.^2,2));
-hist(errNorm, max(errNorm)/0.1 );
+hist(errNorm, 10 );
 
 legend(sprintf('N = %d, mean = %.2f', length(errNorm), mean(errNorm)));
 
