@@ -587,7 +587,7 @@ public:
 
 		x0 = static_cast<g2o::OptimizableGraph::Vertex *>(_vertices[0]);
 
-		s << _name << "{" << _frameCounter << "}[" << ROAMutils::StringUtils::writeNiceTimestamp(_tstamp) << "](" << x0->id();
+		s << _name << "[" << ROAMutils::StringUtils::writeNiceTimestamp(_tstamp) << "](" << x0->id();
 
 		if (MT::_ORDER > 0) {
 			x1 = static_cast<g2o::OptimizableGraph::Vertex *>(_vertices[1]);

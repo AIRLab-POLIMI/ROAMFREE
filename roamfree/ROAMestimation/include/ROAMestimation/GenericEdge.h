@@ -79,8 +79,6 @@ class GenericEdge: public g2o::BaseMultiEdge<D, Eigen::VectorXd>,
 
     double _Dt01, _Dt12; /**< dt between pose vertices */
 
-    long int _frameCounter;
-
     Eigen::VectorXd _x; /**< augmented state: [x, q, v, omega, a, alpha,. disp, dispQ, IMUintdP, IMUintdQ], 33 variables */
 
     Eigen::MatrixXd _noiseCov; /**< noise covariance matrix, it is not necessarily the inverse of _information
@@ -107,7 +105,6 @@ using GenericEdge<MT::_ERROR_SIZE>::_name;                                  \
 using GenericEdge<MT::_ERROR_SIZE>::_tstamp;                                \
 using GenericEdge<MT::_ERROR_SIZE>::_Dt01;                                  \
 using GenericEdge<MT::_ERROR_SIZE>::_Dt12;                                  \
-using GenericEdge<MT::_ERROR_SIZE>::_frameCounter;                          \
 using GenericEdge<MT::_ERROR_SIZE>::_N_STANDARD_PARAMETERS;                 \
 \
 using g2o::BaseMultiEdge<MT::_ERROR_SIZE, Eigen::VectorXd>::_information;   \
@@ -122,8 +119,7 @@ using g2o::BaseMultiEdge<MT::_ERROR_SIZE, Eigen::VectorXd>::resize;
 template<int D>
 GenericEdge<D>::GenericEdge(int nParams) :
     _paramsPtrsSize(nParams), _name("undefined"), _tstamp(
-        -std::numeric_limits<double>::infinity()), _Dt01(0), _Dt12(0), _x(33), _frameCounter(
-        -1) {
+        -std::numeric_limits<double>::infinity()), _Dt01(0), _Dt12(0), _x(33) {
 
   _paramsPtrs = new double *[_paramsPtrsSize]; // 1 Euclidean 3D, 1 Quaternion the possible function specific params
 }
