@@ -133,7 +133,7 @@ SimplifyRM[Expression_, R_, customeq_] := (
    Return[Refine[FullSimplify[Expression, eq],Assumptions:>eq]];
    );
 
-SimplifyQ[Expression_, Q_, customeq_,Tconstr_:{0.5,60}] := (
+SimplifyQ[Expression_, Q_, customeq_,Tconstr_:{0.5,300}] := (
 eq=Table[{
 	Q[[i,1]]^2+Q[[i,2]]^2+Q[[i,3]]^2+Q[[i,4]]^2 == 1,
 	Q[[i,1]]\[Element]Reals,
@@ -148,7 +148,7 @@ eq=Table[{
    Return[ParallelTable[Quiet[FullSimplify[Refine[Expression[[i]],eq],eq,TimeConstraint->Tconstr]],{i,1,Length[Expression]}]];
    );
 
-SimplifyQLite[Expression_, Q_, customeq_,Tconstr_:{0.5,60}] := (
+SimplifyQLite[Expression_, Q_, customeq_,Tconstr_:{0.5,300}] := (
 eq=Table[{
 	Q[[i,1]]^2+Q[[i,2]]^2+Q[[i,3]]^2+Q[[i,4]]^2 == 1,
 	Q[[i,1]]\[Element]Reals,
@@ -163,7 +163,7 @@ eq=Table[{
    Return[ParallelTable[Quiet[Simplify[Refine[Expression[[i]],eq],eq,TimeConstraint->Tconstr]],{i,1,Length[Expression]}]];
    );
 
-SimplifyQLiteMatrix[Expression_, Q_, customeq_,Tconstr_:{0.5,60}] := (
+SimplifyQLiteMatrix[Expression_, Q_, customeq_,Tconstr_:{0.5,300}] := (
 eq=Table[{
 	Q[[i,1]]^2+Q[[i,2]]^2+Q[[i,3]]^2+Q[[i,4]]^2 == 1,
 	Q[[i,1]]\[Element]Reals,
