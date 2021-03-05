@@ -39,7 +39,6 @@ protected:
 
 	const static int _OFF = -1;
 
-private:
 	std::vector<ParameterTemporaries>& _params;
 
 };

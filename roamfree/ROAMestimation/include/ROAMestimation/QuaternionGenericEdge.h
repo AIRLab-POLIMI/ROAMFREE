@@ -155,22 +155,20 @@ public:
 		// <sensor_name>_SO and <sensor_name>_qOS
 
 		// populate the parameter name vector (C++11)
-		std::vector<std::string> to_serach = {"SO", "qOS"};
+		std::vector<std::string> to_search = {_name+"_"+"SO", _name+"_"+"qOS", "gravity"};
 
 		const std::string *argNames = _F.getParamsList();
 
 		for (int k = 0; k < _F.getNParams(); k++) {
-			to_serach.push_back(argNames[k]);
+			to_search.push_back(_name+"_"+argNames[k]);
 		}
 
 		// --- collect the parameter vertices managers
 
-		for (int k = 0; k < to_serach.size(); k++) {
-			std::stringstream s;
-			s << _name << "_" << to_serach[k];
+		for (int k = 0; k < to_search.size(); k++) {
 
 			std::map<std::string, boost::shared_ptr<ParameterVerticesManager> >::const_iterator it =
-			params.find(s.str());
+			params.find(to_search[k]);
 
 			if (it != params.end()) {
 				// allocate the parameter descriptor
@@ -178,7 +176,7 @@ public:
 
 			} else {
 				std::cerr << "[Sensor " << _name << "] Error: Parameter vertex '"
-				<< s.str() << "' not found in graph" << std::endl;
+				<< to_search[k] << "' not found in graph" << std::endl;
 			}
 		}
 
@@ -346,10 +344,11 @@ public:
 		// now we have to evaluate sum_i( J_err/augState_i * J_augState_i/vertex_j ) for each j not fixed
 		// which contributes to the augmented state computation
 
-		// for vertices 0-(MT::_ORDER+1 + 2) (the ones from which we compute the augmented state) compute their jacobian
-		// remember that we assume that S(O) and qOS are time-invariant parameters
+		// for vertices 0-(MT::_ORDER+1 + _N_STANDARD_PARAMETERS-1), e.g., for order 2, 0-5
+		// (the ones from which we compute the augmented state) compute their jacobian
+		// remember that we assume that S(O), qOS and gravity are time-invariant parameters
 
-		for (int v = 0; v < MT::_ORDER + 1 + 2; v++) {
+		for (int v = 0; v < MT::_ORDER + 1 + _N_STANDARD_PARAMETERS; v++) {
 
 			g2o::OptimizableGraph::Vertex *ov =
 			static_cast<g2o::OptimizableGraph::Vertex *>(_vertices[v]);
@@ -393,6 +392,11 @@ public:
 							}
 							break;
 
+							case 1:
+							  // gravity
+							std::cerr << "[Sensor " << _name << "] Error: estimation of gravity not supported in this context" << std::endl;
+							break;
+
 							default:
 							assert(false);
 
@@ -407,18 +411,18 @@ public:
 
 		// here we come to the non default parameters of the function
 
-		int cur_vertex = MT::_ORDER + 1 + 2;
+		int cur_vertex = MT::_ORDER + 1 + _N_STANDARD_PARAMETERS;
 
-		for (int k = 2; k < _params.size(); k++) {
+		for (int k = _N_STANDARD_PARAMETERS; k < _params.size(); k++) {
 			for (int h = 0; h < _params[k].p->getWindowSize(); h++, cur_vertex++) {
 
 				// if the vertex is fixed avoid wasting time
 
 				if (!static_cast<g2o::OptimizableGraph::Vertex *>(_vertices[cur_vertex])->fixed()) {
 
-					// second descriptor in _params is the first non default parameter (indexed with 1 in errorJacobian)
+					// k = _N_STANDARD_PARAMETERS in _params is the first non default parameter (indexed with 1 in errorJacobian, 0 is wrt noises)
 					// TODO: if the jacobian is the identity matrix there is no need to update this stuff every time
-					_F.errorJacobian(_x, _paramsPtrs, _measurement, k - 1,
+					_F.errorJacobian(_x, _paramsPtrs, _measurement, k - _N_STANDARD_PARAMETERS + 1,
 							_jacobianOplus[cur_vertex]);
 
 					// there is the nice property that post-multiplying to J(err) wrt parameter k

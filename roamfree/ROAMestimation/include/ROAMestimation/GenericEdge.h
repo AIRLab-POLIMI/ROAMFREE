@@ -71,6 +71,8 @@ class GenericEdge: public g2o::BaseMultiEdge<D, Eigen::VectorXd>,
 
   protected:
 
+    const static int _N_STANDARD_PARAMETERS = 3; /**< these are S(O), qOS, gravity */
+
     std::string _name; /**< the name of the sensor this edge refers to */
 
     double _tstamp; /**< timestamp of the measurement */
@@ -106,6 +108,7 @@ using GenericEdge<MT::_ERROR_SIZE>::_tstamp;                                \
 using GenericEdge<MT::_ERROR_SIZE>::_Dt01;                                  \
 using GenericEdge<MT::_ERROR_SIZE>::_Dt12;                                  \
 using GenericEdge<MT::_ERROR_SIZE>::_frameCounter;                          \
+using GenericEdge<MT::_ERROR_SIZE>::_N_STANDARD_PARAMETERS;                 \
 \
 using g2o::BaseMultiEdge<MT::_ERROR_SIZE, Eigen::VectorXd>::_information;   \
 using g2o::BaseMultiEdge<MT::_ERROR_SIZE, Eigen::VectorXd>::_measurement;   \
@@ -163,7 +166,7 @@ inline void GenericEdge<D>::handleParamTemporaries() {
 template<int D>
 void GenericEdge<D>::updateParamPtrs() {
   for (int k = 0; k < _paramsPtrsSize; k++) {
-    _paramsPtrs[k] = _params[k + 2].value.data();
+    _paramsPtrs[k] = _params[k + _N_STANDARD_PARAMETERS].value.data();
   }
 }
 

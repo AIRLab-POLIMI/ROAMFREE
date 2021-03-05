@@ -235,6 +235,9 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
         }
         case IMUINT_DELTAPOSE: {
           assert(ORDER > 1);
+
+          const double gravity = _params[2].value(0);
+
 #         include "generated/BackwardAugmentedStateEstimator_v7_JAugIMUintdPX2.cppready"
           return true;
         }
@@ -255,6 +258,9 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
         }
         case IMUINT_DELTAPOSE: {
           assert(ORDER > 1);
+
+          const double gravity = _params[2].value(0);
+
 #         include "generated/BackwardAugmentedStateEstimator_v7_JAugIMUintdPX1.cppready"
           return true;
         }
@@ -299,6 +305,9 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
         }
         case IMUINT_DELTAPOSE: {
           assert(ORDER > 1);
+
+          const double gravity = _params[2].value(0);
+
 #         include "generated/BackwardAugmentedStateEstimator_v7_JAugIMUintdPX0.cppready"
           return true;
         }
@@ -344,6 +353,9 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
           return true;
         }
         case (ORDER + 2): {
+
+          const double gravity = _params[2].value(0);
+
 #         include "generated/BackwardAugmentedStateEstimator_v7_JAugIMUintdPqOS.cppready"
           return true;
         }
