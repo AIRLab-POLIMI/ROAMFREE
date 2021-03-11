@@ -29,7 +29,7 @@ if exist(edgef, 'file')
         
         yl = max(std(err));
         
-        title([pluginConfig.sensorName ' res']);        
+        title([pluginConfig.sensorName ' res'], 'interpreter', 'none');        
         
         xlim([0, edge(end,1)-edge(1,1)])
         ylim([-3*yl-eps 3*yl+eps]);
