@@ -67,7 +67,7 @@ function StateObserver(area, globalConfig, pluginConfig)
                 reference = interp1(ground_truth(:,1), ground_truth(:,range_gt), edge(:,1));
 
                 if isQuaternion
-                    quat_rot_error = quatprod(quatinv(edge(:,range)), reference);
+                    quat_rot_error = quatprod_vec(quatinv(edge(:,range)), reference);
                     state_error = rad2deg(quat2euler(quat_rot_error));
                 else
                     state_error = edge(:,range) - reference;
