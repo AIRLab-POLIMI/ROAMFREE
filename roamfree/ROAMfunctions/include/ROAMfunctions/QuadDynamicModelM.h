@@ -69,7 +69,7 @@ public:
 
 #   include "generated/QuadDynamicModel_Err.cppready"
         
-        err.tail(3) << 0,0,0;
+      //  err.tail(3) << 0,0,0;
 		return false;
 	}
 
