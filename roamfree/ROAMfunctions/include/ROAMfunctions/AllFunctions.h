@@ -46,7 +46,6 @@ Contributors:
 #include "IMUIntegralDeltaQM.h"
 #include "QuadDynamicModelM.h"
 #include "PlaneDynamicModelM.h"
-#include "PlaneDynamicModelParamsV.h"
 
 #endif /* ALLFUNCTIONS_H_ */
 
