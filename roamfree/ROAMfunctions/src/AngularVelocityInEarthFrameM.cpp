@@ -10,19 +10,18 @@ Contributors:
 */
 
 /*
- * VectorField.cpp
+ * AngularVelocity.cpp
  *
- *  Created on: Apr 30, 2013
+ *  Created on: Nov 29, 2018
  *      Author: davide
  */
 
-#include "VectorField.h"
+#include "../include/ROAMfunctions/AngularVelocityInEarthFrameM.h"
 
 namespace ROAMfunctions {
+const bool AngularVelocityInEarthFrameM::_usedComponents[] = { false, true, false, true,
+		false, false, false, false, false, false };
 
-const bool VectorFieldM::_usedComponents[] = { false, true, false, false, false,
-		false, false, false, false, false };
+const std::string AngularVelocityInEarthFrameM::_paramsNames[] = { "G", "B", "EarthRate" };
 
-const std::string VectorFieldM::_paramsNames[] = { "R", "S", "h" };
-
-} /* namespace ROAMfunctions */
+}

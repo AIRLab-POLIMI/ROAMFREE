@@ -21,11 +21,9 @@ Contributors:
 
 #include "AbsolutePositionM.h"
 #include "AbsolutePoseM.h"
-#include "AngularVelocity.h"
-#include "AngularVelocityInEarthFrame.h"
+#include "AccelerationInEarthFrameM.h"
 #include "LinearVelocityM.h"
-#include "Acceleration.h"
-#include "AccelerationInEarthFrame.h"
+#include "AccelerationM.h"
 #include "TriskarKinematicM.h"
 #include "DifferentialDriveKinematicM.h"
 #include "GenericOdometerM.h"
@@ -34,7 +32,8 @@ Contributors:
 #include "RectangularObjectM.h"
 #include "AnchoredRectangularObjectM.h"
 #include "AnchoredRectangularObjectFirstM.h"
-#include "VectorField.h"
+#include "AngularVelocityInEarthFrameM.h"
+#include "AngularVelocityM.h"
 #include "VectorFieldAsCompass.h"
 #include "PlanarConstraintM.h"
 #include "FixedFeaturePositionM.h"
@@ -47,6 +46,7 @@ Contributors:
 #include "QuadDynamicModelM.h"
 #include "PlaneDynamicModelM.h"
 #include "LiDARTieFeaturesM.h"
+#include "VectorFieldM.h"
 
 #endif /* ALLFUNCTIONS_H_ */
 

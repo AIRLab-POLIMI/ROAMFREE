@@ -10,14 +10,14 @@ Contributors:
 */
 
 /*
- * AccelerationInEarthFrame.h
+ * AccelerationInEarthFrameM.h
  *
  *  Created on: Nov, 29 2018
  *      Author: davide
  */
 
-#ifndef ACCELERATIONINEARTHFRAME_H_
-#define ACCELERATIONINEARTHFRAME_H_
+#ifndef ACCELERATIONINEARTHFRAMEM_H_
+#define ACCELERATIONINEARTHFRAMEM_H_
 
 #include <string>
 #include <Eigen/Dense>
@@ -165,4 +165,4 @@ public:
 };
 
 } /* namespace ROAMfunctions */
-#endif /* ACCELERATIONINEARTHFRAME_H_ */
+#endif /* ACCELERATIONINEARTHFRAMEM_H_ */

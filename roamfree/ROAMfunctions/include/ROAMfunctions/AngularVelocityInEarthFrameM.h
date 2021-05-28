@@ -10,14 +10,14 @@ Contributors:
 */
 
 /*
- * AngularVelocity.h
+ * AngularVelocityInEarthFrameM.h
  *
  *  Created on: Nov, 29 2018
  *      Author: davide
  */
 
-#ifndef ANGULARVELOCITYINEARTHFRAME_H_
-#define ANGULARVELOCITYINEARTHFRAME_H_
+#ifndef ANGULARVELOCITYINEARTHFRAMEM_H_
+#define ANGULARVELOCITYINEARTHFRAMEM_H_
 
 #include <Eigen/Dense>
 
@@ -127,4 +127,4 @@ public:
   }
 };
 } /* namespace ROAMfunctions */
-#endif /* ANGULARVELOCITYINEARTHFRAME_H_ */
+#endif /* ANGULARVELOCITYINEARTHFRAMEM_H_ */

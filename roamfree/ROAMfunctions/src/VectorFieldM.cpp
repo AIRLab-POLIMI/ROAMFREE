@@ -10,18 +10,19 @@ Contributors:
 */
 
 /*
- * AngularVelocity.cpp
+ * VectorField.cpp
  *
- *  Created on: Apr 5, 2013
+ *  Created on: Apr 30, 2013
  *      Author: davide
  */
 
-#include "AngularVelocity.h"
+#include "../include/ROAMfunctions/VectorFieldM.h"
 
 namespace ROAMfunctions {
-const bool AngularVelocityM::_usedComponents[] = { false, false, false, true,
-		false, false, false, false, false, false };
 
-const std::string AngularVelocityM::_paramsNames[] = { "G", "B" };
+const bool VectorFieldM::_usedComponents[] = { false, true, false, false, false,
+		false, false, false, false, false };
 
-}
+const std::string VectorFieldM::_paramsNames[] = { "R", "S", "h" };
+
+} /* namespace ROAMfunctions */

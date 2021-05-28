@@ -10,18 +10,18 @@ Contributors:
 */
 
 /*
- * AngularVelocity.cpp
+ * AngularVelocityM.cpp
  *
- *  Created on: Nov 29, 2018
+ *  Created on: Apr 5, 2013
  *      Author: davide
  */
 
-#include "AngularVelocityInEarthFrame.h"
+#include "../include/ROAMfunctions/AngularVelocityM.h"
 
 namespace ROAMfunctions {
-const bool AngularVelocityInEarthFrameM::_usedComponents[] = { false, true, false, true,
+const bool AngularVelocityM::_usedComponents[] = { false, false, false, true,
 		false, false, false, false, false, false };
 
-const std::string AngularVelocityInEarthFrameM::_paramsNames[] = { "G", "B", "EarthRate" };
+const std::string AngularVelocityM::_paramsNames[] = { "G", "B" };
 
 }

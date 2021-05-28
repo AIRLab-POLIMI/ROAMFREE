@@ -10,14 +10,14 @@ Contributors:
 */
 
 /*
- * Acceleration.h
+ * AccelerationM.h
  *
  *  Created on: Mar 28, 2013
  *      Author: davide
  */
 
-#ifndef ACCELERATION_H_
-#define ACCELERATION_H_
+#ifndef ACCELERATIONM_H_
+#define ACCELERATIONM_H_
 
 #include <string>
 #include <Eigen/Dense>
@@ -132,4 +132,4 @@ public:
 };
 
 } /* namespace ROAMfunctions */
-#endif /* ACCELERATION_H_ */
+#endif /* ACCELERATIONM_H_ */

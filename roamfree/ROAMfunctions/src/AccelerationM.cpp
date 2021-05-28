@@ -10,13 +10,13 @@ Contributors:
 */
 
 /*
- * Acceleration.cpp
+ * AccelerationM.cpp
  *
  *  Created on: Mar 28, 2013
  *      Author: davide
  */
 
-#include "Acceleration.h"
+#include "../include/ROAMfunctions/AccelerationM.h"
 
 namespace ROAMfunctions {
 

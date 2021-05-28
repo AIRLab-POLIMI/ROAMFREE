@@ -10,30 +10,28 @@ Contributors:
 */
 
 /*
- * VectorField.h
+ * AngularVelocityM.h
  *
- *  Created on: Apr 30, 2013
+ *  Created on: Apr 5, 2013
  *      Author: davide
  */
 
-#ifndef VECTORFIELD_H_
-#define VECTORFIELD_H_
+#ifndef ANGULARVELOCITYM_H_
+#define ANGULARVELOCITYM_H_
 
-#include <string>
 #include <Eigen/Dense>
 
 namespace ROAMfunctions {
 
-class VectorFieldM {
-private:
+class AngularVelocityM {
 
 public:
   static const bool _usedComponents[];
 
   static const std::string _paramsNames[];
-  static const int _nParams = 3;
+  static const int _nParams = 2;
 
-  static const unsigned int _ORDER = 0;
+  static const unsigned int _ORDER = 1;
 
   static const unsigned int _ERROR_SIZE = 3;
   static const unsigned int _NOISE_SIZE = 3;
@@ -48,75 +46,72 @@ public:
 
   bool predict(const Eigen::VectorXd &x, double **params,
       const Eigen::VectorXd& z, double dt, Eigen::VectorXd &xhat) {
-    return false;
+    xhat = x; // TODO: dummy predictor
+
+    return true;
+
   }
 
   template<typename T>
-  bool error(const Eigen::VectorXd &x, double ** params,
+  bool error(const Eigen::VectorXd &x, double **params,
       const Eigen::VectorXd& z, Eigen::MatrixBase<T> const &const_ret) {
 
-    Eigen::Map<Eigen::VectorXd> r(params[0], 9);
-    Eigen::Map<Eigen::VectorXd> s(params[1], 3);
-    Eigen::Map<Eigen::VectorXd> h(params[2], 3);
+    Eigen::Map<Eigen::VectorXd> g(params[0], 3);
+    Eigen::Map<Eigen::VectorXd> b(params[1], 3);
 
     Eigen::MatrixBase<T> & err = const_cast<Eigen::MatrixBase<T>&>(const_ret);
 
     const static int _OFF = -1;
 
-#   include "generated/VectorField_Err.cppready"
+#   include "generated/AngularVelocity_Err.cppready"
 
     return false;
   }
 
   template<typename T>
-  bool errorJacobian(const Eigen::VectorXd &x, double ** params,
+  bool errorJacobian(const Eigen::VectorXd &x, double **params,
       const Eigen::VectorXd& z, int wrt,
       Eigen::MatrixBase<T> const &const_ret) {
 
-    Eigen::Map<Eigen::VectorXd> r(params[0], 9);
-    Eigen::Map<Eigen::VectorXd> s(params[1], 3);
-    Eigen::Map<Eigen::VectorXd> h(params[2], 3);
+    Eigen::Map<Eigen::VectorXd> g(params[0], 3);
+    Eigen::Map<Eigen::VectorXd> b(params[1], 3);
 
     Eigen::MatrixBase<T> & J = const_cast<Eigen::MatrixBase<T>&>(const_ret);
 
     const static int _OFF = -1;
 
     switch (wrt) {
-    case -2: // jacobian wrt to q
+    case -4: // jacobian wrt to w
     {
-#     include "generated/VectorField_JErrQ.cppready"
+#     include "generated/AngularVelocity_JErrX.cppready"
       return true;
       break;
     }
     case 0: // jacobian wrt to noises
     {
       // it is the identity matrix
-      //#include "generated/VectorField_JErrNoises.cppready"
+//#     include "generated/AngularVelocity_JErrNoises.cppready"
       return false;
       break;
     }
-    case 1: // jacobian wrt parameter R (matrix)
+    case 1: // jacobian wrt to Gain
     {
-#     include "generated/VectorField_JErrR.cppready"
+#     include "generated/AngularVelocity_JErrG.cppready"
       return true;
       break;
     }
-    case 2: // jacobian wrt parameter S (bias)
+    case 2: // jacobian wrt to bias
     {
-#     include "generated/VectorField_JErrS.cppready"
-      return false;
+#     include "generated/AngularVelocity_JErrB.cppready"
+      return false; // it is the identity matrix
       break;
     }
-    case 3: // jacobian wrt parameter h (magnetic field in world frame)
-#     include "generated/VectorField_JErrH.cppready"      
-      return true;
-      break;
+
     }
 
     assert(false);
     return false;
   }
 };
-
 } /* namespace ROAMfunctions */
-#endif /* VECTORFIELD_H_ */
+#endif /* ANGULARVELOCITYM_H_ */

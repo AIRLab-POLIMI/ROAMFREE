@@ -10,13 +10,13 @@ Contributors:
 */
 
 /*
- * Acceleration.cpp
+ * AccelerationInEarthFrameM.cpp
  *
  *  Created on: Mar 28, 2013
  *      Author: davide
  */
 
-#include "AccelerationInEarthFrame.h"
+#include "../include/ROAMfunctions/AccelerationInEarthFrameM.h"
 
 namespace ROAMfunctions {
 
