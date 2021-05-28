@@ -46,6 +46,7 @@ Contributors:
 #include "IMUIntegralDeltaQM.h"
 #include "QuadDynamicModelM.h"
 #include "PlaneDynamicModelM.h"
+#include "LiDARTieFeaturesM.h"
 
 #endif /* ALLFUNCTIONS_H_ */
 

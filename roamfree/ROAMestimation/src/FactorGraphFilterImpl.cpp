@@ -239,6 +239,9 @@ bool FactorGraphFilter_Impl::addSensor(const string& name, MeasTypes type,
   case PlaneDynamicModel:
       s.order = PlaneDynamicModelM::_ORDER;
       break;
+  case LiDARTieFeatures:
+      s.order = LiDARTieFeaturesM::_ORDER;
+      break;
   default:
     cerr << "[FactorGraphFilter] Error: unknown measurement type" << endl;
     break;
@@ -1373,6 +1376,9 @@ GenericEdgeInterface *FactorGraphFilter_Impl::addMeasurement_i(
     break;
   case QuadDynamicModel:
       e = new QuaternionGenericEdge<QuadDynamicModelM>;
+      break;
+  case LiDARTieFeatures:
+      e =  new QuaternionGenericEdge<LiDARTieFeaturesM>;
       break;
     
   default:

@@ -49,7 +49,7 @@ enum MeasTypes {
   IMUintegralDeltaQ,
   PlanarConstraint,
   QuadDynamicModel,
-  RotatingPushbroom
+  LiDARTieFeatures
 };
 
 enum ParameterTypes {
