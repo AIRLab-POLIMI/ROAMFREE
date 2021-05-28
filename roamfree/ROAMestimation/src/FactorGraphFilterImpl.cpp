@@ -200,9 +200,6 @@ bool FactorGraphFilter_Impl::addSensor(const string& name, MeasTypes type,
   case VectorField:
     s.order = VectorFieldM::_ORDER;
     break;
-  case VectorFieldAsCompass:
-    s.order = VectorFieldAsCompassM::_ORDER;
-    break;
   case IMUintegralDeltaP:
     s.order = IMUImtegralDeltaPM::_ORDER;
     break;
@@ -1346,9 +1343,6 @@ GenericEdgeInterface *FactorGraphFilter_Impl::addMeasurement_i(
     break;
   case VectorField:
     e = new QuaternionGenericEdge<VectorFieldM>;
-    break;
-  case VectorFieldAsCompass:
-    e = new QuaternionGenericEdge<VectorFieldAsCompassM>;
     break;
   case FixedFeaturePosition:
     e = new QuaternionGenericEdge<FixedFeaturePositionM>;

@@ -34,7 +34,6 @@ Contributors:
 #include "AnchoredRectangularObjectFirstM.h"
 #include "AngularVelocityInEarthFrameM.h"
 #include "AngularVelocityM.h"
-#include "VectorFieldAsCompass.h"
 #include "PlanarConstraintM.h"
 #include "FixedFeaturePositionM.h"
 #include "FixedFeaturePoseM.h"
