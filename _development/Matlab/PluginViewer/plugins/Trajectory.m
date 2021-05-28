@@ -164,7 +164,9 @@ if flag == 1
         end
         
         plot3(Lw(:,1), Lw(:,2), Lw(:,3), '.', 'Color', [0.75 0.75 0.75]);
-        plot3(Lw_gcps(:,1), Lw_gcps(:,2), Lw_gcps(:,3), '^', 'MarkerEdgeColor', [0.8500, 0.3250, 0.0980], 'MarkerFaceColor', [0.8500, 0.3250, 0.0980]);
+        if (size(Lw_gcps,1)>0)
+            plot3(Lw_gcps(:,1), Lw_gcps(:,2), Lw_gcps(:,3), '^', 'MarkerEdgeColor', [0.8500, 0.3250, 0.0980], 'MarkerFaceColor', [0.8500, 0.3250, 0.0980]);
+        end
     end
 
     if isfield(pluginConfig, 'FHPFeatureSensors')
