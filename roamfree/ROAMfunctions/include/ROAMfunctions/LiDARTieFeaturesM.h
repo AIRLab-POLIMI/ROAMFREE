@@ -31,7 +31,7 @@ public:
   static const std::string _paramsNames[];
   static const int _nParams = 0;
 
-  static const unsigned int _ORDER = 2;
+  static const unsigned int _ORDER = 1;
 
   static const unsigned int _ERROR_SIZE = 3;
   static const unsigned int _NOISE_SIZE = 3;

@@ -1,0 +1,15 @@
+tmp0 = x(26);
+tmp1 = x(25);
+tmp2 = z(2);
+tmp3 = z(3);
+tmp4 = x(24);
+tmp5 = z(1);
+tmp6 = x(23);
+tmp7 = tmp0*tmp2;
+tmp8 = -(tmp1*tmp3);
+tmp9 = tmp1*tmp2;
+tmp10 = (tmp4)^(2);
+tmp11 = (tmp1)^(2);
+err(1) = -x(20) + (-1 + 2*tmp11 + 2*(tmp0)^(2))*tmp5 + 2*tmp6*(tmp7 + tmp8) - 2*tmp4*(tmp9 + tmp0*tmp3) + z(4);
+err(2) = -x(21) - tmp2 + 2*tmp10*tmp2 + tmp4*(-2*tmp1*tmp5 + 2*tmp6*tmp3) + 2*tmp0*(-(tmp6*tmp5) + tmp7 + tmp8) + z(5);
+err(3) = -x(22) + 2*tmp6*(tmp1*tmp5 - tmp4*tmp2) - 2*tmp0*(tmp4*tmp5 + tmp9) - tmp3 + 2*(tmp10 + tmp11)*tmp3 + z(6);
