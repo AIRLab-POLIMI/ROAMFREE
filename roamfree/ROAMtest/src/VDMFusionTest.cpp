@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
   Eigen::VectorXd wndParams(3); // Initial parameters for Wind
   wndParams << 0.0, 0.0, 0.0;
 
-  f->addConstantParameter(Euclidean3D, "VDM_Wnd", wndParams, true);
+  f->addConstantParameter(Euclidean3D, "VDM_Wind", wndParams, true);
 
   //Drag parameter
   Eigen::VectorXd dragParams(3); // Initial parameters for Drag
