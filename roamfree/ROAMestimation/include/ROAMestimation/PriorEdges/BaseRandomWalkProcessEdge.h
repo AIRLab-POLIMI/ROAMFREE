@@ -57,6 +57,8 @@ class BaseRandomWalkProcessEdge: public BaseBinaryProcessEdge<D, VertexXi> {
 
       ROAMmath::invDiagonal(_noiseCov, _information);
 
+      // noiseCov contains the continuous time covariance
+      // cov_disc = cov_cont * dt
       for (int i = 0; i< D; i++) {
         _information(i,i) /= _dt;
       }

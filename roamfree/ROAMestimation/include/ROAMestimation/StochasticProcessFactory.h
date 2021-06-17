@@ -31,24 +31,42 @@ namespace ROAMestimation {
 class StochasticProcessFactory {
   public:
 
+    /**
+     * add an Euclidean 3D random constant process
+     */
     static ParameterWrapper_Ptr addEucl3DRandomConstant(FactorGraphFilter *f,
         std::string name, const Eigen::VectorXd &x0);
 
+    /**
+     * add an Euclidean 3D random walk process
+     *
+     * @ param randomWalkNoiseCov_cnt the *continuous* time variance of the Random Walk innovations (in <unit>/Hz)
+    */
     static ParameterWrapper_Ptr addEucl3DRandomWalk(FactorGraphFilter *f,
         std::string name, const Eigen::VectorXd &x0,
-        const Eigen::MatrixXd &randomWalkNoiseCov, double spacing,
+        const Eigen::MatrixXd &randomWalkNoiseCov_cnt, double spacing,
         InterpolationTypes intType = Linear, unsigned int a = 3);
 
+    /**
+     * add an Euclidean 3D 1st order Gauss-Markov process
+     *
+     * @ param gaussMarkovNoiseCov_cnt the *continuous* time variance of the Gauss-Markov innovations (in <unit>/Hz)
+    */
     static ParameterWrapper_Ptr addEucl3DGaussMarkov(FactorGraphFilter *f,
         std::string name, const Eigen::VectorXd &x0,
         const Eigen::VectorXd &gaussMarkovBeta,
-        const Eigen::MatrixXd &gaussMarkovNoiseCov, double spacing,
+        const Eigen::MatrixXd &gaussMarkovNoiseCov_cnt, double spacing,
         InterpolationTypes intType = Linear, unsigned int a = 3);
 
+    /**
+     * add an Euclidean 3D 1st order Gauss-Markov + random constant process
+     *
+     * @ param gaussMarkovNoiseCov_cnt the *continuous* time variance of the Gauss-Markov innovations (in <unit>/Hz)
+    */
     static ParameterWrapper_Ptr addEucl3DGaussMarkovPlusRandomConstant(
         FactorGraphFilter *f, std::string name, const Eigen::VectorXd &x0_rc,
         const Eigen::VectorXd &x0_gm, const Eigen::VectorXd &gaussMarkovBeta,
-        const Eigen::MatrixXd &gaussMarkovNoiseCov, double spacing,
+        const Eigen::MatrixXd &gaussMarkovNoiseCov_cnt, double spacing,
         InterpolationTypes intType = Linear, unsigned int a = 3);
 
   protected:
