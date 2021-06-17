@@ -20,7 +20,7 @@ Contributors:
 
 namespace ROAMfunctions {
 const bool GenericOdometerM::_usedComponents[] = { false, false, true, true,
-		false, false, false, false, false, false };
+		false, false, false, false, false, false, false, false };
 
 const std::string GenericOdometerM::_paramsNames[] = { "empty" };
 

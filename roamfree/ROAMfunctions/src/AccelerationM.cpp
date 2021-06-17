@@ -21,7 +21,7 @@ Contributors:
 namespace ROAMfunctions {
 
 const bool AccelerationM::_usedComponents[] = { false, true, false, false, true,
-		false, false, false, false, false };
+		false, false, false, false, false, false, false};
 
 const std::string AccelerationM::_paramsNames[] = { "G", "B", "Gravity" };
 

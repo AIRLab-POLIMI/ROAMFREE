@@ -124,6 +124,27 @@ public:
 
     switch (wrt) {
 
+    case -12: // jacobian wrt to previous omega
+    {
+#     include "generated/PlaneDynamicModel_JErrWprev.cppready"
+      return true;
+      break;
+    }
+
+    case -11: // jacobian wrt to previous v
+    {
+#     include "generated/PlaneDynamicModel_JErrVprev.cppready"
+      return true;
+      break;
+    }
+
+    case -10: // jacobian wrt to previous q
+    {
+#     include "generated/PlaneDynamicModel_JErrQprev.cppready"
+      return true;
+      break;
+    }
+
     case -6: // jacobian wrt to alpha
     {
 #     include "generated/PlaneDynamicModel_JErrAlpha.cppready"

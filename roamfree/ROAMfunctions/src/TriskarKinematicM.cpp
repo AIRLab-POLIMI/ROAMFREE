@@ -21,7 +21,7 @@ Contributors:
 namespace ROAMfunctions {
 
 const bool TriskarKinematicM::_usedComponents[] = { false, false, true, true,
-		false, false, false, false, false, false };
+		false, false, false, false, false, false, false, false };
 
 const std::string TriskarKinematicM::_paramsNames[] = { "R", "L" };
 
