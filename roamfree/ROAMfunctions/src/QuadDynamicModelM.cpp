@@ -19,7 +19,7 @@ Contributors:
 #include "QuadDynamicModelM.h"
 
 namespace ROAMfunctions {                        // x      q      v      w      a    alpha
-const bool QuadDynamicModelM::_usedComponents[] = {false, true,  true,  true, true, true, false, false, false, false};
+const bool QuadDynamicModelM::_usedComponents[] = {false, true,  true,  true, true, true, false, false, false, false, false, false};
 
 const std::string QuadDynamicModelM::_paramsNames[] = {"Wind", "Drag", "Mc", "Cp", "Ibd", "Ibod", "Gravity"};
 

@@ -20,7 +20,7 @@ Contributors:
 
 namespace ROAMfunctions {
 const bool AngularVelocityInEarthFrameM::_usedComponents[] = { false, true, false, true,
-		false, false, false, false, false, false };
+		false, false, false, false, false, false, false, false };
 
 const std::string AngularVelocityInEarthFrameM::_paramsNames[] = { "G", "B", "EarthRate" };
 

@@ -110,6 +110,22 @@ public:
 
 #         		include "generated/BackwardAugmentedStateEstimator_v7_IMUintdP.cppready"
 		}
+		if (_usedComponents[PREVIOUS_ORIENTATION])
+		{
+			_x.segment(29, 4) = x1.segment(3, 4);
+		}
+		if (_usedComponents[PREVIOUS_LINEARVELOCITY])
+		{
+			Eigen::VectorBlock<Eigen::VectorXd> &&part = _x.segment(33, 3);
+
+#         		include "generated/BackwardAugmentedStateEstimator_v7_Vprev.cppready"
+		}
+		if (_usedComponents[PREVIOUS_ANGULARVELOCITY])
+		{
+			Eigen::VectorBlock<Eigen::VectorXd> &&part = _x.segment(36, 3);
+
+#         		include "generated/BackwardAugmentedStateEstimator_v7_Wprev.cppready"
+		}
 
 		return true;
 

@@ -21,7 +21,7 @@ Contributors:
 namespace ROAMfunctions {
 
 const bool VectorFieldM::_usedComponents[] = { false, true, false, false, false,
-		false, false, false, false, false };
+		false, false, false, false, false, false, false };
 
 const std::string VectorFieldM::_paramsNames[] = { "R", "S", "h" };
 
