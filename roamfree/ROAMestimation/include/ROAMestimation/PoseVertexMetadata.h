@@ -33,8 +33,9 @@ struct PoseVertexMetadata : public g2o::OptimizableGraph::Data {
 	bool computeUncertainty;
 	bool keepSpatialIndex;
 	bool hasBeenEstimated;
+	bool isInterpolated;
 
-	PoseVertexMetadata() : computeUncertainty(false), keepSpatialIndex(false), hasBeenEstimated(false) {}
+	PoseVertexMetadata() : computeUncertainty(false), keepSpatialIndex(false), hasBeenEstimated(false), isInterpolated(false) {}
 
 	//! read from a stream not implemented
   inline virtual bool read(std::istream& is) {
