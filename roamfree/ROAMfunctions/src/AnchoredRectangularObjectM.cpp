@@ -20,7 +20,7 @@ Contributors:
 
 namespace ROAMfunctions {
 
-const bool AnchoredRectangularObjectM::_usedComponents[] = {true, true, false, false, false, false, false, false, false, false};
+const bool AnchoredRectangularObjectM::_usedComponents[] = {true, true, false, false, false, false, false, false, false, false, false, false};
 
 const std::string AnchoredRectangularObjectM::_paramsNames[] = {"Dim", "F", "FOhp", "FOq", "CM"};
 

@@ -20,7 +20,7 @@ Contributors:
 
 namespace ROAMfunctions {
 const bool FixedFeaturePoseM::_usedComponents[] = { true, true, false, false,
-		false, false, false, false, false, false };
+		false, false, false, false, false, false, false, false };
 
 const std::string FixedFeaturePoseM::_paramsNames[] = { "Fposition",
 		"Forientation" };

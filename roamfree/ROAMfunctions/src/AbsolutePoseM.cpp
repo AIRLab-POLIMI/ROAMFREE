@@ -21,7 +21,7 @@ Contributors:
 namespace ROAMfunctions {
 
 const bool AbsolutePoseM::_usedComponents[] = { true, true, false, false,
-		false, false, false, false, false, false };
+		false, false, false, false, false, false, false, false};
 
 const std::string AbsolutePoseM::_paramsNames[] = { "empty" };
 

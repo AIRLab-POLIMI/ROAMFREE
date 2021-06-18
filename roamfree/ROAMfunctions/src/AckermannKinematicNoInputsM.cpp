@@ -21,7 +21,7 @@ Contributors:
 namespace ROAMfunctions {
 
 const bool AckermannKinematicNoInputsM::_usedComponents[] = { false, false, true, true, false,
-    false, false, false, false, false };
+    false, false, false, false, false, false, false };
 
 const std::string AckermannKinematicNoInputsM::_paramsNames[] = { "CV", "CDelta", "L" };
 
