@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       145,          7]
-NotebookDataLength[    164008,       4282]
-NotebookOptionsPosition[    159280,       4210]
-NotebookOutlinePosition[    159668,       4227]
-CellTagsIndexPosition[    159625,       4224]
+NotebookDataLength[    163426,       4264]
+NotebookOptionsPosition[    158700,       4192]
+NotebookOutlinePosition[    159088,       4209]
+CellTagsIndexPosition[    159045,       4206]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -4115,30 +4115,12 @@ mB43iH52PVsERK/ZHSYJogEySxcA
  CellLabel->
   "In[842]:=",ExpressionUUID->"864a38bf-76e6-483d-bd19-c6de0b9986c0"],
 
-Cell[BoxData[
- RowBox[{
-  RowBox[{"(*", " ", 
-   RowBox[{"debug", " ", "output"}], " ", "*)"}], "\[IndentingNewLine]", 
-  RowBox[{
-   RowBox[{
-    RowBox[{"MyStringWrite", "[", 
-     RowBox[{
-      RowBox[{"ToGoodC", "[", 
-       RowBox[{"Flatten", "[", 
-        RowBox[{"{", 
-         RowBox[{"Ahat", ",", " ", "AlphaHat"}], "}"}], "]"}], "]"}], ",", 
-      "\"\<QuadDynamicModel_xhat.mthout\>\""}], "]"}], ";"}], 
-   "\[IndentingNewLine]", 
-   RowBox[{
-    RowBox[{
-    "Run", "[", 
-     "\"\<python ../fixMathematicaOutput_v2.py QuadDynamicModel_xhat.mthout \
-err 1 0\>\"", "]"}], ";"}], "\[IndentingNewLine]"}]}]], "Input",
+Cell[BoxData["\[IndentingNewLine]"], "Input",
  CellChangeTimes->{{3.6980416039453173`*^9, 3.698041608615369*^9}, {
-  3.698041854979567*^9, 3.6980419185259113`*^9}, {3.749893065239154*^9, 
-  3.749893065695045*^9}},
- CellLabel->
-  "In[855]:=",ExpressionUUID->"7a2f9173-a23d-4062-a0ab-7b097f8f0928"],
+   3.698041854979567*^9, 3.6980419185259113`*^9}, {3.749893065239154*^9, 
+   3.749893065695045*^9}, 
+   3.833280119185337*^9},ExpressionUUID->"7a2f9173-a23d-4062-a0ab-\
+7b097f8f0928"],
 
 Cell[BoxData[""], "Input",
  CellChangeTimes->{{3.749823534638563*^9, 3.749823534822504*^9}, {
@@ -4278,12 +4260,12 @@ Cell[128728, 3411, 17688, 475, 401, "Output",ExpressionUUID->"637961ce-a6cd-4367
 Cell[146431, 3889, 243, 5, 31, "Input",ExpressionUUID->"73d5a0e4-0393-4110-98d0-6d564b860931"],
 Cell[146677, 3896, 5453, 134, 515, "Input",ExpressionUUID->"5fa479f5-23a9-4380-8d16-935421178975"],
 Cell[152133, 4032, 2929, 83, 354, "Input",ExpressionUUID->"864a38bf-76e6-483d-bd19-c6de0b9986c0"],
-Cell[155065, 4117, 878, 23, 101, "Input",ExpressionUUID->"7a2f9173-a23d-4062-a0ab-7b097f8f0928"],
-Cell[155946, 4142, 519, 8, 31, "Input",ExpressionUUID->"8d510ec1-e228-4ef1-b1f5-5f539b8d5d63"],
-Cell[156468, 4152, 481, 11, 31, "Input",ExpressionUUID->"9dadf0d7-2b5c-4547-878a-bae238a21070"],
-Cell[156952, 4165, 597, 12, 55, "Input",ExpressionUUID->"15384276-cfb4-4857-b49f-c0f1d981bf5e"],
-Cell[157552, 4179, 133, 3, 31, "Input",ExpressionUUID->"7516ccfa-e0e8-4e9a-abda-6c56e1b306c4"],
-Cell[157688, 4184, 1588, 24, 35, "Output",ExpressionUUID->"1b671ade-f2d5-461a-a916-343a57ff1537"]
+Cell[155065, 4117, 298, 5, 55, "Input",ExpressionUUID->"7a2f9173-a23d-4062-a0ab-7b097f8f0928"],
+Cell[155366, 4124, 519, 8, 31, "Input",ExpressionUUID->"8d510ec1-e228-4ef1-b1f5-5f539b8d5d63"],
+Cell[155888, 4134, 481, 11, 31, "Input",ExpressionUUID->"9dadf0d7-2b5c-4547-878a-bae238a21070"],
+Cell[156372, 4147, 597, 12, 55, "Input",ExpressionUUID->"15384276-cfb4-4857-b49f-c0f1d981bf5e"],
+Cell[156972, 4161, 133, 3, 31, "Input",ExpressionUUID->"7516ccfa-e0e8-4e9a-abda-6c56e1b306c4"],
+Cell[157108, 4166, 1588, 24, 35, "Output",ExpressionUUID->"1b671ade-f2d5-461a-a916-343a57ff1537"]
 }
 ]
 *)
