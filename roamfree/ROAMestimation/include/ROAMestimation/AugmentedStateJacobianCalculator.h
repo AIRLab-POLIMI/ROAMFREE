@@ -241,6 +241,21 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
 #         include "generated/BackwardAugmentedStateEstimator_v7_JAugIMUintdPX2.cppready"
           return true;
         }
+        case PREVIOUS_ORIENTATION: {
+          assert(ORDER > 1);
+          // do nothing
+          return true;
+        }
+        case PREVIOUS_LINEARVELOCITY: {
+          assert(ORDER > 1);
+          // do nothing
+          return true;
+        }
+        case PREVIOUS_ANGULARVELOCITY: {
+          assert(ORDER > 1);
+          // do nothing
+          return true;
+        }
         }
       }
 
@@ -262,6 +277,21 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
           const double gravity = _params[2].value(0);
 
 #         include "generated/BackwardAugmentedStateEstimator_v7_JAugIMUintdPX1.cppready"
+          return true;
+        }
+        case PREVIOUS_ORIENTATION: {
+          assert(ORDER > 1);
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugQprevX1.cppready"
+          return true;
+        }
+        case PREVIOUS_LINEARVELOCITY: {
+          assert(ORDER > 1);
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugVprevX1.cppready"
+          return true;
+        }
+        case PREVIOUS_ANGULARVELOCITY: {
+          assert(ORDER > 1);
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugWprevX1.cppready"
           return true;
         }
         }
@@ -311,6 +341,21 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
 #         include "generated/BackwardAugmentedStateEstimator_v7_JAugIMUintdPX0.cppready"
           return true;
         }
+        case PREVIOUS_ORIENTATION: {
+          assert(ORDER > 1);
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugQprevX0.cppready"
+          return true;
+        }
+        case PREVIOUS_LINEARVELOCITY: {
+          assert(ORDER > 1);
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugVprevX0.cppready"
+          return true;
+        }
+        case PREVIOUS_ANGULARVELOCITY: {
+          assert(ORDER > 1);
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugWprevX0.cppready"
+          return true;
+        }
         }
       }
 
@@ -357,6 +402,51 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
           const double gravity = _params[2].value(0);
 
 #         include "generated/BackwardAugmentedStateEstimator_v7_JAugIMUintdPqOS.cppready"
+          return true;
+        }
+        }
+
+        break;
+      }
+      case PREVIOUS_ORIENTATION: {
+        assert(ORDER > 1);
+        switch (x) {
+        case (ORDER + 1): {
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugQprevSO.cppready"
+          return true;
+        }
+        case (ORDER + 2): {
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugQprevqOS.cppready"
+          return true;
+        }
+        }
+
+        break;
+      }
+      case PREVIOUS_LINEARVELOCITY: {
+        assert(ORDER > 1);
+        switch (x) {
+        case (ORDER + 1): {
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugVprevSO.cppready"
+          return true;
+        }
+        case (ORDER + 2): {
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugVprevqOS.cppready"
+          return true;
+        }
+        }
+
+        break;
+      }
+      case PREVIOUS_ANGULARVELOCITY: {
+        assert(ORDER > 1);
+        switch (x) {
+        case (ORDER + 1): {
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugWprevSO.cppready"
+          return true;
+        }
+        case (ORDER + 2): {
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugWprevqOS.cppready"
           return true;
         }
         }

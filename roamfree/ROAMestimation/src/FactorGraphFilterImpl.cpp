@@ -712,15 +712,29 @@ PoseVertex *FactorGraphFilter_Impl::addInterpolatingPose_i(double t,
   }
 
   before = after;
-  --before;
-  
-  if(after->second->getTimestamp() - t < 1e-6)
-  {
+
+  if(after->second->getTimestamp() - t < 1e-6)  {
     return after->second;
   }
-  else if(t - before->second->getTimestamp() < 1e-6)
-  {
+
+  // advance after to the first non interpolated pose
+  while (static_cast<PoseVertexMetadata *>(after->second->userData())->isInterpolated == true) {
+    ++after;
+
+    assert(after != _poses.end()); // should never happen
+  }
+
+  --before;
+  
+  if(t - before->second->getTimestamp() < 1e-6) {
     return before->second;
+  }
+
+  // recoil before to the first non interpolated pose
+  while (static_cast<PoseVertexMetadata *>(before->second->userData())->isInterpolated == true) {
+    assert(before != _poses.begin()); // should never happen
+
+    --before;
   }
 
   PoseVertex *xi = addPose_i(t);
@@ -749,7 +763,10 @@ PoseVertex *FactorGraphFilter_Impl::addInterpolatingPose_i(double t,
   ROAMmath::invDiagonal(pseudoObsCov, edge->information());
 
   edge->init();
-  static_cast<PoseVertexMetadata *>(xi->userData())->hasBeenEstimated = true; // prediction is already accurate
+
+  PoseVertexMetadata *meta = static_cast<PoseVertexMetadata *>(xi->userData());
+  meta->hasBeenEstimated = true; // prediction is already accurate
+  meta->isInterpolated = true;
 
   // create the metadata
   edge->setUserData(new MeasurementEdgeMetadata);
@@ -1788,7 +1805,6 @@ bool FactorGraphFilter_Impl::estimate_i(g2o::HyperGraph::EdgeSet &eset,
   double tInitialized = g2o::get_time();
 
 // run the optimization
-
   bool ret = _optimizer->optimize(nIterations) || nIterations == 0;
   if (ret == false) {
 #   ifdef DEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES

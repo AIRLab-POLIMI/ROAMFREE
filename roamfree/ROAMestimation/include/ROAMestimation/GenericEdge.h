@@ -119,7 +119,7 @@ using g2o::BaseMultiEdge<MT::_ERROR_SIZE, Eigen::VectorXd>::resize;
 template<int D>
 GenericEdge<D>::GenericEdge(int nParams) :
     _paramsPtrsSize(nParams), _name("undefined"), _tstamp(
-        -std::numeric_limits<double>::infinity()), _Dt01(0), _Dt12(0), _x(33) {
+        -std::numeric_limits<double>::infinity()), _Dt01(0), _Dt12(0), _x(39) {
 
   _paramsPtrs = new double *[_paramsPtrsSize]; // 1 Euclidean 3D, 1 Quaternion the possible function specific params
 }

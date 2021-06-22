@@ -21,7 +21,7 @@ Contributors:
 namespace ROAMfunctions {
 
 const bool LinearVelocityM::_usedComponents[] = { false, false, true, false,
-		false, false, false, false, false, false };
+		false, false, false, false, false, false, false, false };
 
 const std::string LinearVelocityM::_paramsNames[] = { "empty" };
 

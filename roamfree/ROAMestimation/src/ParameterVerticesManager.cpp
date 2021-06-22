@@ -149,12 +149,11 @@ g2o::OptimizableGraph::Vertex * ParameterVerticesManager::newVertex(
 
     switch (_process) {
     case RandomWalk:
-      addRandomWalkProcessEdge(older, newer, _randomWalkNoiseCov, dt);
+      addRandomWalkProcessEdge(older, newer, dt);
       break;
 
     case GaussMarkov:
-      addGaussMarkovProcessEdge(older, newer, _gaussMarkovNoiseCov,
-          _gaussMarkovBeta, dt);
+      addGaussMarkovProcessEdge(older, newer, dt);
       break;
     }
 
@@ -178,8 +177,7 @@ void ParameterVerticesManager::setProcessModelType(ProcessTypes t) {
 }
 
 g2o::OptimizableGraph::Edge* ParameterVerticesManager::addRandomWalkProcessEdge(
-    g2o::OptimizableGraph::Vertex* older, g2o::OptimizableGraph::Vertex* newer,
-    const Eigen::MatrixXd& noiseCov, double dt) {
+    g2o::OptimizableGraph::Vertex* older, g2o::OptimizableGraph::Vertex* newer, double dt) {
 
   g2o::OptimizableGraph::Edge * oe;
 
@@ -187,7 +185,7 @@ g2o::OptimizableGraph::Edge* ParameterVerticesManager::addRandomWalkProcessEdge(
   case Euclidean3D: {
     Eucl3DRandomWalkProcessEdge*gmpe = new Eucl3DRandomWalkProcessEdge;
 
-    gmpe->setNoiseCov(noiseCov);
+    gmpe->setNoiseCov(_randomWalkNoiseCov_cnt);
     gmpe->init(dt);
 
     gmpe->setCategory(_name + "_proc");
@@ -216,8 +214,7 @@ g2o::OptimizableGraph::Edge* ParameterVerticesManager::addRandomWalkProcessEdge(
 }
 
 g2o::OptimizableGraph::Edge* ParameterVerticesManager::addGaussMarkovProcessEdge(
-    g2o::OptimizableGraph::Vertex* older, g2o::OptimizableGraph::Vertex* newer,
-    const Eigen::MatrixXd& noiseCov, const Eigen::VectorXd &beta, double dt) {
+    g2o::OptimizableGraph::Vertex* older, g2o::OptimizableGraph::Vertex* newer, double dt) {
 
   g2o::OptimizableGraph::Edge * oe;
 
@@ -225,8 +222,8 @@ g2o::OptimizableGraph::Edge* ParameterVerticesManager::addGaussMarkovProcessEdge
   case Euclidean3D: {
     Eucl3DGaussMarkovProcessEdge *gmpe = new Eucl3DGaussMarkovProcessEdge;
 
-    gmpe->setNoiseCov(noiseCov);
-    gmpe->init(beta, dt);
+    gmpe->setNoiseCov(_gaussMarkovNoiseCov_cnt);
+    gmpe->init(_gaussMarkovBeta, dt);
 
     gmpe->setCategory(_name + "_proc");
     gmpe->setTimestamp(
@@ -254,14 +251,14 @@ g2o::OptimizableGraph::Edge* ParameterVerticesManager::addGaussMarkovProcessEdge
 }
 
 void ParameterVerticesManager::setGaussMarkovProcessNoiseCov(
-    const Eigen::MatrixXd &cov) {
+    const Eigen::MatrixXd &cov_cnt) {
   if (_process != ProcessTypes::GaussMarkov) {
     std::cerr
         << "[ParameterVerticesManager] Warning: setting Gauss-Markov process noise covariance with different process type"
         << std::endl;
   }
 
-  _gaussMarkovNoiseCov = cov;
+  _gaussMarkovNoiseCov_cnt = cov_cnt;
 }
 
 void ParameterVerticesManager::setGaussMarkovProcessBeta(
@@ -277,14 +274,14 @@ void ParameterVerticesManager::setGaussMarkovProcessBeta(
 }
 
 void ParameterVerticesManager::setRandomWalkProcessNoiseCov(
-    const Eigen::MatrixXd& cov) {
+    const Eigen::MatrixXd& cov_cnt) {
   if (_process != ProcessTypes::RandomWalk) {
     std::cerr
         << "[ParameterVerticesManager] Warning: setting Random-Walk process noise covariance with different process type"
         << std::endl;
   }
 
-  _randomWalkNoiseCov = cov;
+  _randomWalkNoiseCov_cnt = cov_cnt;
 }
 
 GenericVertexInterface* ParameterVerticesManager::getVertexNearestTo(

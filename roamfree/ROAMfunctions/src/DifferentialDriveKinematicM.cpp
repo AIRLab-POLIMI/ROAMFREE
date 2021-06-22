@@ -20,7 +20,7 @@ Contributors:
 
 namespace ROAMfunctions {
 const bool DifferentialDriveKinematicM::_usedComponents[] = { false, false,
-		true, true, false, false, false, false, false, false };
+		true, true, false, false, false, false, false, false, false, false };
 
 const std::string DifferentialDriveKinematicM::_paramsNames[] = { "R", "L" };
 

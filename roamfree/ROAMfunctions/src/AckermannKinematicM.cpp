@@ -21,7 +21,7 @@ Contributors:
 namespace ROAMfunctions {
 
 const bool AckermannM::_usedComponents[] = { false, false, true, true, false,
-		false, false, false, false, false };
+		false, false, false, false, false, false, false };
 
 const std::string AckermannM::_paramsNames[] = { "kSpeed", "kSteer", "psiSteer",
 		"L" };

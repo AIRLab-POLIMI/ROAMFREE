@@ -110,7 +110,7 @@ public:
 
 		for (int k = 0; k < AUGSTATE_N_COMPONENTS; k++) {
 			if (_F._usedComponents[k] == true) {
-				_JErrx[k] = new Eigen::MatrixXd((int) MT::_ERROR_SIZE, (k == 1 || k == 7) ? 4 : 3);
+				_JErrx[k] = new Eigen::MatrixXd((int) MT::_ERROR_SIZE, (k == 1 || k == 7 || k == 9) ? 4 : 3);
 			}
 
 			isNotTheIdentity[k] = true;
@@ -232,7 +232,7 @@ public:
 		// check that I have no duplicates in the vertex set
 		for (int i = 0; i < freeVertexPosition-1; i++) {
 			for (int j = i+1; j< freeVertexPosition; j++) {
-				assert( _vertices[i]!= _vertices[j]);
+				// assert( _vertices[i]!= _vertices[j]);
 			}
 		}
 #		endif
@@ -370,7 +370,7 @@ public:
 						switch (ov->dimension()) { // this is for the dimension of temporaries
 							case 3: 
 							// SO or qOS, cols = 3
-							if (k == 1 || k == 7) { // with respect to some quaternion, rows = 4
+							if (k == 1 || k == 7 || k == 9) { // with respect to some quaternion, rows = 4
 								computeJacobianBlock(k, v, _JxArgs4x3);
 								_jacobianOplus[v].noalias() += (*_JErrx[k]) * _JxArgs4x3;
 							} else {
@@ -382,7 +382,7 @@ public:
 
 							case 6:  
 							// pose vertices, cols = 6
-							if (k == 1 || k == 7) { // with respect to q or delta q, rows = 4
+							if (k == 1 || k == 7 || k == 9) { // with respect to q or delta q, rows = 4
 								computeJacobianBlock(k, v, _JxArgs4x6);
 								_jacobianOplus[v].noalias() += (*_JErrx[k]) * _JxArgs4x6;
 							} else {

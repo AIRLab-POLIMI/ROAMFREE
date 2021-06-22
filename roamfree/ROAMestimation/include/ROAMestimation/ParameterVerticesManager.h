@@ -68,14 +68,14 @@ class ParameterVerticesManager {
     virtual void setProcessModelType(ProcessTypes t);
 
     /**
-     * \brief set the noise covariance matrix for the GaussMarkovProcessEdge
+     * \brief set the noise covariance matrix for the RandomWalkProcessEdge (N.B. in continuous time units, e.g. deg^2/s^2/Hz)
      */
-    virtual void setRandomWalkProcessNoiseCov(const Eigen::MatrixXd &cov);
+    virtual void setRandomWalkProcessNoiseCov(const Eigen::MatrixXd &cov_cnt);
 
     /**
-     * \brief set the noise covariance matrix for the GaussMarkovProcessEdge
+     * \brief set the noise covariance matrix for the GaussMarkovProcessEdge (N.B. in continuous time units, e.g. deg^2/s^2/Hz)
      */
-    virtual void setGaussMarkovProcessNoiseCov(const Eigen::MatrixXd &cov);
+    virtual void setGaussMarkovProcessNoiseCov(const Eigen::MatrixXd &cov_cnt);
 
     /**
      * \brief set the beta for the GaussMarkovProcessEdge. With beta = 0 you have a random walk.
@@ -276,9 +276,9 @@ class ParameterVerticesManager {
     // stuff for process models
     ProcessTypes _process; //!< type of the process model for the parameter
 
-    Eigen::MatrixXd _randomWalkNoiseCov;
+    Eigen::MatrixXd _randomWalkNoiseCov_cnt;
 
-    Eigen::MatrixXd _gaussMarkovNoiseCov;
+    Eigen::MatrixXd _gaussMarkovNoiseCov_cnt;
     Eigen::VectorXd _gaussMarkovBeta;
 
     VertexMap _v;
@@ -300,7 +300,7 @@ class ParameterVerticesManager {
      */
     g2o::OptimizableGraph::Edge * addRandomWalkProcessEdge(
         g2o::OptimizableGraph::Vertex *older,
-        g2o::OptimizableGraph::Vertex *newer, const Eigen::MatrixXd &noiseCov,
+        g2o::OptimizableGraph::Vertex *newer,
         double dt);
 
     /**
@@ -308,8 +308,8 @@ class ParameterVerticesManager {
      */
     g2o::OptimizableGraph::Edge * addGaussMarkovProcessEdge(
         g2o::OptimizableGraph::Vertex *older,
-        g2o::OptimizableGraph::Vertex *newer, const Eigen::MatrixXd &noiseCov,
-        const Eigen::VectorXd &beta, double dt);
+        g2o::OptimizableGraph::Vertex *newer,
+        double dt);
 
     /**
      * returns the vertex in the set which is nearest to tstamp

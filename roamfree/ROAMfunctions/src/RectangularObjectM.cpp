@@ -19,7 +19,7 @@ Contributors:
 #include "RectangularObjectM.h"
 
 namespace ROAMfunctions {
-const bool RectangularObjectM::_usedComponents[] = {true, true, false, false, false, false, false, false, false, false};
+const bool RectangularObjectM::_usedComponents[] = {true, true, false, false, false, false, false, false, false, false, false, false};
 
 const std::string RectangularObjectM::_paramsNames[] = {"Dim", "F", "CM"};
 

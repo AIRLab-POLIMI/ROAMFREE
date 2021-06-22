@@ -20,6 +20,8 @@
 
 #include "SE3InterpolationEdge.h"
 
+#include "ROAMutils/StringUtils.h"
+
 using namespace std;
 
 namespace ROAMestimation {
@@ -124,7 +126,7 @@ std::string SE3InterpolationEdge::writeDebugInfo() const {
   PoseVertex *xiv = static_cast<PoseVertex *>(_vertices[1]);
   PoseVertex *x2v = static_cast<PoseVertex *>(_vertices[2]);
 
-  s << "SE3InterpolationEdge(" << x1v->id() << "," << xiv->id() << ","
+  s << "SE3InterpolationEdge[" << ROAMutils::StringUtils::writeNiceTimestamp(xiv->getTimestamp()) <<"](" << x1v->id() << "," << xiv->id() << ","
       << x2v->id() << ")";
 
   return s.str();

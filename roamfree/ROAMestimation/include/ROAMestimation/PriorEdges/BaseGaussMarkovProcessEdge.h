@@ -78,13 +78,13 @@ class BaseGaussMarkovProcessEdge: public BaseBinaryProcessEdge<D, VertexXi> {
 
       ROAMmath::invDiagonal(_noiseCov, _information);
 
-      // obtain the discrete time covariance matrix as a function
-      // of beta and dt
-      for (int i = 0; i < D; i++) {
-    	// From Sensor Orientation coursebook (looks wrong scaling coeff is not unitless)
-    	//_information(i, i) /= 1.0 / (2.0 * _beta(i))*(1.0 - exp(-2.0 * _beta(i) * _dt));
+      // noiseCov contains the continuous time covariance
+      // cov_disc = cov_cnt * (1-exp(-2*beta*dt) / (2 * beta)
+      // from "Estimation with Applications to Tracking and Navigation", Y. Bar-Shalom
+      // Equation 4.3.1-8, page 188
 
-    	_information(i,i) /= (1.0 - exp(-2.0 * _beta(i) * _dt));
+      for (int i = 0; i < D; i++) {
+        _information(i,i) /= (1.0 - exp(-2.0 * _beta(i) * _dt)) / (2.0 * _beta(i));
       }
       //
     }

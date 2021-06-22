@@ -19,7 +19,7 @@ Contributors:
 #include "FramedHomogeneousPointM.h"
 
 namespace ROAMfunctions {
-const bool FramedHomogeneousPointM::_usedComponents[] = {true, true, false, false, false, false, false, false, false, false};
+const bool FramedHomogeneousPointM::_usedComponents[] = {true, true, false, false, false, false, false, false, false, false, false, false};
 
 const std::string FramedHomogeneousPointM::_paramsNames[] = {"HP", "F", "CM"};
 

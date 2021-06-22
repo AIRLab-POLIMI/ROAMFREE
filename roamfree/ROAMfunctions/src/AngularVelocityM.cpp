@@ -20,7 +20,7 @@ Contributors:
 
 namespace ROAMfunctions {
 const bool AngularVelocityM::_usedComponents[] = { false, false, false, true,
-		false, false, false, false, false, false };
+		false, false, false, false, false, false, false, false };
 
 const std::string AngularVelocityM::_paramsNames[] = { "G", "B" };
 
