@@ -126,7 +126,7 @@ public:
 		case 0: // jacobian wrt to noises
 		{
 #			include "generated/QuadDynamicModel_JErrNoises.cppready"
-			return false; // it is the identity matrix
+			return true; // it is not the identity matrix
 			break;
 		}
 		case 1: // jacobian wrt wind
