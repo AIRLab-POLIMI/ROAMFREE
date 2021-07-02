@@ -31,7 +31,7 @@ public:
   static const bool _usedComponents[];
 
   static const std::string _paramsNames[];
-  static const int _nParams = 3;
+  static const int _nParams = 2;
 
   static const unsigned int _ORDER = 2;
 
@@ -116,12 +116,6 @@ public:
     {
 #     include "generated/Acceleration_JErrB.cppready"
       return false; // it is the identity matrix
-      break;
-    }
-    case 3: // jacobian wrt gravity
-    {
-#     include "generated/Acceleration_JErrGravity.cppready"      
-      return false;
       break;
     }
     }

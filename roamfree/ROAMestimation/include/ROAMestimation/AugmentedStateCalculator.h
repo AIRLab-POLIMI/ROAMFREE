@@ -104,8 +104,6 @@ public:
 		if (_usedComponents[IMUINT_DELTAPOSE])
 		{
 
-		  const double gravity = _params[2].value(0);
-
 			Eigen::VectorBlock<Eigen::VectorXd> &&part = _x.segment(26, 3);
 
 #         		include "generated/BackwardAugmentedStateEstimator_v7_IMUintdP.cppready"

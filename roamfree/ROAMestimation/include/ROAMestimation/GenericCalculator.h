@@ -21,7 +21,17 @@ class GenericCalculator
 {
 public:
 	GenericCalculator(std::vector<ParameterTemporaries>& params) :
-	  _params(params), so(params[0].value), qos(params[1].value) { }
+	  _params(params), so(params[0].value), qos(params[1].value) {
+
+	  epshift << 0.0, 0.0, 0.0;
+
+	  epa = std::numeric_limits<double>::infinity();
+	  epb = 1.0;
+
+	  earthrate = 0.0;
+
+	  gravity = _params[2].value(0);
+	}
 
 	virtual bool calculate(const Eigen::VectorXd& x2) = 0;
 	virtual bool calculate(const Eigen::VectorXd& x1, const Eigen::VectorXd& x2,
@@ -40,6 +50,11 @@ protected:
 	const static int _OFF = -1;
 
 	std::vector<ParameterTemporaries>& _params;
+
+	Eigen::Vector3d epshift;
+	double epa, epb;
+	double earthrate;
+	double gravity;
 
 };
 
