@@ -13,6 +13,7 @@ Contributors:
 #ifndef GENERICCALCULATOR_H_
 #define GENERICCALCULATOR_H_
 
+#include "OriginFrameProperties.h"
 #include "ParameterTemporaries.h"
 
 namespace ROAMestimation
@@ -21,16 +22,14 @@ class GenericCalculator
 {
 public:
 	GenericCalculator(std::vector<ParameterTemporaries>& params) :
-	  _params(params), so(params[0].value), qos(params[1].value) {
-
-	  epshift << 0.0, 0.0, 0.0;
-
-	  epa = std::numeric_limits<double>::infinity();
-	  epb = 1.0;
-
-	  earthrate = 0.0;
-
-	  gravity = _params[2].value(0);
+	  _params(params),
+	  so(params[0].value),
+	  qos(params[1].value),
+	  epshift(OriginFrameProperties::getInstance().epshift),
+	  epa(OriginFrameProperties::getInstance().epa),
+	  epb(OriginFrameProperties::getInstance().epb),
+	  earthrate(OriginFrameProperties::getInstance().earthrate),
+	  gravity(_params[2].value(0)){
 	}
 
 	virtual bool calculate(const Eigen::VectorXd& x2) = 0;
@@ -51,10 +50,10 @@ protected:
 
 	std::vector<ParameterTemporaries>& _params;
 
-	Eigen::Vector3d epshift;
-	double epa, epb;
-	double earthrate;
-	double gravity;
+	const Eigen::Vector3d &epshift;
+	const double &epa, &epb;
+	const double &earthrate;
+	const double &gravity;
 
 };
 
