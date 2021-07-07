@@ -62,7 +62,6 @@ public:
 
     Eigen::Map<Eigen::VectorXd> g(params[0], 3);
     Eigen::Map<Eigen::VectorXd> b(params[1], 3);
-    Eigen::Map<Eigen::VectorXd> gravity(params[2], 1);
 
     Eigen::MatrixBase<T> & err = const_cast<Eigen::MatrixBase<T>&>(const_ret);
 
@@ -80,7 +79,6 @@ public:
 
     Eigen::Map<Eigen::VectorXd> g(params[0], 3);
     Eigen::Map<Eigen::VectorXd> b(params[1], 3);
-    Eigen::Map<Eigen::VectorXd> gravity(params[2], 1);
 
     Eigen::MatrixBase<T> & J = const_cast<Eigen::MatrixBase<T>&>(const_ret);
 
