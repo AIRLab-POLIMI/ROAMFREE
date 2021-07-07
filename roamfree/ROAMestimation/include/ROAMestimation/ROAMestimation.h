@@ -24,6 +24,7 @@ Contributors:
 #include "PoseVertexWrapper.h"
 #include "MeasurementEdgeWrapper.h"
 #include "ParameterWrapper.h"
+#include "OriginFrameProperties.h"
 #include "Enums.h"
 
 #endif /* ROAMESTIMATION_H_ */

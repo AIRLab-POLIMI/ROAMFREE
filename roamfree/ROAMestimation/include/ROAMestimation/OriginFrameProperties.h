@@ -21,6 +21,7 @@
   the direction of the gravity vector can be computed as a function of the position.
 */
 
+namespace ROAMestimation {
 
 class OriginFrameProperties
 {
@@ -45,4 +46,6 @@ class OriginFrameProperties
         double earthrate; //!< the rotation rate of the fusion frame (e.g., ECEF) with respect to the inertial frame
 
 };
+
+}
 #endif /* DATUM_H_ */

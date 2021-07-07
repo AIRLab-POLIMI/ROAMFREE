@@ -7,6 +7,8 @@
 
 #include "../include/ROAMestimation/OriginFrameProperties.h"
 
+namespace ROAMestimation {
+
 OriginFrameProperties::OriginFrameProperties() {
 
   // default configuration leads to the fusion on an Euclidean frame
@@ -19,4 +21,6 @@ OriginFrameProperties::OriginFrameProperties() {
 
   epa = std::numeric_limits<double>::infinity();
   epb = 1.0;
+}
+
 }
