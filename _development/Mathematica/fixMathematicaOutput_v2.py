@@ -113,7 +113,8 @@ def fixMathFunctions(l):
 			elif l[pt] == ')':
 				depth = depth - 1
 			elif l[pt] == ',':
-				coma = pt
+				if depth == 1:
+					coma = pt
 
 			pt = pt + 1
 
