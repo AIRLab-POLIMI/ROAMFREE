@@ -225,6 +225,9 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
         switch (y) {
         case ACCELERATION: {
           assert(ORDER > 1);
+
+          OriginFrameProperties::getInstance().evaluateGravityVectorAt(x2, gravityVector);
+
 #         include "generated/BackwardAugmentedStateEstimator_v7_JAugAX2.cppready"
           return true;
         }
@@ -235,6 +238,7 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
         }
         case IMUINT_DELTAPOSE: {
           assert(ORDER > 1);
+          OriginFrameProperties::getInstance().evaluateGravityVectorAt(x2, gravityVector);
 
 #         include "generated/BackwardAugmentedStateEstimator_v7_JAugIMUintdPX2.cppready"
           return true;
@@ -271,6 +275,7 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
         }
         case IMUINT_DELTAPOSE: {
           assert(ORDER > 1);
+          OriginFrameProperties::getInstance().evaluateGravityVectorAt(x2, gravityVector);
 
 #         include "generated/BackwardAugmentedStateEstimator_v7_JAugIMUintdPX1.cppready"
           return true;
@@ -362,6 +367,8 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
           return true;
         }
         case (ORDER + 2): {
+          OriginFrameProperties::getInstance().evaluateGravityVectorAt(x2, gravityVector);
+
 #         include "generated/BackwardAugmentedStateEstimator_v7_JAugAqOS.cppready"
           return true;
         }
@@ -392,6 +399,7 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
           return true;
         }
         case (ORDER + 2): {
+          OriginFrameProperties::getInstance().evaluateGravityVectorAt(x2, gravityVector);
 
 #         include "generated/BackwardAugmentedStateEstimator_v7_JAugIMUintdPqOS.cppready"
           return true;

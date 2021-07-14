@@ -36,13 +36,13 @@ public:
 		{
 			Eigen::VectorBlock<Eigen::VectorXd> &&part = _x.segment(0, 3);
 
-#    			 include "generated/BackwardAugmentedStateEstimator_v7_POSE.cppready"
+#     include "generated/BackwardAugmentedStateEstimator_v7_POSE.cppready"
 		}
 		if (_usedComponents[ORIENTATION])
 		{
 			Eigen::VectorBlock<Eigen::VectorXd> &&part = _x.segment(3, 4);
 
-#     			include "generated/BackwardAugmentedStateEstimator_v7_Q.cppready"
+#     include "generated/BackwardAugmentedStateEstimator_v7_Q.cppready"
 		}
 
 		return true;
@@ -57,26 +57,26 @@ public:
 		{
 			Eigen::VectorBlock<Eigen::VectorXd> &&part = _x.segment(7, 3);
 
-#       		include "generated/BackwardAugmentedStateEstimator_v7_V.cppready"
+#     include "generated/BackwardAugmentedStateEstimator_v7_V.cppready"
 		}
 		if (_usedComponents[ANGULARVELOCITY])
 		{
 			Eigen::VectorBlock<Eigen::VectorXd> &&part = _x.segment(10, 3);
 
-#       		include "generated/BackwardAugmentedStateEstimator_v7_W.cppready"
+#     include "generated/BackwardAugmentedStateEstimator_v7_W.cppready"
 		}
 
 		if (_usedComponents[DELTA_POSITION])
 		{
 			Eigen::VectorBlock<Eigen::VectorXd> &&part = _x.segment(19, 3);
 
-#       		include "generated/BackwardAugmentedStateEstimator_v7_Disp.cppready"
+#     include "generated/BackwardAugmentedStateEstimator_v7_Disp.cppready"
 		}
 		if (_usedComponents[DELTA_ORIENTATION])
 		{
 			Eigen::VectorBlock<Eigen::VectorXd> &&part = _x.segment(22, 4);
 
-#       		include "generated/BackwardAugmentedStateEstimator_v7_DispQ.cppready"
+#     include "generated/BackwardAugmentedStateEstimator_v7_DispQ.cppready"
 		}
 
 		return true;
@@ -93,20 +93,24 @@ public:
 		{
 			Eigen::VectorBlock<Eigen::VectorXd> &&part = _x.segment(13, 3);
 
-#         		include "generated/BackwardAugmentedStateEstimator_v7_A.cppready"
+			OriginFrameProperties::getInstance().evaluateGravityVectorAt(x2, gravityVector);
+
+#     include "generated/BackwardAugmentedStateEstimator_v7_A.cppready"
 		}
 		if (_usedComponents[ANGULARACCELERATION])
 		{
 			Eigen::VectorBlock<Eigen::VectorXd> &&part = _x.segment(16, 3);
 
-#         		include "generated/BackwardAugmentedStateEstimator_v7_Alpha.cppready"
+#     include "generated/BackwardAugmentedStateEstimator_v7_Alpha.cppready"
 		}
 		if (_usedComponents[IMUINT_DELTAPOSE])
 		{
 
 			Eigen::VectorBlock<Eigen::VectorXd> &&part = _x.segment(26, 3);
 
-#         		include "generated/BackwardAugmentedStateEstimator_v7_IMUintdP.cppready"
+			OriginFrameProperties::getInstance().evaluateGravityVectorAt(x2, gravityVector);
+
+#     include "generated/BackwardAugmentedStateEstimator_v7_IMUintdP.cppready"
 		}
 		if (_usedComponents[PREVIOUS_ORIENTATION])
 		{
@@ -116,13 +120,13 @@ public:
 		{
 			Eigen::VectorBlock<Eigen::VectorXd> &&part = _x.segment(33, 3);
 
-#         		include "generated/BackwardAugmentedStateEstimator_v7_Vprev.cppready"
+#     include "generated/BackwardAugmentedStateEstimator_v7_Vprev.cppready"
 		}
 		if (_usedComponents[PREVIOUS_ANGULARVELOCITY])
 		{
 			Eigen::VectorBlock<Eigen::VectorXd> &&part = _x.segment(36, 3);
 
-#         		include "generated/BackwardAugmentedStateEstimator_v7_Wprev.cppready"
+#     include "generated/BackwardAugmentedStateEstimator_v7_Wprev.cppready"
 		}
 
 		return true;

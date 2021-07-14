@@ -104,6 +104,11 @@ enum SolverMethod {
   GaussNewton, LevenbergMarquardt
 };
 
+enum FusionFrameTypes {
+  TangentPlane,
+  ECEF
+};
+
 }
 
 #endif /* ENUMS_H_ */

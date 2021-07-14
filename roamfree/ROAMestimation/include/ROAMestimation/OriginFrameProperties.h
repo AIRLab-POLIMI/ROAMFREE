@@ -9,6 +9,7 @@
 #define DATUM_H_
 
 #include <Eigen/Dense>
+#include "Enums.h"
 
 /*! Specifies the properties of fusion frame (rotation, gravity model) */
 
@@ -32,18 +33,26 @@ class OriginFrameProperties
 
             return instance;
         }
-    private:
-        OriginFrameProperties();
 
     public:
         OriginFrameProperties(OriginFrameProperties const&) = delete;
         void operator=(OriginFrameProperties const&) = delete;
+
+        void evaluateGravityVectorAt(const Eigen::VectorXd &x, Eigen::Vector3d &gravityVector);
+
+        FusionFrameTypes frametype; //!< what is the type of fusion frame
 
         Eigen::Vector3d epshift; //!< three dimensional shift of the origin of the fusion frame with respect to the ellipsoid
 
         double epa, epb; //!< three dimensional shift of the origin of the fusion frame with respect to the center of the ellipsoid
 
         double earthrate; //!< the rotation rate of the fusion frame (e.g., ECEF) with respect to the inertial frame
+
+    protected:
+        const static int _OFF = -1;
+
+    private:
+        OriginFrameProperties();
 
 };
 

@@ -26,8 +26,6 @@ public:
 	  so(params[0].value),
 	  qos(params[1].value),
 	  epshift(OriginFrameProperties::getInstance().epshift),
-	  epa(OriginFrameProperties::getInstance().epa),
-	  epb(OriginFrameProperties::getInstance().epb),
 	  earthrate(OriginFrameProperties::getInstance().earthrate),
 	  gravity(_params[2].value(0)){
 	}
@@ -41,17 +39,20 @@ public:
 
 	virtual ~GenericCalculator() {}
 
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
 protected:
   
 	const Eigen::VectorXd &so;
 	const Eigen::VectorXd &qos;
+
+	Eigen::Vector3d gravityVector;
 
 	const static int _OFF = -1;
 
 	std::vector<ParameterTemporaries>& _params;
 
 	const Eigen::Vector3d &epshift;
-	const double &epa, &epb;
 	const double &earthrate;
 	const double &gravity;
 
