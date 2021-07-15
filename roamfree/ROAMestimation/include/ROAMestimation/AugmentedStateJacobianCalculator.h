@@ -67,6 +67,10 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
 #         include "generated/BackwardAugmentedStateEstimator_v7_JAugPOSEqOS.cppready"
           return true;
         }
+        case (ORDER + 3): { // wrt gravity
+          // do nothing
+          return true;
+        }
         }
 
         break;
@@ -79,6 +83,10 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
         }
         case (ORDER + 2): {
 #         include "generated/BackwardAugmentedStateEstimator_v7_JAugQqOS.cppready"
+          return true;
+        }
+        case (ORDER + 3): { // wrt gravity
+          // do nothing
           return true;
         }
         }
@@ -164,6 +172,10 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
 #         include "generated/BackwardAugmentedStateEstimator_v7_JAugVqOS.cppready"
           return true;
         }
+        case (ORDER + 3): { // wrt gravity
+          // do nothing
+          return true;
+        }
         }
 
         break;
@@ -176,6 +188,10 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
         }
         case (ORDER + 2): {
 #         include "generated/BackwardAugmentedStateEstimator_v7_JAugWqOS.cppready"
+          return true;
+        }
+        case (ORDER + 3): { // wrt gravity
+          // do nothing
           return true;
         }
         }
@@ -192,6 +208,10 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
 #         include "generated/BackwardAugmentedStateEstimator_v7_JAugDispqOS.cppready"
           return true;
         }
+        case (ORDER + 3): { // wrt gravity
+          // do nothing
+          return true;
+        }
         }
 
         break;
@@ -204,6 +224,10 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
         }
         case (ORDER + 2): {
 #         include "generated/BackwardAugmentedStateEstimator_v7_JAugDispQqOS.cppready"
+          return true;
+        }
+        case (ORDER + 3): { // wrt gravity
+          // do nothing
           return true;
         }
         }
@@ -372,6 +396,12 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
 #         include "generated/BackwardAugmentedStateEstimator_v7_JAugAqOS.cppready"
           return true;
         }
+        case (ORDER + 3): {
+          OriginFrameProperties::getInstance().evaluateGravityVectorAt(x2, gravityVector);
+
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugAgravity.cppready"
+          return true;
+        }
         }
 
         break;
@@ -385,6 +415,10 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
         }
         case (ORDER + 2): {
 #         include "generated/BackwardAugmentedStateEstimator_v7_JAugAlphaqOS.cppready"
+          return true;
+        }
+        case (ORDER + 3): { // wrt gravity
+          // do nothing
           return true;
         }
         }
@@ -404,6 +438,12 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
 #         include "generated/BackwardAugmentedStateEstimator_v7_JAugIMUintdPqOS.cppready"
           return true;
         }
+        case (ORDER + 3): {
+          OriginFrameProperties::getInstance().evaluateGravityVectorAt(x2, gravityVector);
+
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugIMUintdPgravity.cppready"
+          return true;
+        }
         }
 
         break;
@@ -417,6 +457,10 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
         }
         case (ORDER + 2): {
 #         include "generated/BackwardAugmentedStateEstimator_v7_JAugQprevqOS.cppready"
+          return true;
+        }
+        case (ORDER + 3): { // wrt gravity
+          // do nothing
           return true;
         }
         }
@@ -434,6 +478,10 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
 #         include "generated/BackwardAugmentedStateEstimator_v7_JAugVprevqOS.cppready"
           return true;
         }
+        case (ORDER + 3): { // wrt gravity
+          // do nothing
+          return true;
+        }
         }
 
         break;
@@ -447,6 +495,10 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
         }
         case (ORDER + 2): {
 #         include "generated/BackwardAugmentedStateEstimator_v7_JAugWprevqOS.cppready"
+          return true;
+        }
+        case (ORDER + 3): { // wrt gravity
+          // do nothing
           return true;
         }
         }

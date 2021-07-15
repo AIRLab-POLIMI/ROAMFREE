@@ -80,6 +80,8 @@ protected:
 	Eigen::Matrix<double, 4, 3> _JxArgs4x3;
 	Eigen::Matrix<double, 3, 6> _JxArgs3x6;
 	Eigen::Matrix<double, 4, 6> _JxArgs4x6;
+	Eigen::Matrix<double, 3, 1> _JxArgs3x1;
+	Eigen::Matrix<double, 4, 1> _JxArgs4x1;
 
 	// temporary variables to hold covariance and J wrt noises
 
@@ -93,8 +95,8 @@ protected:
 public:
 
 	QuaternionGenericEdge() :
-	GenericEdge<MT::_ERROR_SIZE>(_F.getNParams()), _JxArgs3x6(
-			3, 6), _JxArgs4x6(4, 6), _JxArgs3x3(3, 3), _JxArgs4x3(4, 3) {
+	GenericEdge<MT::_ERROR_SIZE>(_F.getNParams()), _JxArgs3x6(3, 6),
+	  _JxArgs4x6(4, 6), _JxArgs3x3(3, 3), _JxArgs4x3(4, 3), _JxArgs3x1(3, 1), _JxArgs4x1(4, 1) {
 
 		// resize all(almost) that needs to be resized
 		_measurement.resize(MT::_MEASUREMENT_SIZE);
@@ -369,32 +371,39 @@ public:
 						// here we have to map the current value of v to the correct value the computeJacobianBlock expects
 						switch (ov->dimension()) { // this is for the dimension of temporaries
 							case 3: 
-							// SO or qOS, cols = 3
-							if (k == 1 || k == 7 || k == 9) { // with respect to some quaternion, rows = 4
-								computeJacobianBlock(k, v, _JxArgs4x3);
-								_jacobianOplus[v].noalias() += (*_JErrx[k]) * _JxArgs4x3;
-							} else {
-								// rows = 3
-								computeJacobianBlock(k, v, _JxArgs3x3);
-								_jacobianOplus[v].noalias() += (*_JErrx[k]) * _JxArgs3x3;
-							}
+                // SO or qOS, cols = 3
+                if (k == 1 || k == 7 || k == 9) { // with respect to some quaternion, rows = 4
+                  computeJacobianBlock(k, v, _JxArgs4x3);
+                  _jacobianOplus[v].noalias() += (*_JErrx[k]) * _JxArgs4x3;
+                } else {
+                  // rows = 3
+                  computeJacobianBlock(k, v, _JxArgs3x3);
+                  _jacobianOplus[v].noalias() += (*_JErrx[k]) * _JxArgs3x3;
+                }
 							break;
 
 							case 6:  
-							// pose vertices, cols = 6
-							if (k == 1 || k == 7 || k == 9) { // with respect to q or delta q, rows = 4
-								computeJacobianBlock(k, v, _JxArgs4x6);
-								_jacobianOplus[v].noalias() += (*_JErrx[k]) * _JxArgs4x6;
-							} else {
-								// rows = 3
-								computeJacobianBlock(k, v, _JxArgs3x6);
-								_jacobianOplus[v].noalias() += (*_JErrx[k]) * _JxArgs3x6;
-							}
+                // pose vertices, cols = 6
+                if (k == 1 || k == 7 || k == 9) { // with respect to q or delta q, rows = 4
+                  computeJacobianBlock(k, v, _JxArgs4x6);
+                  _jacobianOplus[v].noalias() += (*_JErrx[k]) * _JxArgs4x6;
+                } else {
+                  // rows = 3
+                  computeJacobianBlock(k, v, _JxArgs3x6);
+                  _jacobianOplus[v].noalias() += (*_JErrx[k]) * _JxArgs3x6;
+                }
 							break;
 
 							case 1:
-							  // gravity
-							std::cerr << "[Sensor " << _name << "] Error: estimation of gravity not supported in this context" << std::endl;
+							  // singleton parameters, e.g., gravity, cols = 1
+	              if (k == 1 || k == 7 || k == 9) { // with respect to q or delta q, rows = 4
+	                computeJacobianBlock(k, v, _JxArgs4x1);
+	                _jacobianOplus[v].noalias() += (*_JErrx[k]) * _JxArgs4x1;
+	              } else {
+	                // rows = 3
+	                computeJacobianBlock(k, v, _JxArgs3x1);
+	                _jacobianOplus[v].noalias() += (*_JErrx[k]) * _JxArgs3x1;
+	              }
 							break;
 
 							default:
