@@ -49,16 +49,6 @@ target_link_libraries(PerfectIMUTest
     ROAMestimation ROAMimu 
 )
 
-# ----------- PerfectIMUInEarthFrameTest
-
-add_executable(PerfectIMUInEarthFrameTest
-    src/PerfectIMUInEarthFrameTest.cpp
-)
-
-target_link_libraries(PerfectIMUInEarthFrameTest
-    ROAMestimation ROAMimu 
-)
-
 # ----------- CameraIMUTest
 
 add_executable(CameraIMUTest

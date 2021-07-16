@@ -170,20 +170,11 @@ bool FactorGraphFilter_Impl::addSensor(const string& name, MeasTypes type,
   case AngularVelocity:
     s.order = AngularVelocityM::_ORDER;
     break;
-  case AngularVelocityInEarthFrame:
-    s.order = AngularVelocityM::_ORDER;
-    break;
   case LinearAcceleration:
     s.order = AccelerationM::_ORDER;
     break;
-  case LinearAccelerationInEarthFrame:
-    s.order = AccelerationInEarthFrameM::_ORDER;
-    break;
   case AckermannOdometer:
     s.order = AckermannM::_ORDER;
-    break;
-  case AckermannConstraint:
-    s.order = AckermannKinematicNoInputsM::_ORDER;
     break;
   case TriskarOdometer:
     s.order = TriskarKinematicM::_ORDER;
@@ -217,18 +208,6 @@ bool FactorGraphFilter_Impl::addSensor(const string& name, MeasTypes type,
     break;
   case FramedHomogeneousPoint:
     s.order = FramedHomogeneousPointM::_ORDER;
-    break;
-  case RectangularObject:
-    s.order = RectangularObjectM::_ORDER;
-    break;
-  case AnchoredRectangularObject:
-    s.order = AnchoredRectangularObjectM::_ORDER;
-    break;
-  case AnchoredRectangularObjectFirst:
-    s.order = AnchoredRectangularObjectM::_ORDER;
-    break;
-  case PlanarConstraint:
-    s.order = PlanarConstraintM::_ORDER;
     break;
   case QuadDynamicModel:
       s.order = QuadDynamicModelM::_ORDER;
@@ -1322,20 +1301,11 @@ GenericEdgeInterface *FactorGraphFilter_Impl::addMeasurement_i(
   case AngularVelocity:
     e = new QuaternionGenericEdge<AngularVelocityM>;
     break;
-  case AngularVelocityInEarthFrame:
-    e = new QuaternionGenericEdge<AngularVelocityInEarthFrameM>;
-    break;
   case LinearAcceleration:
     e = new QuaternionGenericEdge<AccelerationM>;
     break;
-  case LinearAccelerationInEarthFrame:
-    e = new QuaternionGenericEdge<AccelerationInEarthFrameM>;
-    break;
   case AckermannOdometer:
     e = new QuaternionGenericEdge<AckermannM>;
-    break;
-  case AckermannConstraint:
-    e = new QuaternionGenericEdge<AckermannKinematicNoInputsM>;
     break;
   case TriskarOdometer:
     e = new QuaternionGenericEdge<TriskarKinematicM>;
@@ -1372,18 +1342,6 @@ GenericEdgeInterface *FactorGraphFilter_Impl::addMeasurement_i(
     break;
   case FramedHomogeneousPoint:
     e = new QuaternionGenericEdge<FramedHomogeneousPointM>;
-    break;
-  case RectangularObject:
-    e = new QuaternionGenericEdge<RectangularObjectM>;
-    break;
-  case AnchoredRectangularObject:
-    e = new QuaternionGenericEdge<AnchoredRectangularObjectM>;
-    break;
-  case AnchoredRectangularObjectFirst:
-    e = new QuaternionGenericEdge<AnchoredRectangularObjectFirstM>;
-    break;
-  case PlanarConstraint:
-    e = new QuaternionGenericEdge<PlanarConstraintM>;
     break;
   case QuadDynamicModel:
       e = new QuaternionGenericEdge<QuadDynamicModelM>;
