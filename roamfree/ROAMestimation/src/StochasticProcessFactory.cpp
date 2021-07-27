@@ -44,6 +44,35 @@ ParameterWrapper_Ptr StochasticProcessFactory::addEucl3DRandomConstant(
 }
 
 
+ParameterWrapper_Ptr StochasticProcessFactory::addEucl1DRandomWalk(
+    FactorGraphFilter* f, std::string name, const Eigen::VectorXd& x0,
+    const Eigen::MatrixXd& randomWalkNoiseCov_cnt, double spacing,
+    InterpolationTypes intType, unsigned int a) {
+
+  ParameterWrapper_Ptr p = addTimeVarying1DParameter(f, name, x0, spacing,
+      intType, a);
+
+  p->setProcessModelType(RandomWalk);
+  p->setRandomWalkNoiseCov(randomWalkNoiseCov_cnt);
+
+  return p;
+}
+
+
+ParameterWrapper_Ptr StochasticProcessFactory::addEucl2DRandomWalk(
+    FactorGraphFilter* f, std::string name, const Eigen::VectorXd& x0,
+    const Eigen::MatrixXd& randomWalkNoiseCov_cnt, double spacing,
+    InterpolationTypes intType, unsigned int a) {
+
+  ParameterWrapper_Ptr p = addTimeVarying2DParameter(f, name, x0, spacing,
+      intType, a);
+
+  p->setProcessModelType(RandomWalk);
+  p->setRandomWalkNoiseCov(randomWalkNoiseCov_cnt);
+
+  return p;
+}
+
 ParameterWrapper_Ptr StochasticProcessFactory::addEucl3DRandomWalk(
     FactorGraphFilter* f, std::string name, const Eigen::VectorXd& x0,
     const Eigen::MatrixXd& randomWalkNoiseCov_cnt, double spacing,

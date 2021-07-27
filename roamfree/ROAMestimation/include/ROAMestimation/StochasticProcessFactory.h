@@ -50,6 +50,26 @@ class StochasticProcessFactory {
         std::string name, const Eigen::VectorXd &x0);
 
     /**
+     * add an Euclidean 1D random walk process
+     *
+     * @ param randomWalkNoiseCov_cnt the *continuous* time variance of the Random Walk innovations (in <unit>/Hz)
+    */
+    static ParameterWrapper_Ptr addEucl1DRandomWalk(FactorGraphFilter *f,
+        std::string name, const Eigen::VectorXd &x0,
+        const Eigen::MatrixXd &randomWalkNoiseCov_cnt, double spacing,
+        InterpolationTypes intType = Linear, unsigned int a = 3);
+
+    /**
+     * add an Euclidean 2D random walk process
+     *
+     * @ param randomWalkNoiseCov_cnt the *continuous* time variance of the Random Walk innovations (in <unit>/Hz)
+    */
+    static ParameterWrapper_Ptr addEucl2DRandomWalk(FactorGraphFilter *f,
+        std::string name, const Eigen::VectorXd &x0,
+        const Eigen::MatrixXd &randomWalkNoiseCov_cnt, double spacing,
+        InterpolationTypes intType = Linear, unsigned int a = 3);
+
+    /**
      * add an Euclidean 3D random walk process
      *
      * @ param randomWalkNoiseCov_cnt the *continuous* time variance of the Random Walk innovations (in <unit>/Hz)
