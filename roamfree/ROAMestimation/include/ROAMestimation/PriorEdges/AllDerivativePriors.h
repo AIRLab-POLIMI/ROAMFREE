@@ -19,6 +19,8 @@ Contributors:
 #ifndef ALLDERIVATIVEPRIORS_H_
 #define ALLDERIVATIVEPRIORS_H_
 
+#include "Eucl1DGaussMarkovProcessEdge.h"
+#include "Eucl2DGaussMarkovProcessEdge.h"
 #include "Eucl3DGaussMarkovProcessEdge.h"
 #include "Eucl3DRandomWalkProcessEdge.h"
 
