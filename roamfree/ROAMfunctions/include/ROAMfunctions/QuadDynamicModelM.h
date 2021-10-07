@@ -75,7 +75,7 @@ namespace ROAMfunctions
 			Eigen::Map<Eigen::VectorXd> qdrag(params[4], 3);
 			Eigen::Map<Eigen::VectorXd> rdrag(params[5], 3);
 			Eigen::Map<Eigen::VectorXd> lambda(params[6], 1);
-			Eigen::Map<Eigen::VectorXd> mu(params[7], 1);
+			Eigen::Map<Eigen::VectorXd> mu(params[7], 2);
 			Eigen::Map<Eigen::VectorXd> mc(params[8], 2);
 			Eigen::Map<Eigen::VectorXd> cp(params[9], 3);
 			Eigen::Map<Eigen::VectorXd> ibd(params[10], 3);
@@ -105,7 +105,7 @@ namespace ROAMfunctions
 			Eigen::Map<Eigen::VectorXd> qdrag(params[4], 3);
 			Eigen::Map<Eigen::VectorXd> rdrag(params[5], 3);
 			Eigen::Map<Eigen::VectorXd> lambda(params[6], 1);
-			Eigen::Map<Eigen::VectorXd> mu(params[7], 1);
+			Eigen::Map<Eigen::VectorXd> mu(params[7], 2);
 			Eigen::Map<Eigen::VectorXd> mc(params[8], 2);
 			Eigen::Map<Eigen::VectorXd> cp(params[9], 3);
 			Eigen::Map<Eigen::VectorXd> ibd(params[10], 3);
