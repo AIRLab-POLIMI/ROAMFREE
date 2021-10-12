@@ -119,6 +119,27 @@ namespace ROAMfunctions
 			switch (wrt)
 			{
 
+			case -12: // jacobian wrt to previous omega
+    		{
+#include "generated/QuadDynamicModel_JErrWprev.cppready"
+      			return true;
+      			break;
+    		}
+
+    		case -11: // jacobian wrt to previous v
+    		{
+#include "generated/QuadDynamicModel_JErrVprev.cppready"
+      			return true;
+      			break;
+    		}
+
+    		case -10: // jacobian wrt to previous q
+    		{
+#include "generated/QuadDynamicModel_JErrQprev.cppready"
+      			return true;
+      			break;
+    		}
+
 			case -6: // jacobian wrt to Alpha
 			{
 #include "generated/QuadDynamicModel_JErrAlpha.cppready"
