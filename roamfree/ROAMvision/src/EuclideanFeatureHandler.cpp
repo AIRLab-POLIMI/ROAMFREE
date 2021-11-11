@@ -94,7 +94,7 @@ bool EuclideanFeatureHandler::addFeatureObservation(long int id, double t,
     obs.z = z;
     obs.cov = cov;
 
-    if (!dontInitialize && d.zHistory.size() >= 3) {
+    if (!dontInitialize && d.zHistory.size() >= 2) {
       return initializeFeature_i(d, id);
     }
 
