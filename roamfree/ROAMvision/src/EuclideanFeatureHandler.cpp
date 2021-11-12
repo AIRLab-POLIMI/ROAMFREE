@@ -39,7 +39,7 @@ EuclideanFeatureHandler::EuclideanFeatureHandler() {
 
 bool EuclideanFeatureHandler::init(FactorGraphFilter* f, const string &name,
     const Eigen::VectorXd & T_OS, const Eigen::VectorXd & K,
-    const Eigen::VectorXd & RD, const Eigen::VectorXd & TD) {
+    const Eigen::VectorXd & RD, const Eigen::VectorXd & TD, const Eigen::VectorXd & SKEW) {
 
   _filter = f;
   _sensorName = name;
@@ -53,10 +53,13 @@ bool EuclideanFeatureHandler::init(FactorGraphFilter* f, const string &name,
   K_par = _filter->addConstantParameter(Euclidean3D, _sensorName + "_Cam_CM", K,
       true);
 
-  _filter->addConstantParameter(Euclidean3D, _sensorName + "_Cam_RD",
+  _filter->addConstantParameter(Euclidean4D, _sensorName + "_Cam_RD",
       RD, true);
   _filter->addConstantParameter(Euclidean2D, _sensorName + "_Cam_TD",
       TD, true);
+  _filter->addConstantParameter(Euclidean2D, _sensorName + "_Cam_SKEW",
+      SKEW, true);
+
 
   return true;
 }
@@ -169,6 +172,7 @@ bool EuclideanFeatureHandler::initializeFeature_i(EuclideanTrackDescriptor &d, l
     _filter->shareParameter(_sensorName + "_Cam_CM", sensor + "_CM");
     _filter->shareParameter(_sensorName + "_Cam_RD", sensor + "_RD");
     _filter->shareParameter(_sensorName + "_Cam_TD", sensor + "_TD");
+    _filter->shareParameter(_sensorName + "_Cam_SKEW", sensor + "_SKEW");
 
     _filter->addConstantParameter(Euclidean3D, sensor + "_Lw", d.zHistory.begin()->first, Lw, false);
 
@@ -226,6 +230,8 @@ bool EuclideanFeatureHandler::getFeaturePositionInWorldFrame(long int id,
       getFeatureParameterName(id) + "_Lw"); // euclidean coordinates
 
   fw = lw_par->getEstimate();
+
+  return true;
 }
 
 bool EuclideanFeatureHandler::getFeaturesIds(vector<long int>& to) const {

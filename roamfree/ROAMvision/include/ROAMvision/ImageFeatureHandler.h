@@ -36,10 +36,15 @@ class ImageFeatureHandler {
     }
     ;
 
-    virtual bool init(ROAMestimation::FactorGraphFilter* f,
-        const std::string &name, const Eigen::VectorXd & T_OS,
-        const Eigen::VectorXd & K, const Eigen::VectorXd & RD,
-        const Eigen::VectorXd & TD) = 0;
+    virtual bool init(
+        ROAMestimation::FactorGraphFilter* f,
+        const std::string &name,
+        const Eigen::VectorXd & T_OS,
+        const Eigen::VectorXd & K, 
+        const Eigen::VectorXd & RD,
+        const Eigen::VectorXd & TD,
+        const Eigen::VectorXd & SKEW
+    ) = 0;
 
     /**
      *  \brief feed the FeatureHandler with a new image measurement
