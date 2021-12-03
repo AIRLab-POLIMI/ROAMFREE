@@ -180,9 +180,9 @@ ParameterWrapper_Ptr StochasticProcessFactory::addEucl3DGaussMarkovPlusRandomCon
     const Eigen::MatrixXd& gaussMarkovNoiseCov_cnt, double spacing,
     InterpolationTypes intType, unsigned int a) {
 
-  ParameterWrapper_Ptr p_gm = addEucl2DGaussMarkov(f, name + "_GM", x0_gm,
+  ParameterWrapper_Ptr p_gm = addEucl3DGaussMarkov(f, name + "_GM", x0_gm,
       gaussMarkovBeta, gaussMarkovNoiseCov_cnt, spacing, intType, a);
-  ParameterWrapper_Ptr p_rc = f->addConstantParameter(Euclidean2D, name + "_RC",
+  ParameterWrapper_Ptr p_rc = f->addConstantParameter(Euclidean3D, name + "_RC",
       x0_rc, false);
 
   ParameterWrapperVector_Ptr toblend(new ParameterWrapperVector);
