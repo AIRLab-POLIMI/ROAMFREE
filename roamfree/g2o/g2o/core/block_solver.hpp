@@ -507,39 +507,72 @@ bool BlockSolver<Traits>::computeMarginalsDirect(SparseBlockMatrix<MatrixXd>& sp
 				      rbi.size(),
 				      rbi.size(), true);  
   
+  // create data structre 
+  // each key in the map is a column to be solved for
+  // each element is a vector of the block indices that will have to be populated from that col
+
+  std::map< long int, std::vector < std::pair<int, int> > > cols_to_solve;
+
+  // iterate trought the block indices and fill col_to_solve
+
+  for (int bi_i = 0; bi_i < blockIndices.size(); ++bi_i ) {
+    const std::pair<int, int> &th_bi  = blockIndices[bi_i];
+
+    long int start_col = th_bi.second > 0 ? rbi[th_bi.second-1] : 0;
+	  long int end_col = rbi[th_bi.second]-1;
+
+    for (long int c = start_col; c <= end_col; ++c) {
+      auto & c_entry = cols_to_solve[c];
+
+      c_entry.push_back(th_bi);
+    }
+  }
+
+  cerr << " I have to solve for " << cols_to_solve.size() << " columns" << endl;
+
+  // iterate trought the columns and solve for those
 
   bool ok = true;
-  
-  for (int cb = 0; cb < blockIndices.size(); ++cb ) {
-  
-	  const std::pair<int, int> &c  = blockIndices[cb];
 
-	  int start_row = c.first > 0 ? rbi[c.first-1] : 0;
-	  int end_row = rbi[c.first]-1;
+  double *b = new double[vectorSize()];
+	memset(b, 0, vectorSize()*sizeof(double));
 
-	  int start_col = c.second > 0 ? rbi[c.second-1] : 0;
-	  int end_col = rbi[c.second]-1;
+	double *x = new double[vectorSize()];
 
-	  // cerr << "computing block index (" << c.first << "," << c.second << "), rows " << start_row << ":" << end_row << " cols " << start_col << ":" << end_col <<std::endl;
+  for (auto col_it = cols_to_solve.begin(); col_it != cols_to_solve.end(); ++col_it) {
+    cerr << " Solving col " << col_it->first <<  endl;
+    
+    b[col_it->first] = 1;
 
-	  double *b = new double[vectorSize()];
-	  memset(b, 0, vectorSize()*sizeof(double));
+    ok = ok && _linearSolver->solve(*_Hpp, x, b);
 
-	  double *x = new double[vectorSize()];
-	  for (int cc = start_col; cc <= end_col; ++cc) {
-		  b[cc] = 1;
+    if (!ok) {
+      break;
+    }
 
-		  ok = ok && _linearSolver->solve(*_Hpp, x, b);
+    // iterate trought the involved blockindices and fill the results
 
-		  Eigen::MatrixXd *ret = spinv.block(c.first, c.second);
+    for (auto bi_it = col_it->second.begin(); bi_it != col_it->second.end(); ++bi_it) {
+      const std::pair<int, int> &th_bi  = *bi_it;
+
+      int start_row = th_bi.first > 0 ? rbi[th_bi.first-1] : 0;
+      int end_row = rbi[th_bi.first]-1;
+
+      int start_col = th_bi.second > 0 ? rbi[th_bi.second-1] : 0;
+      int end_col = rbi[th_bi.second]-1;
+
+      Eigen::MatrixXd *ret = spinv.block(th_bi.first, th_bi.second);
 
 		  assert(ret->rows() == end_row-start_row+1);
 
-		  ret->col(cc-start_col) = Eigen::Map<Eigen::VectorXd>(&x[start_row], ret->rows());
+		  ret->col(col_it->first-start_col) = Eigen::Map<Eigen::VectorXd>(&x[start_row], ret->rows());
+    }
 
-		  b[cc] = 0;
-	  }
+    b[col_it->first] = 0;
   }
+
+  delete x;
+  delete b;
   
   if (globalStats) {
     globalStats->timeMarginals = get_time() - t;
