@@ -133,8 +133,8 @@ IBOD =  Table[ibod[i],{i,1,3}];
 
 
 
-
-WINDW=Table[wind[i],{i,1,3}];wind speed in world frame
+(* wind speed in world frame *)
+WINDW=Table[wind[i],{i,1,3}];
 
 
 
