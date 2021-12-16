@@ -528,7 +528,7 @@ bool BlockSolver<Traits>::computeMarginalsDirect(SparseBlockMatrix<MatrixXd>& sp
     }
   }
 
-  cerr << " I have to solve for " << cols_to_solve.size() << " columns" << endl;
+  // cerr << " I have to solve for " << cols_to_solve.size() << " columns" << endl;
 
   // iterate trought the columns and solve for those
 
@@ -540,7 +540,7 @@ bool BlockSolver<Traits>::computeMarginalsDirect(SparseBlockMatrix<MatrixXd>& sp
 	double *x = new double[vectorSize()];
 
   for (auto col_it = cols_to_solve.begin(); col_it != cols_to_solve.end(); ++col_it) {
-    cerr << " Solving col " << col_it->first <<  endl;
+    // cerr << " Solving col " << col_it->first <<  endl;
     
     b[col_it->first] = 1;
 
