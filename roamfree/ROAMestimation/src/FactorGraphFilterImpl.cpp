@@ -546,6 +546,7 @@ MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnConstantParameter(
 
   priorif->setMeasurement(x0);
   priorif->setNoiseCov(cov);
+  priorif->setCategory(name+"_prior");
 
   _optimizer->addEdge(edge);
 
@@ -617,6 +618,11 @@ MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnTimeVaryingParamete
 
   priorif->setMeasurement(x0);
   priorif->setNoiseCov(cov);
+
+  stringstream s;
+  s << name << "(" << fixed << t << ")_prior";
+
+  priorif->setCategory(s.str());
 
   _optimizer->addEdge(edge);
 
