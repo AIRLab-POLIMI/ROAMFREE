@@ -36,7 +36,7 @@ public:
 			const std::string &name, const Eigen::VectorXd & T_OS,
 			const Eigen::VectorXd & K);
 	virtual bool addFeatureObservation(long int id, double t,
-			const Eigen::VectorXd &z, const Eigen::MatrixXd &cov);
+			const Eigen::VectorXd &z, const Eigen::MatrixXd &cov, bool dontInitialize = true);
 
 	virtual bool getFeaturePositionInWorldFrame(long int id,
 				Eigen::VectorXd &lw) const;

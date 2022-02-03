@@ -167,18 +167,6 @@ class FactorGraphFilter {
     virtual bool setRobustKernel(const std::string &sensor, bool enabled,
         double huberWidth) = 0;
 
-    /**
-     *  \brief ugly suff to be removed
-     *
-     * Since we keep separate each component of the misalignment parameter, so that one can enable the
-     * estimation of only one, e.g. the rotation around the z axis, there is nothing that prevents
-     * qx^2+qy^2+qz^2 to be greather than 1 and thus sqrt(1 - (qx^2+qy^2+qz^2) ) to be nan.
-     *
-     * Until a better solution which both allows to estimate only one component of the misalignment while
-     * maintaining the quaternion health, we have to include this guard
-     */
-    virtual bool addMisalignmentGuard(const std::string &sensor) = 0;
-
     /* --------------------------- PARAMETER LEVEL METHODS ---------------------------- */
 
     /**
@@ -523,7 +511,13 @@ class FactorGraphFilter {
      * @param nIterations the number of Gauss-Newton/Levenberg-Marquardt iteration to perform.
      */
     virtual bool estimate(PoseVertexWrapperVector poses, int nIterations) = 0;
-
+    
+    /**
+     *  \brief compytes the cross correlation covariances between the parameters
+     */
+    
+    virtual void computeCrossCovariances() = 0;
+    
     virtual ~FactorGraphFilter() {
     }
 };

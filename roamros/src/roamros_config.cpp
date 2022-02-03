@@ -494,7 +494,7 @@ bool setUpSubscriptions(const std::vector<SensorConfiguration*>* sensors,
 					throw -1;
 				break;
 				//case to manage imuhandler
-			case ROAMestimation::IMUHandler:
+			case ROAMestimation::IMUintegralDeltaP:
 				ROS_INFO("within case imuhandler");
 				if (s->topic_type_ == "sensor_msgs/Imu") {
 					subscribers->push_back(

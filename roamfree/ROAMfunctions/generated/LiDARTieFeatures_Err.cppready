@@ -1,0 +1,15 @@
+double tmp0 = x(26+_OFF);
+double tmp1 = x(25+_OFF);
+double tmp2 = z(2+_OFF);
+double tmp3 = z(3+_OFF);
+double tmp4 = x(24+_OFF);
+double tmp5 = z(1+_OFF);
+double tmp6 = x(23+_OFF);
+double tmp7 = tmp0*tmp2;
+double tmp8 = -(tmp1*tmp3);
+double tmp9 = tmp1*tmp2;
+double tmp10 = std::pow(tmp4,2);
+double tmp11 = std::pow(tmp1,2);
+err(1+_OFF) = -x(20+_OFF) + (-1 + 2*tmp11 + 2*std::pow(tmp0,2))*tmp5 + 2*tmp6*(tmp7 + tmp8) - 2*tmp4*(tmp9 + tmp0*tmp3) + z(4+_OFF);
+err(2+_OFF) = -x(21+_OFF) - tmp2 + 2*tmp10*tmp2 + tmp4*(-2*tmp1*tmp5 + 2*tmp6*tmp3) + 2*tmp0*(-(tmp6*tmp5) + tmp7 + tmp8) + z(5+_OFF);
+err(3+_OFF) = -x(22+_OFF) + 2*tmp6*(tmp1*tmp5 - tmp4*tmp2) - 2*tmp0*(tmp4*tmp5 + tmp9) - tmp3 + 2*(tmp10 + tmp11)*tmp3 + z(6+_OFF);

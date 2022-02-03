@@ -40,21 +40,19 @@ bool FHPFeatureHandler::init(FactorGraphFilter* f, const string &name,
 
   // TODO: currently FHP works only if system is camera-centric, i.e., T_OS = I
   assert(T_OS.head(3).norm() == 0.0 && T_OS.tail(3).norm() == 0.0);
+  
+  Eigen::VectorXd SO = T_OS.head(3);
+  Eigen::VectorXd qOS = T_OS.tail(4);  
 
-  _filter->addConstantParameter(_sensorName + "_Cam_SOx", T_OS(0), true);
-  _filter->addConstantParameter(_sensorName + "_Cam_SOy", T_OS(1), true);
-  _filter->addConstantParameter(_sensorName + "_Cam_SOz", T_OS(2), true);
-
-  _filter->addConstantParameter(_sensorName + "_Cam_qOSx", T_OS(4), true);
-  _filter->addConstantParameter(_sensorName + "_Cam_qOSy", T_OS(5), true);
-  _filter->addConstantParameter(_sensorName + "_Cam_qOSz", T_OS(6), true);
+  _filter->addConstantParameter(Euclidean3D, + "_Cam_SO", SO, true);
+  _filter->addConstantParameter(Quaternion, _sensorName + "_Cam_qOS", qOS, true);
 
   _K_par = _filter->addConstantParameter(Matrix3D, _sensorName + "_Cam_CM", K,
       true);
 }
 
 bool FHPFeatureHandler::addFeatureObservation(long int id, double t,
-    const Eigen::VectorXd &z, const Eigen::MatrixXd &cov) {
+    const Eigen::VectorXd &z, const Eigen::MatrixXd &cov, bool dontInitialize) {
 
   const string &sensor = getFeatureSensor(id);
 
@@ -185,9 +183,8 @@ bool FHPFeatureHandler::initFeature(const std::string& sensor,
   // we have to share manually the parameters
   // _filter->shareSensorFrame(_sensorName + "_Cam", sensor);
 
-  const string suffixes[] =
-      { "_SOx", "_SOy", "_SOz", "_qOSx", "_qOSy", "_qOSz" };
-  for (int k = 0; k < 6; k++) {
+  const string suffixes[] = { "_SO", "_qOS" };
+  for (int k = 0; k < 2; k++) {
     _filter->shareParameter(_sensorName + "_Cam" + suffixes[k],
         sensor + suffixes[k]);
   }

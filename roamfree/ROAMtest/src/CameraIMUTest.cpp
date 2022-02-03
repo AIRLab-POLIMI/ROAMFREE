@@ -141,12 +141,14 @@ int main(int argc, char *argv[]) {
   FHPFeatureHandler camera(10.0);
   //*/
 
-  camera.init(f, "Camera", T_OS_CAM, cm);
+  camera.init(f, "Camera", T_OS_CAM, cm, Eigen::VectorXd::Zero(4), Eigen::VectorXd::Zero(2), Eigen::VectorXd::Zero(2));
 
   f->getParameterByName("Camera_Cam_CM")->setFixed(false);
   f->getParameterByName("Camera_Cam_TD")->setFixed(false);
   f->getParameterByName("Camera_Cam_RD")->setFixed(false);
 
+  const Eigen::VectorXd &qos = f->getParameterByName("Camera_Cam_qOS")->getEstimate();
+  
   // generate 3D features on a sphere
   Eigen::Vector3d r; // vector that is rotated to generate features
   r << 10.0, 0.0, 0.0;

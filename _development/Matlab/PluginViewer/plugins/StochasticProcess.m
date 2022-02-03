@@ -8,7 +8,7 @@ toPlot = {};
 
 for i=1:length(F)
     if strncmp(F(i).name, pluginConfig.parameterName, length(pluginConfig.parameterName))
-        if ~strncmp(F(i).name(end-7:end),'proc.log',8)
+        if ~strncmp(F(i).name(end-7:end),'proc.log',8) && ~strcmp(F(i).name(end-3:end),'.txt')
             toPlot{end+1} = F(i).name;
         end
     end
@@ -61,12 +61,8 @@ end
 subplot('Position', squeezeArea(area,0.02))   
 hold on
 
-if findstr(pluginConfig.parameterName, 'Bw')
-    y = y /pi*180.0*3600;
-    ylabel('deg/h');
-elseif findstr(pluginConfig.parameterName, 'Ba')
-    y = y /9.8*1e6;
-    ylabel('ug');
+if isfield(pluginConfig, 'scale')
+    y = y * pluginConfig.scale;
 end
 
 CO = get(gcf,'DefaultAxesColorOrder');

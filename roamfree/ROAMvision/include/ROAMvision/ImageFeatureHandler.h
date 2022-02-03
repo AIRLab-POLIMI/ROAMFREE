@@ -36,10 +36,15 @@ class ImageFeatureHandler {
     }
     ;
 
-    virtual bool init(ROAMestimation::FactorGraphFilter* f,
-        const std::string &name, const Eigen::VectorXd & T_OS,
-        const Eigen::VectorXd & K, const Eigen::VectorXd & RD,
-        const Eigen::VectorXd & TD) = 0;
+    virtual bool init(
+        ROAMestimation::FactorGraphFilter* f,
+        const std::string &name,
+        const Eigen::VectorXd & T_OS,
+        const Eigen::VectorXd & K, 
+        const Eigen::VectorXd & RD,
+        const Eigen::VectorXd & TD,
+        const Eigen::VectorXd & SKEW
+    ) = 0;
 
     /**
      *  \brief feed the FeatureHandler with a new image measurement
@@ -47,7 +52,7 @@ class ImageFeatureHandler {
      *  @return true if the feature is initialized and ready for estimation, false otherwise     *
      */
     virtual bool addFeatureObservation(long int id, double t,
-        const Eigen::VectorXd &z, const Eigen::MatrixXd &cov) = 0;
+        const Eigen::VectorXd &z, const Eigen::MatrixXd &cov, bool dontInitialize = false) = 0;
 
     virtual bool getFeaturePositionInWorldFrame(long int id,
         Eigen::VectorXd &lw) const = 0;

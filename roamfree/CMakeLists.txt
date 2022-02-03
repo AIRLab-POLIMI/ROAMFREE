@@ -55,7 +55,7 @@ include_directories(${CSPARSE_INCLUDE_DIR})
 # --- Opencv
 
 find_package(OpenCV REQUIRED)
-include_directories(${OpenCV_INCLUDE_DIR})
+include_directories(${OpenCV_INCLUDE_DIRS})
 
 # ----------------------- GCC FLAGS ----------------------------
 
@@ -100,21 +100,6 @@ else()
 	set(BUILD_TYPE_MSG "Release")
 endif()
 
-# ------------------------ MESSAGES ----------------------------
-
-message(STATUS "Using catkin?    : " ${CATKIN_MSG})
-message(STATUS "Build type       : " ${BUILD_TYPE_MSG})
-
-message(STATUS "g20 libs         : " ${G2O_LIBS})
-
-message(STATUS "csparse found?   : " ${CSPARSE_FOUND})
-message(STATUS "csparse includes : " ${CSPARSE_INCLUDE_DIR})
-message(STATUS "csparse libs     : " ${CSPARSE_LIBRARY})
-message(STATUS "cholmod libs     : " ${CHOLMOD_LIBRARY})
-
-message(STATUS "opencv found?    : " ${OpenCV_FOUND})
-message(STATUS "opencv includes  : " ${OpenCV_INCLUDE_DIR})
-message(STATUS "opencv libs      : " ${OpenCV_LIBS})
 
 # -------------------------------------------------------------
 
@@ -128,3 +113,21 @@ add_subdirectory(ROAMlog)
 add_subdirectory(ROAMtest)
 add_subdirectory(ROAMimu)
 add_subdirectory(ROAMvision)
+
+# ------------------------ MESSAGES ----------------------------
+
+message(STATUS "Using catkin?    : " ${CATKIN_MSG})
+message(STATUS "Build type       : " ${BUILD_TYPE_MSG})
+
+message(STATUS "g20 libs         : " ${G2O_LIBS})
+
+message(STATUS "csparse found?   : " ${CSPARSE_FOUND})
+message(STATUS "csparse includes : " ${CSPARSE_INCLUDE_DIR})
+message(STATUS "csparse libs     : " ${CSPARSE_LIBRARY})
+message(STATUS "cholmod libs     : " ${CHOLMOD_LIBRARY})
+
+message(STATUS "opencv found?    : " ${OpenCV_FOUND})
+message(STATUS "opencv includes  : " ${OpenCV_INCLUDE_DIRS})
+message(STATUS "opencv libs      : " ${OpenCV_LIBS})
+
+message(STATUS "eigen includes   : " ${EIGEN3_INCLUDE_DIR})

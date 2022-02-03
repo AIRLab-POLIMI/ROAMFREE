@@ -48,13 +48,15 @@ enum MeasTypes {
   IMUintegralDeltaP,
   IMUintegralDeltaQ,
   PlanarConstraint,
-  QuadDynamicModel
+  QuadDynamicModel,
+  LiDARTieFeatures
 };
 
 enum ParameterTypes {
   Euclidean1D,
   Euclidean2D,
   Euclidean3D,
+  Euclidean4D,
   Quaternion,
   Matrix3D,
   SE3,
@@ -63,7 +65,10 @@ enum ParameterTypes {
 
 enum PriorEdgeTypes {
   Euclidean1DPrior,
+  Euclidean2DPrior,
   Euclidean3DPrior,
+  Euclidean4DPrior,
+  QuaternionPrior,
   SE3Prior,
   FHPPriorOnHomogeneousPoint
 };
@@ -89,7 +94,10 @@ enum AugStateComponents {
   DELTA_POSITION,
   DELTA_ORIENTATION,
   IMUINT_DELTAPOSE,
-  AUGSTATE_N_COMPONENTS
+  PREVIOUS_ORIENTATION,
+  PREVIOUS_LINEARVELOCITY,
+  PREVIOUS_ANGULARVELOCITY,
+  AUGSTATE_N_COMPONENTS,
 };
 
 enum SolverMethod {

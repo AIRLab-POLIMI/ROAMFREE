@@ -166,7 +166,9 @@ bool IMUIntegralHandler::step(double* za, double* zw) {
 #   ifdef DEBUG_PRINT_INFO_MESSAGES
     cerr << "[IMUIntegralHandler] Completed integration, adding poses and low level measurements ..." << endl;
 #   endif
-
+    
+    ret = true;
+    
     // -------------------- STEP 1: z1 = z1 + delta  ---------------------- //
     //  sum the positive part of the integral to z1
 
@@ -247,19 +249,10 @@ bool IMUIntegralHandler::step(double* za, double* zw) {
 
         Eigen::VectorXd s2hat(7);
 
-        const double & sO1 = _filter->getParameterByName(
-            _sensorNameDeltaP + "_SOx")->getEstimate()(0);
-        const double & sO2 = _filter->getParameterByName(
-            _sensorNameDeltaP + "_SOy")->getEstimate()(0);
-        const double & sO3 = _filter->getParameterByName(
-            _sensorNameDeltaP + "_SOz")->getEstimate()(0);
-
-        const double & qOS1 = _filter->getParameterByName(
-            _sensorNameDeltaP + "_qOSx")->getEstimate()(0);
-        const double & qOS2 = _filter->getParameterByName(
-            _sensorNameDeltaP + "_qOSy")->getEstimate()(0);
-        const double & qOS3 = _filter->getParameterByName(
-            _sensorNameDeltaP + "_qOSz")->getEstimate()(0);
+	const Eigen::VectorXd &so = _filter->getParameterByName(
+            _sensorNameDeltaP + "_SO")->getEstimate();
+	const Eigen::VectorXd &qos = _filter->getParameterByName(
+            _sensorNameDeltaP + "_qOS")->getEstimate();
 
         const Eigen::VectorXd & imuDp = _z12->head(3);
         const Eigen::VectorXd & imuDq = _zGyro;
@@ -267,9 +260,9 @@ bool IMUIntegralHandler::step(double* za, double* zw) {
         const double Dt = _dt * _N;
 
         // this predictor assume IMUcentric platform (T_WS = T_WR)
-//#			include "generated/IMUpredictor_S2.cppready"
+//#	include "generated/IMUpredictor_S2.cppready"
 
-#				include "generated/IMUpredictor_S2genericSO.cppready"
+#	include "generated/IMUpredictor_S2genericSO.cppready"
 
         _x2->setEstimate(s2hat); // initialize with the computed prediction
       } else {
@@ -289,7 +282,7 @@ bool IMUIntegralHandler::step(double* za, double* zw) {
       _x0 = _x1;
       _x1 = _x2;
 
-      ret = true;
+      // ret = true; before this was the only case in which we were returning true 
     } else {
 
       if (_isMaster == true) {
@@ -307,20 +300,11 @@ bool IMUIntegralHandler::step(double* za, double* zw) {
         const Eigen::VectorXd & x0 = _x0->getEstimate();
 
         Eigen::VectorXd s1hat(7);
-
-        const double & sO1 = _filter->getParameterByName(
-            _sensorNameDeltaP + "_SOx")->getEstimate()(0);
-        const double & sO2 = _filter->getParameterByName(
-            _sensorNameDeltaP + "_SOy")->getEstimate()(0);
-        const double & sO3 = _filter->getParameterByName(
-            _sensorNameDeltaP + "_SOz")->getEstimate()(0);
-
-        const double & qOS1 = _filter->getParameterByName(
-            _sensorNameDeltaP + "_qOSx")->getEstimate()(0);
-        const double & qOS2 = _filter->getParameterByName(
-            _sensorNameDeltaP + "_qOSy")->getEstimate()(0);
-        const double & qOS3 = _filter->getParameterByName(
-            _sensorNameDeltaP + "_qOSz")->getEstimate()(0);
+	
+	const Eigen::VectorXd &so = _filter->getParameterByName(
+            _sensorNameDeltaP + "_SO")->getEstimate();
+	const Eigen::VectorXd &qos = _filter->getParameterByName(
+            _sensorNameDeltaP + "_qOS")->getEstimate();
 
         const Eigen::VectorXd & imuDp = curdP;
         const Eigen::VectorXd & imuDq = _zGyro;
@@ -328,9 +312,9 @@ bool IMUIntegralHandler::step(double* za, double* zw) {
         const double Dt = _dt * _N;
 
         // this predictor assume IMUcentric platform (T_WS = T_WR)
-//#			include "generated/IMUpredictor_S1.cppready"
+//#	include "generated/IMUpredictor_S1.cppready"
 
-#				include "generated/IMUpredictor_S1genericSO.cppready"
+#	include "generated/IMUpredictor_S1genericSO.cppready"
 
         _x1->setEstimate(s1hat); // initialize with the computed prediction
       } else {

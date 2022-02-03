@@ -689,6 +689,10 @@ namespace g2o{
     return _solver->computeMarginals(spinv, blockIndices);
   }
 
+  bool SparseOptimizer::computeMarginalsDirect(SparseBlockMatrix<MatrixXd>& spinv, const std::vector<std::pair<int, int> >& blockIndices){
+    return _solver->computeMarginalsDirect(spinv, blockIndices);
+  }
+
 
   void SparseOptimizer::setMaxTrialsAfterFailure(int max_trials)
   {

@@ -19,7 +19,7 @@ Contributors:
 #include "IMUIntegralDeltaPM.h"
 
 namespace ROAMfunctions {
-const bool IMUImtegralDeltaPM::_usedComponents[] = {false, false, false, false, false, false, false, false, true, false};
+const bool IMUImtegralDeltaPM::_usedComponents[] = {false, false, false, false, false, false, false, false, true, false, false, false};
 
 const std::string IMUImtegralDeltaPM::_paramsNames[] = {"Ba", "Bw"};
 

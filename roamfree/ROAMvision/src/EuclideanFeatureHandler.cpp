@@ -29,6 +29,9 @@
 using namespace std;
 using namespace ROAMestimation;
 
+// #define DEBUG_PRINT_VISION_INFO_MESSAGES 1
+// #define DEBUG_OPTIMIZATION_VERBOSE 1
+
 namespace ROAMvision {
 
 EuclideanFeatureHandler::EuclideanFeatureHandler() {
@@ -36,32 +39,33 @@ EuclideanFeatureHandler::EuclideanFeatureHandler() {
 
 bool EuclideanFeatureHandler::init(FactorGraphFilter* f, const string &name,
     const Eigen::VectorXd & T_OS, const Eigen::VectorXd & K,
-    const Eigen::VectorXd & RD, const Eigen::VectorXd & TD) {
+    const Eigen::VectorXd & RD, const Eigen::VectorXd & TD, const Eigen::VectorXd & SKEW) {
 
   _filter = f;
   _sensorName = name;
 
-  _filter->addConstantParameter(_sensorName + "_Cam_SOx", T_OS(0), true);
-  _filter->addConstantParameter(_sensorName + "_Cam_SOy", T_OS(1), true);
-  _filter->addConstantParameter(_sensorName + "_Cam_SOz", T_OS(2), true);
-
-  _filter->addConstantParameter(_sensorName + "_Cam_qOSx", T_OS(4), true);
-  _filter->addConstantParameter(_sensorName + "_Cam_qOSy", T_OS(5), true);
-  _filter->addConstantParameter(_sensorName + "_Cam_qOSz", T_OS(6), true);
+  Eigen::VectorXd SO = T_OS.head(3);
+  Eigen::VectorXd qOS = T_OS.tail(4);
+  
+  _filter->addConstantParameter(Euclidean3D, _sensorName + "_Cam_SO", SO, true);
+  qOS_par = _filter->addConstantParameter(Quaternion, _sensorName + "_Cam_qOS", qOS, true);
 
   K_par = _filter->addConstantParameter(Euclidean3D, _sensorName + "_Cam_CM", K,
       true);
 
-  _filter->addConstantParameter(Euclidean3D, _sensorName + "_Cam_RD",
+  _filter->addConstantParameter(Euclidean4D, _sensorName + "_Cam_RD",
       RD, true);
   _filter->addConstantParameter(Euclidean2D, _sensorName + "_Cam_TD",
       TD, true);
+  _filter->addConstantParameter(Euclidean2D, _sensorName + "_Cam_SKEW",
+      SKEW, true);
+
 
   return true;
 }
 
 bool EuclideanFeatureHandler::addFeatureObservation(long int id, double t,
-    const Eigen::VectorXd &z, const Eigen::MatrixXd &cov) {
+    const Eigen::VectorXd &z, const Eigen::MatrixXd &cov, bool dontInitialize) {
 
   // there must already exist a pose
   PoseVertexWrapper_Ptr cur_frame = _filter->getNearestPoseByTimestamp(t);
@@ -71,6 +75,7 @@ bool EuclideanFeatureHandler::addFeatureObservation(long int id, double t,
 
   // time of the message must match the vertex found
   if (fabs(t - cur_frame->getTimestamp()) > _timestampOffsetTreshold) {
+    cerr << "[EuclideanFeatureHandler]: ERROR, frame too fare for feature " << id << endl;
     return false;
   }
 
@@ -80,8 +85,6 @@ bool EuclideanFeatureHandler::addFeatureObservation(long int id, double t,
   }
 # endif
 
-  const string &sensor = getFeatureParameterName(id);
-
   // this implicitly initialize the new track if it was not there
   EuclideanTrackDescriptor &d = _features[id];
 
@@ -90,77 +93,19 @@ bool EuclideanFeatureHandler::addFeatureObservation(long int id, double t,
     // add the current observation to history
     ObservationDescriptor &obs = d.zHistory[t];
     obs.pose = cur_frame;
-    obs.z = z;
     obs.t = t;
+    obs.z = z;
+    obs.cov = cov;
 
-    // TODO: if initialization is succesful
-    Eigen::VectorXd Lw(3);
-
-    if (d.zHistory.size() >= 3) {
-
-      if (initialize(d, K_par->getEstimate(), Lw)) {
-
-        _filter->addSensor(sensor, ImagePlaneProjection, false, true);
-
-        // it does not work, there is no sensor called _sensorName + "_Cam"
-        // we have to share manually the parameters
-        // _filter->shareSensorFrame(_sensorName + "_Cam", sensor);
-
-        const string suffixes[] = { "_SOx", "_SOy", "_SOz", "_qOSx", "_qOSy",
-            "_qOSz" };
-        for (int k = 0; k < 6; k++) {
-          _filter->shareParameter(_sensorName + "_Cam" + suffixes[k],
-              sensor + suffixes[k]);
-        }
-
-        // TODO: hardcoded
-        // do we want the robust kernel by default?
-
-        // considering a 1.5 sigma plus 1e6 scaling, threshold at 10 pix
-        // beta =  || err || / sigma
-        // where ||err|| is where we want the weight to start to decrease
-
-        // TODO: sigma is hardcoded
-        double beta = 5 / sqrt(1e6 * pow(0.8, 2));
-
-        _filter->setRobustKernel(sensor, true, beta);
-
-        // add parameter vertices
-
-        _filter->shareParameter(_sensorName + "_Cam_CM", sensor + "_CM");
-        _filter->shareParameter(_sensorName + "_Cam_RD", sensor + "_RD");
-        _filter->shareParameter(_sensorName + "_Cam_TD", sensor + "_TD");
-
-        _filter->addConstantParameter(Euclidean3D, sensor + "_Lw",
-            d.zHistory.begin()->first, Lw, false);
-
-        // add all the edges
-
-        for (auto it = d.zHistory.begin(); it != d.zHistory.end(); ++it) {
-          const ObservationDescriptor &obs = it->second;
-
-          MeasurementEdgeWrapper_Ptr ret = _filter->addMeasurement(sensor,
-              obs.t, obs.z, cov, obs.pose);
-
-          assert(ret);
-        }
-
-        // done
-        d.zHistory.clear();
-        d.isInitialized = true;
-
-#			ifdef DEBUG_PRINT_VISION_INFO_MESSAGES
-        cerr << "[EuclideanFeatureHandler] Ready to estimate depth for track " << id
-        << endl;
-#			endif
-
-        return true;
-      }
+    if (!dontInitialize && d.zHistory.size() >= 2) {
+      return initializeFeature_i(d, id);
     }
 
     return false;
 
   } else { // it has already been initialized, just add the measurement
+    const string &sensor = getFeatureParameterName(id);
+    
     MeasurementEdgeWrapper_Ptr ret = _filter->addMeasurement(sensor, t, z, cov,
         cur_frame);
 
@@ -168,6 +113,91 @@ bool EuclideanFeatureHandler::addFeatureObservation(long int id, double t,
   }
 
   return true;
+}
+
+bool EuclideanFeatureHandler::initializeFeature(long int id)
+{
+  auto it = _features.find(id);
+  if ( it != _features.end() ) {
+    return initializeFeature_i(it->second, id); 
+  } else {    
+    cerr << "[EuclideanFeatureHandler]: ERROR, feature " << id << " does not exist." << endl;
+    return false;
+  }  
+}
+
+bool EuclideanFeatureHandler::initializeFeature_i(EuclideanTrackDescriptor &d, long int id) {
+  if (d.isInitialized) {
+    cerr << "[EuclideanFeatureHandler] Feature " << id << " is already initialized " << endl;
+    return true;
+  }
+  
+# ifdef DEBUG_PRINT_VISION_INFO_MESSAGES
+    cerr << "[EuclideanFeatureHandler] Initializing track " << id << endl;
+# endif
+
+  // TODO: if initialization is succesful
+  Eigen::VectorXd Lw(3);
+    
+  if (initialize(d, K_par->getEstimate(), Lw)) {
+    
+    const string &sensor = getFeatureParameterName(id);
+
+    _filter->addSensor(sensor, ImagePlaneProjection, false, true);
+
+    // it does not work, there is no sensor called _sensorName + "_Cam"
+    // we have to share manually the parameters
+    // _filter->shareSensorFrame(_sensorName + "_Cam", sensor);
+
+    const string suffixes[] = { "_SO", "_qOS"};
+    for (int k = 0; k < 2; k++) {
+      _filter->shareParameter(_sensorName + "_Cam" + suffixes[k],
+	  sensor + suffixes[k]);
+    }
+
+    // TODO: hardcoded
+    // do we want the robust kernel by default?
+
+    // considering a 1.5 sigma plus 1e6 scaling, threshold at 10 pix
+    // beta =  || err || / sigma
+    // where ||err|| is where we want the weight to start to decrease
+
+    // TODO: sigma is hardcoded
+    double beta = 5 / sqrt(1e8 * pow(0.8, 2));
+
+    _filter->setRobustKernel(sensor, true, beta);
+
+    // add parameter vertices
+
+    _filter->shareParameter(_sensorName + "_Cam_CM", sensor + "_CM");
+    _filter->shareParameter(_sensorName + "_Cam_RD", sensor + "_RD");
+    _filter->shareParameter(_sensorName + "_Cam_TD", sensor + "_TD");
+    _filter->shareParameter(_sensorName + "_Cam_SKEW", sensor + "_SKEW");
+
+    _filter->addConstantParameter(Euclidean3D, sensor + "_Lw", d.zHistory.begin()->first, Lw, false);
+
+    // add all the edges
+
+    for (auto it = d.zHistory.begin(); it != d.zHistory.end(); ++it) {
+      const ObservationDescriptor &obs = it->second;
+
+      MeasurementEdgeWrapper_Ptr ret = _filter->addMeasurement(sensor,
+	  obs.t, obs.z, obs.cov, obs.pose);
+
+      assert(ret);
+    }
+
+    // done
+    d.zHistory.clear();
+    d.isInitialized = true;
+
+#   ifdef DEBUG_PRINT_VISION_INFO_MESSAGES
+      cerr << "[EuclideanFeatureHandler] Ready to estimate depth for track " << id  << endl;
+#   endif
+
+    return true;
+  }
+  return false;
 }
 
 void EuclideanFeatureHandler::fixOlderPosesWRTVisibleFeatures() {
@@ -200,6 +230,8 @@ bool EuclideanFeatureHandler::getFeaturePositionInWorldFrame(long int id,
       getFeatureParameterName(id) + "_Lw"); // euclidean coordinates
 
   fw = lw_par->getEstimate();
+
+  return true;
 }
 
 bool EuclideanFeatureHandler::getFeaturesIds(vector<long int>& to) const {
@@ -290,15 +322,26 @@ bool EuclideanFeatureHandler::initialize(const EuclideanTrackDescriptor &track,
   triangulated3DPointInit.z = triangulated3DPointInitTemp[2]
       / triangulated3DPointInitTemp[3];
 
-  // run Gauss-Newton with all the cameras
+  /* run Gauss-Newton with all the cameras
   int resGN = GaussNewton(curCams, curPoints, triangulated3DPointInit,
       triangulated3DPoint);
 
   lw << triangulated3DPoint.x, triangulated3DPoint.y, triangulated3DPoint.z;
   //*/
 
+  // use directly opencv triangulation
+  int resGN = 1;
+  lw << 
+    triangulated3DPointInitTemp[0] / triangulated3DPointInitTemp[3], 
+    triangulated3DPointInitTemp[1] / triangulated3DPointInitTemp[3], 
+    triangulated3DPointInitTemp[2] / triangulated3DPointInitTemp[3];
+  //*/
+
   if (resGN != -1) {
     // test that the triangulated points lies in front of each camera
+    
+    const Eigen::VectorXd &qos = qOS_par->getEstimate();
+    
     for (auto it = track.zHistory.begin(); it != track.zHistory.end(); ++it) {
 
       Eigen::VectorXd testz(1); // it could be a double, but automated equation generation always works with vectors
@@ -310,7 +353,7 @@ bool EuclideanFeatureHandler::initialize(const EuclideanTrackDescriptor &track,
 #       include "../../ROAMfunctions/generated/ImagePlaneProjection_testZ.cppready"
 
         if (testz(0) < 0) {
-          cerr << "WARNING: point behind camera: z = " << testz(0) << ". Initialization failed" << endl;
+          cerr << "[EuclideanFeatureHandler]: point behind camera: z = " << testz(0) << ". Initialization failed" << endl;
           resGN = -1;
           break;
         }
@@ -344,62 +387,21 @@ bool EuclideanFeatureHandler::initialize(const EuclideanTrackDescriptor &track,
   return resGN > 0;
 }
 
-void EuclideanFeatureHandler::buildProjectionMatrix(const Eigen::VectorXd &T_WS,
+void EuclideanFeatureHandler::buildProjectionMatrix(const Eigen::VectorXd &two,
     const cv::Mat &K, cv::Mat &projMat) {
 
   cv::Mat T_SW_cv(3, 4, CV_64F);
+  
+  const Eigen::VectorXd &qos = qOS_par->getEstimate();
+
+  Eigen::Map<Eigen::Matrix<double, 3, 4, Eigen::RowMajor>> Tcw(T_SW_cv.ptr<double>());
 
   // RF eigen pose (x,q) from world to camera is transformed in
   // cv transformation matrix from camera to world.
-
-  double tmp0 = T_WS(4);
-  double tmp1 = T_WS(5);
-  double tmp2 = T_WS(3);
-  double tmp3 = T_WS(6);
-  double tmp4 = tmp0 * tmp1;
-  double tmp5 = tmp2 * tmp3;
-  double tmp6 = tmp4 + tmp5;
-  double tmp7 = -(tmp2 * tmp1);
-  double tmp8 = tmp0 * tmp3;
-  double tmp9 = tmp7 + tmp8;
-  double tmp10 = pow(tmp2, 2);
-  double tmp11 = pow(tmp0, 2);
-  double tmp12 = pow(tmp1, 2);
-  double tmp13 = -tmp12;
-  double tmp14 = pow(tmp3, 2);
-  double tmp15 = -tmp14;
-  double tmp16 = tmp10 + tmp11 + tmp13 + tmp15;
-  double tmp17 = T_WS(0);
-  double tmp18 = -(tmp2 * tmp3);
-  double tmp19 = tmp4 + tmp18;
-  double tmp20 = T_WS(2);
-  double tmp21 = tmp2 * tmp0;
-  double tmp22 = tmp1 * tmp3;
-  double tmp23 = tmp21 + tmp22;
-  double tmp24 = T_WS(1);
-  double tmp25 = -tmp11;
-  double tmp26 = tmp10 + tmp25 + tmp12 + tmp15;
-  double tmp27 = tmp2 * tmp1;
-  double tmp28 = tmp27 + tmp8;
-  double tmp29 = -(tmp2 * tmp0);
-  double tmp30 = tmp29 + tmp22;
-  double tmp31 = tmp10 + tmp25 + tmp13 + tmp14;
-
-  T_SW_cv.at<double>(0, 0) = tmp16;
-  T_SW_cv.at<double>(0, 1) = 2 * tmp6;
-  T_SW_cv.at<double>(0, 2) = 2 * tmp9;
-  T_SW_cv.at<double>(0, 3) = -2 * tmp24 * tmp6 - 2 * tmp20 * tmp9
-      - tmp17 * tmp16;
-  T_SW_cv.at<double>(1, 0) = 2 * tmp19;
-  T_SW_cv.at<double>(1, 1) = tmp26;
-  T_SW_cv.at<double>(1, 2) = 2 * tmp23;
-  T_SW_cv.at<double>(1, 3) = -2 * tmp17 * tmp19 - 2 * tmp20 * tmp23
-      - tmp24 * tmp26;
-  T_SW_cv.at<double>(2, 0) = 2 * tmp28;
-  T_SW_cv.at<double>(2, 1) = 2 * tmp30;
-  T_SW_cv.at<double>(2, 2) = tmp31;
-  T_SW_cv.at<double>(2, 3) = -2 * tmp17 * tmp28 - 2 * tmp24 * tmp30
-      - tmp20 * tmp31;
+  
+  const static int _OFF = -1;
+  
+# include "generated/FromRFtoCV.cppready"
 
   projMat = K * T_SW_cv;
 }

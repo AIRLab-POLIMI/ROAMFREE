@@ -71,13 +71,13 @@ class GenericEdge: public g2o::BaseMultiEdge<D, Eigen::VectorXd>,
 
   protected:
 
+    const static int _N_STANDARD_PARAMETERS = 3; /**< these are S(O), qOS, gravity */
+
     std::string _name; /**< the name of the sensor this edge refers to */
 
     double _tstamp; /**< timestamp of the measurement */
 
     double _Dt01, _Dt12; /**< dt between pose vertices */
-
-    long int _frameCounter;
 
     Eigen::VectorXd _x; /**< augmented state: [x, q, v, omega, a, alpha,. disp, dispQ, IMUintdP, IMUintdQ], 33 variables */
 
@@ -105,7 +105,7 @@ using GenericEdge<MT::_ERROR_SIZE>::_name;                                  \
 using GenericEdge<MT::_ERROR_SIZE>::_tstamp;                                \
 using GenericEdge<MT::_ERROR_SIZE>::_Dt01;                                  \
 using GenericEdge<MT::_ERROR_SIZE>::_Dt12;                                  \
-using GenericEdge<MT::_ERROR_SIZE>::_frameCounter;                          \
+using GenericEdge<MT::_ERROR_SIZE>::_N_STANDARD_PARAMETERS;                 \
 \
 using g2o::BaseMultiEdge<MT::_ERROR_SIZE, Eigen::VectorXd>::_information;   \
 using g2o::BaseMultiEdge<MT::_ERROR_SIZE, Eigen::VectorXd>::_measurement;   \
@@ -119,10 +119,9 @@ using g2o::BaseMultiEdge<MT::_ERROR_SIZE, Eigen::VectorXd>::resize;
 template<int D>
 GenericEdge<D>::GenericEdge(int nParams) :
     _paramsPtrsSize(nParams), _name("undefined"), _tstamp(
-        -std::numeric_limits<double>::infinity()), _Dt01(0), _Dt12(0), _x(33), _frameCounter(
-        -1) {
+        -std::numeric_limits<double>::infinity()), _Dt01(0), _Dt12(0), _x(39) {
 
-  _paramsPtrs = new double *[_paramsPtrsSize]; // 6 1d parameters plus the eventual others
+  _paramsPtrs = new double *[_paramsPtrsSize]; // 1 Euclidean 3D, 1 Quaternion the possible function specific params
 }
 
 template<int D>
@@ -163,7 +162,7 @@ inline void GenericEdge<D>::handleParamTemporaries() {
 template<int D>
 void GenericEdge<D>::updateParamPtrs() {
   for (int k = 0; k < _paramsPtrsSize; k++) {
-    _paramsPtrs[k] = _params[k + 6].value.data();
+    _paramsPtrs[k] = _params[k + _N_STANDARD_PARAMETERS].value.data();
   }
 }
 

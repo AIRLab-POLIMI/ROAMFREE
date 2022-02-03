@@ -29,7 +29,7 @@ public:
 	static const bool _usedComponents[];
 
 	static const std::string _paramsNames[];
-	static const int _nParams = 6;
+	static const int _nParams = 7;
 
 	static const unsigned int _ORDER = 2;
 
@@ -46,7 +46,9 @@ public:
 
 	bool predict(const Eigen::VectorXd &x, double **params,
 			const Eigen::VectorXd& z, double dt, Eigen::VectorXd &xhat) {
-		return false;
+		
+		xhat = x;
+		return true;
 	}
 
 	template<typename T>
@@ -55,17 +57,19 @@ public:
 
 		Eigen::Map<Eigen::VectorXd> wnd(params[0], 3);
 		Eigen::Map<Eigen::VectorXd> drag(params[1], 3);
-		Eigen::Map<Eigen::VectorXd> mc(params[2], 3);
+		Eigen::Map<Eigen::VectorXd> mc(params[2], 2);
 		Eigen::Map<Eigen::VectorXd> cp(params[3], 2);
 		Eigen::Map<Eigen::VectorXd> ibd(params[4], 3);
 		Eigen::Map<Eigen::VectorXd> ibod(params[5], 3);
-
+		Eigen::Map<Eigen::VectorXd> gravity(params[6], 1);
+		
 		Eigen::MatrixBase<T> & err = const_cast<Eigen::MatrixBase<T>&>(const_ret);
 
 		const static int _OFF = -1;
 
 #   include "generated/QuadDynamicModel_Err.cppready"
-
+        
+      //  err.tail(3) << 0,0,0;
 		return false;
 	}
 
@@ -76,10 +80,11 @@ public:
 
     Eigen::Map<Eigen::VectorXd> wnd(params[0], 3);
     Eigen::Map<Eigen::VectorXd> drag(params[1], 3);
-    Eigen::Map<Eigen::VectorXd> mc(params[2], 3);
+    Eigen::Map<Eigen::VectorXd> mc(params[2], 2);
     Eigen::Map<Eigen::VectorXd> cp(params[3], 2);
     Eigen::Map<Eigen::VectorXd> ibd(params[4], 3);
     Eigen::Map<Eigen::VectorXd> ibod(params[5], 3);
+    Eigen::Map<Eigen::VectorXd> gravity(params[6], 1);
 
 		Eigen::MatrixBase<T> & J = const_cast<Eigen::MatrixBase<T>&>(const_ret);
 
@@ -121,7 +126,7 @@ public:
 		case 0: // jacobian wrt to noises
 		{
 #			include "generated/QuadDynamicModel_JErrNoises.cppready"
-			return false; // it is the identity matrix
+			return true; // it is not the identity matrix
 			break;
 		}
 		case 1: // jacobian wrt wind

@@ -30,14 +30,14 @@ ParameterWrapper_Ptr StochasticProcessFactory::addEucl3DRandomConstant(
 
 ParameterWrapper_Ptr StochasticProcessFactory::addEucl3DRandomWalk(
     FactorGraphFilter* f, std::string name, const Eigen::VectorXd& x0,
-    const Eigen::MatrixXd& randomWalkNoiseCov, double spacing,
+    const Eigen::MatrixXd& randomWalkNoiseCov_cnt, double spacing,
     InterpolationTypes intType, unsigned int a) {
 
   ParameterWrapper_Ptr p = addTimeVaryingParameter(f, name, x0, spacing,
       intType, a);
 
   p->setProcessModelType(RandomWalk);
-  p->setRandomWalkNoiseCov(randomWalkNoiseCov);
+  p->setRandomWalkNoiseCov(randomWalkNoiseCov_cnt);
 
   return p;
 }
@@ -45,14 +45,14 @@ ParameterWrapper_Ptr StochasticProcessFactory::addEucl3DRandomWalk(
 ParameterWrapper_Ptr StochasticProcessFactory::addEucl3DGaussMarkov(
     FactorGraphFilter* f, std::string name, const Eigen::VectorXd& x0,
     const Eigen::VectorXd& gaussMarkovBeta,
-    const Eigen::MatrixXd& gaussMarkovNoiseCov, double spacing,
+    const Eigen::MatrixXd& gaussMarkovNoiseCov_cnt, double spacing,
     InterpolationTypes intType, unsigned int a) {
 
   ParameterWrapper_Ptr p = addTimeVaryingParameter(f, name, x0, spacing,
       intType, a);
 
   p->setProcessModelType(GaussMarkov);
-  p->setGaussMarkovNoiseCov(gaussMarkovNoiseCov);
+  p->setGaussMarkovNoiseCov(gaussMarkovNoiseCov_cnt);
   p->setGaussMarkovBeta(gaussMarkovBeta);
 
   return p;
@@ -61,11 +61,11 @@ ParameterWrapper_Ptr StochasticProcessFactory::addEucl3DGaussMarkov(
 ParameterWrapper_Ptr StochasticProcessFactory::addEucl3DGaussMarkovPlusRandomConstant(
     FactorGraphFilter* f, std::string name, const Eigen::VectorXd& x0_rc,
     const Eigen::VectorXd& x0_gm, const Eigen::VectorXd& gaussMarkovBeta,
-    const Eigen::MatrixXd& gaussMarkovNoiseCov, double spacing,
+    const Eigen::MatrixXd& gaussMarkovNoiseCov_cnt, double spacing,
     InterpolationTypes intType, unsigned int a) {
 
   ParameterWrapper_Ptr p_gm = addEucl3DGaussMarkov(f, name + "_GM", x0_gm,
-      gaussMarkovBeta, gaussMarkovNoiseCov, spacing, intType, a);
+      gaussMarkovBeta, gaussMarkovNoiseCov_cnt, spacing, intType, a);
   ParameterWrapper_Ptr p_rc = f->addConstantParameter(Euclidean3D, name + "_RC",
       x0_rc, false);
 

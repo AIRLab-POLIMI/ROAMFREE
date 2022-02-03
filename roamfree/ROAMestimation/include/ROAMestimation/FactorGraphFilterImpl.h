@@ -93,8 +93,6 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
     bool setRobustKernel(const std::string &sensor, bool enabled,
         double huberWidth);
 
-    bool addMisalignmentGuard(const std::string &sensor);
-
     /* --------------------------- PARAMETER LEVEL METHODS ---------------------------- */
 
     ParameterWrapper_Ptr addConstantParameter(ParameterTypes type,
@@ -123,20 +121,7 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
         const std::string &name, ParameterWrapperVector_Ptr toblend);
 
     ParameterWrapper_Ptr getParameterByName(const std::string &name);
-
-    class MisalignmentGuard: public g2o::HyperGraphAction {
-
-      protected:
-        GenericVertex<Eucl1DV> *_v1, *_v2, *_v3;
-
-      public:
-        MisalignmentGuard(GenericVertex<Eucl1DV> *v1,
-            GenericVertex<Eucl1DV> *v2, GenericVertex<Eucl1DV> *v3);
-
-        HyperGraphAction* operator()(const g2o::HyperGraph* graph,
-            g2o::HyperGraphAction::Parameters* parameters = 0);
-    };
-
+    
     /* --------------------------- POSES AND EDGES LEVEL METHODS ---------------------- */
 
     PoseVertexWrapper_Ptr addPose(double t);
@@ -197,7 +182,8 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
     bool estimate(int nIterations);
 
     bool estimate(PoseVertexWrapperVector poses, int nIterations);
-
+    
+    void computeCrossCovariances();
     /* --------------------------- OTHER STUFF ---------------------------------------- */
 
     ~FactorGraphFilter_Impl();
@@ -225,6 +211,7 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
 
     bool _lowLevelLogging, _writeGraph, _writeHessianStructure;
     ROAMlog::GraphLogger *_logger; //!< the object which handles low level logging
+    std::string _logFolder;
 
     SpatialIndex *_spatialIndex; //!< the object which maintains spatial informations about poses.
 
@@ -252,6 +239,7 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
 
     //! collection for the parameter descriptors
     std::map<std::string, boost::shared_ptr<ParameterVerticesManager> > _params;
+    
 
     /* --------------------------- STUFF FOR POSES AND MEASUREMENTS ------------------- */
 

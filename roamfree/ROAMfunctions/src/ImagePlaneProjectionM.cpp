@@ -19,8 +19,8 @@ Contributors:
 #include "ImagePlaneProjectionM.h"
 
 namespace ROAMfunctions {
-const bool ImagePlaneProjectionM::_usedComponents[] = {true, true, false, false, false, false, false, false, false, false};
+const bool ImagePlaneProjectionM::_usedComponents[] = {true, true, false, false, false, false, false, false, false, false, false, false};
 
-const std::string ImagePlaneProjectionM::_paramsNames[] = {"Lw", "CM", "RD", "TD"};
+const std::string ImagePlaneProjectionM::_paramsNames[] = {"Lw", "CM", "RD", "TD", "SKEW"};
 
 } /* namespace ROAMfunctions */

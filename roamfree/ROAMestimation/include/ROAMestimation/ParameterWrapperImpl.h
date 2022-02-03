@@ -49,7 +49,17 @@ class ParameterWrapper_Impl: public ParameterWrapper {
     inline virtual void setComputeCovariance(bool computeCovariance) {
       _param->setComputeCovariance(computeCovariance);
     }
-
+    
+    inline virtual std::list<ParameterWrapper_Ptr> getCrossCovariance() {
+      return (_param->getCrossCovariance()); 
+    }
+    
+     inline virtual void addCrossCovarianceParameter(ParameterWrapper_Ptr paramCross) {
+       if(!paramCross->getFixed() && !_param->fixed()) {
+	  _param->addCrossCovarianceParameter(paramCross);
+       }
+    }
+    
     virtual const Eigen::VectorXd &getEstimate() const;
     virtual const Eigen::VectorXd &getEstimate(double t) const;
 

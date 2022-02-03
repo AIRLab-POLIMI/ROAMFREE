@@ -41,13 +41,17 @@ bool ParameterBlender::getValueAt(double tstamp, Eigen::VectorXd& ret) const {
 
   Eigen::VectorXd tmp;
 
-  tmp.resize(tmp.rows());
+  tmp.resize(ret.rows());
   ret.setZero();
+  
+  bool hasToUpdateValue = false;
 
   for (auto pit = _toblend.begin(); pit != _toblend.end(); ++pit) {
-    (*pit)->getValueAt(tstamp, tmp);
+    hasToUpdateValue |= (*pit)->getValueAt(tstamp, tmp);
     ret += tmp;
   }
+  
+  return hasToUpdateValue;
 }
 
 inline void ParameterBlender::resizeJacobianMatrix(Eigen::MatrixXd& ret) {
@@ -65,8 +69,11 @@ bool ParameterBlender::getJacobianAt(double tstamp, int j,
     j -= _toblend[which]->getWindowSize();
     which++;
   }
-
-  return _toblend[which]->getJacobianAt(tstamp, j, ret);
+  
+  // TODO: this return works only by luck, because all the jacobians for the parameter 
+  // types implemented so far don't depend on tstamp and need not to be evaluated again
+  
+  return _toblend[which]->getJacobianAt(tstamp, j, ret);;
 }
 
 void ParameterBlender::setFixed(bool isfixed) {

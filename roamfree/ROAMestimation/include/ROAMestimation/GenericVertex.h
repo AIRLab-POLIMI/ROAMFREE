@@ -59,6 +59,8 @@ class GenericVertex: public g2o::BaseVertex<
       _estimate.resize(Traits::_INTERNAL_SIZE);
       _hasTimestamp = false;
 
+      _uncertainty.setZero();
+      
       //initialize the cell 0,0 of the covariance matrix to +inf so I can distinguish
       //the vertices for which I have computed the covariance
       _uncertainty(0, 0) = std::numeric_limits<double>::infinity();

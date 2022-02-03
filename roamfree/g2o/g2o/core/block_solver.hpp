@@ -494,6 +494,92 @@ bool BlockSolver<Traits>::computeMarginals(SparseBlockMatrix<MatrixXd>& spinv, c
   return ok;
 }
 
+template <typename Traits>
+bool BlockSolver<Traits>::computeMarginalsDirect(SparseBlockMatrix<MatrixXd>& spinv, const std::vector<std::pair<int, int> >& blockIndices)
+{
+  double t = get_time();
+  
+  // initialize spinv
+  const std::vector<int>& rbi = _Hpp->rowBlockIndices();
+  
+  spinv = SparseBlockMatrix<MatrixXd>(& rbi[0], 
+				      & rbi[0], 
+				      rbi.size(),
+				      rbi.size(), true);  
+  
+  // create data structre 
+  // each key in the map is a column to be solved for
+  // each element is a vector of the block indices that will have to be populated from that col
+
+  std::map< long int, std::vector < std::pair<int, int> > > cols_to_solve;
+
+  // iterate trought the block indices and fill col_to_solve
+
+  for (int bi_i = 0; bi_i < blockIndices.size(); ++bi_i ) {
+    const std::pair<int, int> &th_bi  = blockIndices[bi_i];
+
+    long int start_col = th_bi.second > 0 ? rbi[th_bi.second-1] : 0;
+	  long int end_col = rbi[th_bi.second]-1;
+
+    for (long int c = start_col; c <= end_col; ++c) {
+      auto & c_entry = cols_to_solve[c];
+
+      c_entry.push_back(th_bi);
+    }
+  }
+
+  // cerr << " I have to solve for " << cols_to_solve.size() << " columns" << endl;
+
+  // iterate trought the columns and solve for those
+
+  bool ok = true;
+
+  double *b = new double[vectorSize()];
+	memset(b, 0, vectorSize()*sizeof(double));
+
+	double *x = new double[vectorSize()];
+
+  for (auto col_it = cols_to_solve.begin(); col_it != cols_to_solve.end(); ++col_it) {
+    // cerr << " Solving col " << col_it->first <<  endl;
+    
+    b[col_it->first] = 1;
+
+    ok = ok && _linearSolver->solve(*_Hpp, x, b);
+
+    if (!ok) {
+      break;
+    }
+
+    // iterate trought the involved blockindices and fill the results
+
+    for (auto bi_it = col_it->second.begin(); bi_it != col_it->second.end(); ++bi_it) {
+      const std::pair<int, int> &th_bi  = *bi_it;
+
+      int start_row = th_bi.first > 0 ? rbi[th_bi.first-1] : 0;
+      int end_row = rbi[th_bi.first]-1;
+
+      int start_col = th_bi.second > 0 ? rbi[th_bi.second-1] : 0;
+      int end_col = rbi[th_bi.second]-1;
+
+      Eigen::MatrixXd *ret = spinv.block(th_bi.first, th_bi.second);
+
+		  assert(ret->rows() == end_row-start_row+1);
+
+		  ret->col(col_it->first-start_col) = Eigen::Map<Eigen::VectorXd>(&x[start_row], ret->rows());
+    }
+
+    b[col_it->first] = 0;
+  }
+
+  delete x;
+  delete b;
+  
+  if (globalStats) {
+    globalStats->timeMarginals = get_time() - t;
+  }
+  return ok;
+}
+
 
 
 template <typename Traits>

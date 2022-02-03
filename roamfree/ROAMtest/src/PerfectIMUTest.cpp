@@ -44,6 +44,13 @@ int main(int argc, char *argv[]) {
   f->setWriteGraph(true);
   f->setWriteHessianStructure(true);
 
+  Eigen::VectorXd gravity(1); // Initial gain and bias calibration parameters for accelerometer
+  gravity << 9.8;
+
+  f->addConstantParameter(Euclidean1D, "gravity", gravity, true);
+  f->shareParameter("gravity", "Accelerometer_Gravity");
+
+
   /* ---------------------- Configure sensors ---------------------- */
 
   // Accelerometer sensor
@@ -59,11 +66,7 @@ int main(int argc, char *argv[]) {
 
   f->addConstantParameter(Euclidean3D, "Accelerometer_G", accGain0, true);
   
-  //gravity parameter
-  Eigen::VectorXd gravity(1); // Initial gain and bias calibration parameters for accelerometer
-  gravity << 9.8;
 
-  f->addConstantParameter(Euclidean1D, "Accelerometer_Gravity", gravity, true);
 
   //bias calibration parameter
   Eigen::VectorXd accBias0(3);
