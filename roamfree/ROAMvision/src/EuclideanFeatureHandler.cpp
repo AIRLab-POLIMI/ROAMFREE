@@ -353,7 +353,7 @@ bool EuclideanFeatureHandler::initialize(const EuclideanTrackDescriptor &track,
 #       include "../../ROAMfunctions/generated/ImagePlaneProjection_testZ.cppready"
 
         if (testz(0) < 0) {
-          cerr << "[EuclideanFeatureHandler]: point behind camera: z = " << testz(0) << ". Initialization failed" << endl;
+          // cerr << "[EuclideanFeatureHandler]: point behind camera: z = " << testz(0) << ". Initialization failed" << endl;
           resGN = -1;
           break;
         }
