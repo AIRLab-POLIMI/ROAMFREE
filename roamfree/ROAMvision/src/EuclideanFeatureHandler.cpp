@@ -34,7 +34,13 @@ using namespace ROAMestimation;
 
 namespace ROAMvision {
 
-EuclideanFeatureHandler::EuclideanFeatureHandler() {
+EuclideanFeatureHandler::EuclideanFeatureHandler() 
+  : EuclideanFeatureHandler(false, -1.0) {
+}
+
+EuclideanFeatureHandler::EuclideanFeatureHandler(bool is_robust, double huber_width) 
+  : _is_robust(is_robust), _huber_width(huber_width) {
+
 }
 
 bool EuclideanFeatureHandler::init(FactorGraphFilter* f, const string &name,
@@ -155,17 +161,9 @@ bool EuclideanFeatureHandler::initializeFeature_i(EuclideanTrackDescriptor &d, l
 	  sensor + suffixes[k]);
     }
 
-    // TODO: hardcoded
-    // do we want the robust kernel by default?
-
-    // considering a 1.5 sigma plus 1e6 scaling, threshold at 10 pix
-    // beta =  || err || / sigma
-    // where ||err|| is where we want the weight to start to decrease
-
-    // TODO: sigma is hardcoded
-    double beta = 5 / sqrt(1e8 * pow(0.8, 2));
-
-    _filter->setRobustKernel(sensor, true, beta);
+    if (_is_robust) {
+      _filter->setRobustKernel(sensor, true, _huber_width);
+    }
 
     // add parameter vertices
 

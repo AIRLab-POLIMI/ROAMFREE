@@ -34,6 +34,7 @@ class EuclideanFeatureHandler: public ImageFeatureHandler {
 
   public:
     EuclideanFeatureHandler();
+    EuclideanFeatureHandler(bool is_robust, double huber_width);
 
     virtual bool init(
         ROAMestimation::FactorGraphFilter* f,
@@ -92,6 +93,9 @@ class EuclideanFeatureHandler: public ImageFeatureHandler {
     ROAMestimation::ParameterWrapper_Ptr K_par;
     
     ROAMestimation::ParameterWrapper_Ptr qOS_par;
+
+    bool _is_robust;
+    double _huber_width;
 };
 
 } /* namespace ROAMvision */
