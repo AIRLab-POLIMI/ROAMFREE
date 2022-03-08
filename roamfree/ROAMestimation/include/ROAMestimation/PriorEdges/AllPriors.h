@@ -21,6 +21,8 @@ Contributors:
 
 #include "Eucl1DPriorEdge.h"
 #include "Eucl2DPriorEdge.h"
+#include "Eucl1DGaussMarkovProcessEdge.h"
+#include "Eucl2DGaussMarkovProcessEdge.h"
 #include "Eucl3DGaussMarkovProcessEdge.h"
 #include "Eucl3DPriorEdge.h"
 #include "Eucl4DPriorEdge.h"

@@ -16,7 +16,7 @@ def removeHoldFunctions(s):
 	ret = s
 		
 	while True:
-		p = string.find(ret, 'Hold(')		
+		p = ret.find('Hold(')		
 		if p == -1:
 			break;		
 
@@ -52,7 +52,7 @@ def parseList(s):
 	ret = list()
 	
 	while True:
-		p = string.find(tmp, 'List(')
+		p = tmp.find('List(')
 		if p == -1:
 			break;
 		
@@ -98,7 +98,7 @@ def fixMathFunctions(l):
 	cnt = 0;
 	while True:		
 		
-		occ = string.find(l,'atan2',cnt)
+		occ = l.find('atan2',cnt)
 
 		if occ == -1:
 			break
@@ -128,7 +128,7 @@ def fixMathFunctions(l):
 	cnt = 0;
 	while True:		
 		
-		occ = string.find(l,'Sign',cnt)
+		occ = l.find('Sign',cnt)
 
 		if occ == -1:
 			break
@@ -200,7 +200,8 @@ def reshapeTwoArgsFunction(C, str, op):
 
 	return nC
 			
-endname = string.find(sys.argv[1], '.');
+#endname = string.find(sys.argv[1], '.');
+endname = sys.argv[1].find('.');
 
 if sys.argv[3]=='1':
 	ext = 'm'
@@ -223,7 +224,7 @@ if tmp1[0] == '(':
 
 # find the important expression 
 
-p = string.find(tmp1, 'List(')
+p = tmp1.find('List(')
 ep = matchingBracket(tmp1,p+4)
 
 temporaries = tmp1[0:p]+'\n'
@@ -239,7 +240,7 @@ ret = re.findall('Compile_\$(\d+)',temporaries)
 
 tmps = dict()
 for k in ret:
-	if not tmps.has_key(k):		
+	if not k in tmps:		
 		tmps[k] = len(tmps)
 
 # output temporaries definition
@@ -254,13 +255,13 @@ for t in tmpslist:
 
 
 if type(expression[0]) == list:
-	print "matrix", len(expression),'x',len(expression[0])
+	print ("matrix", len(expression),'x',len(expression[0]))
 	
 	for i in range(len(expression)):
 		for j in range(len(expression[0])):
 			C = C + '{0}({1}+_OFF,{2}+_OFF) = {3};\n'.format(sys.argv[2],i+1,j+1,expression[i][j])
 else:
-	print "vector", len(expression)
+	print ("vector", len(expression))
 	
 	for i in range(len(expression)):
 		C = C + '{0}({1}+_OFF) = {2};\n'.format(sys.argv[2],i+1,expression[i])
@@ -296,6 +297,6 @@ if sys.argv[4]=='1':
 	C = re.sub('[^\n]+ = 0;\s*','',C)
 	
 
-print C
+print (C)
 
 g.write(C)

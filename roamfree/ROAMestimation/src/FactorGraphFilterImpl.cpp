@@ -598,6 +598,9 @@ MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnTimeVaryingParamete
   case Euclidean1DPrior:
     priorif = new Eucl1DPriorEdge;
     break;
+  case Euclidean2DPrior:
+    priorif = new Eucl2DPriorEdge;
+    break; 
   case Euclidean3DPrior:
     priorif = new Eucl3DPriorEdge;
     break;    
