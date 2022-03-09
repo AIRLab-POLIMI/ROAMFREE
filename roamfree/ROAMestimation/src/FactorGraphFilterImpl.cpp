@@ -691,17 +691,21 @@ PoseVertex *FactorGraphFilter_Impl::addPose_i(double t) {
   return v;
 }
 
-PoseVertexWrapper_Ptr FactorGraphFilter_Impl::addInterpolatingPose(double t,
-    const Eigen::MatrixXd &pseudoObsCov)
-    {
-  PoseVertex *v = addInterpolatingPose_i(t, pseudoObsCov);
+PoseVertexWrapper_Ptr FactorGraphFilter_Impl::addInterpolatingPose(double t, 
+  ParameterWrapper_Ptr dp, const Eigen::MatrixXd &pseudoObsCov) {
+
+  assert(dp != NULL);
+
+  ParameterVerticesManager *dpvm = boost::static_pointer_cast<ParameterWrapper_Impl>(dp)->_param;
+
+  PoseVertex *v = addInterpolatingPose_i(t, dpvm, pseudoObsCov);
 
   return PoseVertexWrapper_Ptr(v != NULL ? new PoseVertexWrapper_Impl(v) : NULL);
 
 }
 
 PoseVertex *FactorGraphFilter_Impl::addInterpolatingPose_i(double t,
-    const Eigen::MatrixXd &pseudoObsCov) {
+    ParameterVerticesManager *dp, const Eigen::MatrixXd &pseudoObsCov) {
 
   // get the two poses between which t lies
 
@@ -752,15 +756,6 @@ PoseVertex *FactorGraphFilter_Impl::addInterpolatingPose_i(double t,
     return NULL;
   }
   
-  ParameterVerticesManager *dp = getParameterByName_i("SE3IntDelay");
-  if (dp == NULL) {
-   cerr << "[FactorGraphFilter] Error: could not find 'SE3IntDealy' parameter" << endl;
-   return NULL;
-  }
-  if (dp->getWindowSize() != 1) {
-    cerr << "[FactorGraphFilter] Error: 'SE3IntDealy' must not be time varying." << endl;
-  }
-
   SE3InterpolationEdge *edge = new SE3InterpolationEdge;
 
   edge->vertices()[0] = before->second;
