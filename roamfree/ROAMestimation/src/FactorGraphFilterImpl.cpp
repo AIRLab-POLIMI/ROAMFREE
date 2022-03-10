@@ -707,10 +707,25 @@ PoseVertexWrapper_Ptr FactorGraphFilter_Impl::addInterpolatingPose(double t,
 PoseVertex *FactorGraphFilter_Impl::addInterpolatingPose_i(double t,
     ParameterVerticesManager *dp, const Eigen::MatrixXd &pseudoObsCov) {
 
+  double tolerance = 1e-6;
+
+  // if one pose sufficiently close is already available
+  PoseVertex *np = getNearestPoseByTimestamp_i(t);
+
+  if (np == NULL) {
+    cerr << "[FactorGraphFilter] Error: cannot interpolate, the graph is empty" << endl;
+    return NULL;
+  }
+
+  if (fabs(np->getTimestamp()-t) < tolerance) {
+    return np;
+  }
+
+  // otherwise we really need to interpolate
   // get the two poses between which t lies
 
   PoseMapIterator before, after;
-  after = _poses.lower_bound(t);
+  after = _poses.lower_bound(t); // after >= t
 
   if (after == _poses.end()) {
     cerr << "[FactorGraphFilter] Error: timestap "
