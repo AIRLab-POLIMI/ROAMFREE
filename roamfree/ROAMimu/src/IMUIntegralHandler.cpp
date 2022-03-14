@@ -111,7 +111,7 @@ void IMUIntegralHandler::init(bool isMaster, double t0,
 }
 
 // TODO: have this method return the vecotr of edges that have been added
-bool IMUIntegralHandler::step(double* za, double* zw) {
+bool IMUIntegralHandler::step(double zt, double* za, double* zw) {
 
   static Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
 
@@ -223,10 +223,9 @@ bool IMUIntegralHandler::step(double* za, double* zw) {
 
       // move the pose window ahead and add the new pose
       if (_isMaster) {
-        _x2 = _filter->addPose(_x1->getTimestamp() + _dt * _N);
+        _x2 = _filter->addPose(zt);
       } else {
-        _x2 = _filter->getNearestPoseByTimestamp(
-            _x1->getTimestamp() + _dt * _N);
+        _x2 = _filter->getNearestPoseByTimestamp(zt);
 
         double dt01 = _x1->getTimestamp() - _x0->getTimestamp();
         double dt12 = _x2->getTimestamp() - _x1->getTimestamp();
@@ -286,10 +285,9 @@ bool IMUIntegralHandler::step(double* za, double* zw) {
     } else {
 
       if (_isMaster == true) {
-        _x1 = _filter->addPose(_x0->getTimestamp() + _dt * _N);
+        _x1 = _filter->addPose(zt);
       } else {
-        _x1 = _filter->getNearestPoseByTimestamp(
-            _x0->getTimestamp() + _dt * _N);
+        _x1 = _filter->getNearestPoseByTimestamp(zt);
       }
 
       if (_predictorEnabled) {

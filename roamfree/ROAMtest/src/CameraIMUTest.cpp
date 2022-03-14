@@ -217,7 +217,7 @@ int main(int argc, char *argv[]) {
     }
 
     // make an integration step
-    if (hndl.step(za.data(), zw.data())) { // if we have finished:
+    if (hndl.step(t, za.data(), zw.data())) { // if we have finished:
 
       PoseVertexWrapper_Ptr curx_ptr = f->getNewestPose();
 
