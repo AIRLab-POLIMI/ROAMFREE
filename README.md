@@ -45,14 +45,12 @@ and [JOSER](http://joser.unibg.it/index.php?journal=joser&page=article&op=view&p
 
 # Dependencies
 
-ROAMFREE relies on Eigen3, and on a modified 
-version of g<sup>2</sup>o, which in turn relies on suitesparse. 
-Furthermore, it requires a compiler which supports C++11, (e.g., gcc 4.7 or newer).
+ROAMFREE relies on Eigen3, and on a modified  version of g<sup>2</sup>o, which in turn relies on suitesparse. Few functions from opencv are also used. It requires a compiler which supports C++11.
 
 On Ubuntu you can provided the required dependencies
 with
 
-```sudo apt-get install libsuitesparse-dev libeigen3-dev libboost-all-dev```
+```sudo apt-get install libsuitesparse-dev libeigen3-dev libboost-all-dev libopencv-dev```
 
 # Build
 
