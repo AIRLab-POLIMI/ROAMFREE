@@ -182,6 +182,34 @@ g2o::OptimizableGraph::Edge* ParameterVerticesManager::addRandomWalkProcessEdge(
   g2o::OptimizableGraph::Edge * oe;
 
   switch (_type) {
+  case Euclidean1D: {
+    Eucl1DRandomWalkProcessEdge*gmpe = new Eucl1DRandomWalkProcessEdge;
+
+    gmpe->setNoiseCov(_randomWalkNoiseCov_cnt);
+    gmpe->init(dt);
+
+    gmpe->setCategory(_name + "_proc");
+    gmpe->setTimestamp(
+        static_cast<GenericVertex<Eucl1DV> *>(newer)->getTimestamp());
+
+    oe = gmpe->getg2oOptGraphPointer();
+
+    break;
+  }
+  case Euclidean2D: {
+    Eucl2DRandomWalkProcessEdge*gmpe = new Eucl2DRandomWalkProcessEdge;
+
+    gmpe->setNoiseCov(_randomWalkNoiseCov_cnt);
+    gmpe->init(dt);
+
+    gmpe->setCategory(_name + "_proc");
+    gmpe->setTimestamp(
+        static_cast<GenericVertex<Eucl2DV> *>(newer)->getTimestamp());
+
+    oe = gmpe->getg2oOptGraphPointer();
+
+    break;
+  }
   case Euclidean3D: {
     Eucl3DRandomWalkProcessEdge*gmpe = new Eucl3DRandomWalkProcessEdge;
 
@@ -196,6 +224,7 @@ g2o::OptimizableGraph::Edge* ParameterVerticesManager::addRandomWalkProcessEdge(
 
     break;
   }
+  
   default:
     std::cerr
         << "[ParameterVerticesManager] Error: non implemented for this parameter type"
@@ -233,6 +262,35 @@ g2o::OptimizableGraph::Edge* ParameterVerticesManager::addGaussMarkovProcessEdge
 
     break;
   }
+  case Euclidean2D: {
+    Eucl2DGaussMarkovProcessEdge *gmpe = new Eucl2DGaussMarkovProcessEdge;
+
+    gmpe->setNoiseCov(_gaussMarkovNoiseCov_cnt);
+    gmpe->init(_gaussMarkovBeta, dt);
+
+    gmpe->setCategory(_name + "_proc");
+    gmpe->setTimestamp(
+        static_cast<GenericVertex<Eucl2DV> *>(newer)->getTimestamp());
+
+    oe = gmpe->getg2oOptGraphPointer();
+
+    break;
+  }
+  case Euclidean1D: {
+    Eucl1DGaussMarkovProcessEdge *gmpe = new Eucl1DGaussMarkovProcessEdge;
+
+    gmpe->setNoiseCov(_gaussMarkovNoiseCov_cnt);
+    gmpe->init(_gaussMarkovBeta, dt);
+
+    gmpe->setCategory(_name + "_proc");
+    gmpe->setTimestamp(
+        static_cast<GenericVertex<Eucl1DV> *>(newer)->getTimestamp());
+
+    oe = gmpe->getg2oOptGraphPointer();
+
+    break;
+  }
+  
   default:
     std::cerr
         << "[ParameterVerticesManager] Error: non implemented for this parameter type"

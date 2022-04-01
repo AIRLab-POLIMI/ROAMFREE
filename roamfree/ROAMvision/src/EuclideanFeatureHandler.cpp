@@ -34,12 +34,18 @@ using namespace ROAMestimation;
 
 namespace ROAMvision {
 
-EuclideanFeatureHandler::EuclideanFeatureHandler() {
+EuclideanFeatureHandler::EuclideanFeatureHandler() 
+  : EuclideanFeatureHandler(false, -1.0) {
+}
+
+EuclideanFeatureHandler::EuclideanFeatureHandler(bool is_robust, double huber_width) 
+  : _is_robust(is_robust), _huber_width(huber_width) {
+
 }
 
 bool EuclideanFeatureHandler::init(FactorGraphFilter* f, const string &name,
     const Eigen::VectorXd & T_OS, const Eigen::VectorXd & K,
-    const Eigen::VectorXd & RD, const Eigen::VectorXd & TD) {
+    const Eigen::VectorXd & RD, const Eigen::VectorXd & TD, const Eigen::VectorXd & SKEW) {
 
   _filter = f;
   _sensorName = name;
@@ -53,10 +59,13 @@ bool EuclideanFeatureHandler::init(FactorGraphFilter* f, const string &name,
   K_par = _filter->addConstantParameter(Euclidean3D, _sensorName + "_Cam_CM", K,
       true);
 
-  _filter->addConstantParameter(Euclidean3D, _sensorName + "_Cam_RD",
+  _filter->addConstantParameter(Euclidean4D, _sensorName + "_Cam_RD",
       RD, true);
   _filter->addConstantParameter(Euclidean2D, _sensorName + "_Cam_TD",
       TD, true);
+  _filter->addConstantParameter(Euclidean2D, _sensorName + "_Cam_SKEW",
+      SKEW, true);
+
 
   return true;
 }
@@ -94,7 +103,7 @@ bool EuclideanFeatureHandler::addFeatureObservation(long int id, double t,
     obs.z = z;
     obs.cov = cov;
 
-    if (!dontInitialize && d.zHistory.size() >= 3) {
+    if (!dontInitialize && d.zHistory.size() >= 2) {
       return initializeFeature_i(d, id);
     }
 
@@ -152,23 +161,16 @@ bool EuclideanFeatureHandler::initializeFeature_i(EuclideanTrackDescriptor &d, l
 	  sensor + suffixes[k]);
     }
 
-    // TODO: hardcoded
-    // do we want the robust kernel by default?
-
-    // considering a 1.5 sigma plus 1e6 scaling, threshold at 10 pix
-    // beta =  || err || / sigma
-    // where ||err|| is where we want the weight to start to decrease
-
-    // TODO: sigma is hardcoded
-    double beta = 5 / sqrt(1e8 * pow(0.8, 2));
-
-    _filter->setRobustKernel(sensor, true, beta);
+    if (_is_robust) {
+      _filter->setRobustKernel(sensor, true, _huber_width);
+    }
 
     // add parameter vertices
 
     _filter->shareParameter(_sensorName + "_Cam_CM", sensor + "_CM");
     _filter->shareParameter(_sensorName + "_Cam_RD", sensor + "_RD");
     _filter->shareParameter(_sensorName + "_Cam_TD", sensor + "_TD");
+    _filter->shareParameter(_sensorName + "_Cam_SKEW", sensor + "_SKEW");
 
     _filter->addConstantParameter(Euclidean3D, sensor + "_Lw", d.zHistory.begin()->first, Lw, false);
 
@@ -226,6 +228,8 @@ bool EuclideanFeatureHandler::getFeaturePositionInWorldFrame(long int id,
       getFeatureParameterName(id) + "_Lw"); // euclidean coordinates
 
   fw = lw_par->getEstimate();
+
+  return true;
 }
 
 bool EuclideanFeatureHandler::getFeaturesIds(vector<long int>& to) const {
@@ -316,11 +320,19 @@ bool EuclideanFeatureHandler::initialize(const EuclideanTrackDescriptor &track,
   triangulated3DPointInit.z = triangulated3DPointInitTemp[2]
       / triangulated3DPointInitTemp[3];
 
-  // run Gauss-Newton with all the cameras
+  /* run Gauss-Newton with all the cameras
   int resGN = GaussNewton(curCams, curPoints, triangulated3DPointInit,
       triangulated3DPoint);
 
   lw << triangulated3DPoint.x, triangulated3DPoint.y, triangulated3DPoint.z;
+  //*/
+
+  // use directly opencv triangulation
+  int resGN = 1;
+  lw << 
+    triangulated3DPointInitTemp[0] / triangulated3DPointInitTemp[3], 
+    triangulated3DPointInitTemp[1] / triangulated3DPointInitTemp[3], 
+    triangulated3DPointInitTemp[2] / triangulated3DPointInitTemp[3];
   //*/
 
   if (resGN != -1) {
@@ -339,7 +351,7 @@ bool EuclideanFeatureHandler::initialize(const EuclideanTrackDescriptor &track,
 #       include "../../ROAMfunctions/generated/ImagePlaneProjection_testZ.cppready"
 
         if (testz(0) < 0) {
-          cerr << "[EuclideanFeatureHandler]: point behind camera: z = " << testz(0) << ". Initialization failed" << endl;
+          // cerr << "[EuclideanFeatureHandler]: point behind camera: z = " << testz(0) << ". Initialization failed" << endl;
           resGN = -1;
           break;
         }

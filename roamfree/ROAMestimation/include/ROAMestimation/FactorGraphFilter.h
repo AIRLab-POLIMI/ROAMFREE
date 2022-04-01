@@ -290,11 +290,12 @@ class FactorGraphFilter {
      * existing pose vertices based on the difference of timestamps.
      *
      * @param t the new pose timestamp
+     * @param delayParameter a constant Euclidean1D parameter that is added to t in computing the linear interpolating pose
      * @param pseudoObsCov the covariance of the pseudo-observation constraining the interpolating pose value
      *
      * @return a wrapper to the created pose or NULL in case of failure.
      */
-    virtual PoseVertexWrapper_Ptr addInterpolatingPose(double t, const Eigen::MatrixXd &pseudoObsCov) = 0;
+    virtual PoseVertexWrapper_Ptr addInterpolatingPose(double t, ParameterWrapper_Ptr delayParameter, const Eigen::MatrixXd &pseudoObsCov) = 0;
 
     /**
      *  \brief Adds a measurement.

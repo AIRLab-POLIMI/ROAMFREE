@@ -236,7 +236,7 @@ int main(int argc, char *argv[]) {
     }
 
     // make an integration step
-    if (hndl.step(za.data(), zw.data())) { // if we have finished:
+    if (hndl.step(t, za.data(), zw.data())) { // if we have finished:
 
       if (cntImu % gpsDivisor == 0) {
 

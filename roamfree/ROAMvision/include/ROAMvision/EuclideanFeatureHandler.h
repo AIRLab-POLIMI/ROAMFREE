@@ -34,12 +34,18 @@ class EuclideanFeatureHandler: public ImageFeatureHandler {
 
   public:
     EuclideanFeatureHandler();
+    EuclideanFeatureHandler(bool is_robust, double huber_width);
 
-    virtual bool init(ROAMestimation::FactorGraphFilter* f,
-        const std::string &name, const Eigen::VectorXd & T_OS,
-        const Eigen::VectorXd & K, const Eigen::VectorXd & RD =
-            Eigen::VectorXd::Zero(3), const Eigen::VectorXd & TD =
-            Eigen::VectorXd::Zero(2));
+    virtual bool init(
+        ROAMestimation::FactorGraphFilter* f,
+        const std::string &name, 
+        const Eigen::VectorXd & T_OS,
+        const Eigen::VectorXd & K, 
+        const Eigen::VectorXd & RD, 
+        const Eigen::VectorXd & TD,
+        const Eigen::VectorXd & SKEW
+    );
+
     virtual bool addFeatureObservation(long int id, double t,
         const Eigen::VectorXd &z, const Eigen::MatrixXd &cov, bool dontInitialize = true);
     
@@ -87,6 +93,9 @@ class EuclideanFeatureHandler: public ImageFeatureHandler {
     ROAMestimation::ParameterWrapper_Ptr K_par;
     
     ROAMestimation::ParameterWrapper_Ptr qOS_par;
+
+    bool _is_robust;
+    double _huber_width;
 };
 
 } /* namespace ROAMvision */

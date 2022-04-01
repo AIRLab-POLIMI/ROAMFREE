@@ -525,6 +525,7 @@ MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnConstantParameter(
 
   priorif->setMeasurement(x0);
   priorif->setNoiseCov(cov);
+  priorif->setCategory(name+"_prior");
 
   _optimizer->addEdge(edge);
 
@@ -576,6 +577,9 @@ MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnTimeVaryingParamete
   case Euclidean1DPrior:
     priorif = new Eucl1DPriorEdge;
     break;
+  case Euclidean2DPrior:
+    priorif = new Eucl2DPriorEdge;
+    break; 
   case Euclidean3DPrior:
     priorif = new Eucl3DPriorEdge;
     break;    
@@ -596,6 +600,11 @@ MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnTimeVaryingParamete
 
   priorif->setMeasurement(x0);
   priorif->setNoiseCov(cov);
+
+  stringstream s;
+  s << name << "(" << fixed << t << ")_prior";
+
+  priorif->setCategory(s.str());
 
   _optimizer->addEdge(edge);
 
@@ -661,22 +670,41 @@ PoseVertex *FactorGraphFilter_Impl::addPose_i(double t) {
   return v;
 }
 
-PoseVertexWrapper_Ptr FactorGraphFilter_Impl::addInterpolatingPose(double t,
-    const Eigen::MatrixXd &pseudoObsCov)
-    {
-  PoseVertex *v = addInterpolatingPose_i(t, pseudoObsCov);
+PoseVertexWrapper_Ptr FactorGraphFilter_Impl::addInterpolatingPose(double t, 
+  ParameterWrapper_Ptr dp, const Eigen::MatrixXd &pseudoObsCov) {
+
+  assert(dp != NULL);
+
+  ParameterVerticesManager *dpvm = boost::static_pointer_cast<ParameterWrapper_Impl>(dp)->_param;
+
+  PoseVertex *v = addInterpolatingPose_i(t, dpvm, pseudoObsCov);
 
   return PoseVertexWrapper_Ptr(v != NULL ? new PoseVertexWrapper_Impl(v) : NULL);
 
 }
 
 PoseVertex *FactorGraphFilter_Impl::addInterpolatingPose_i(double t,
-    const Eigen::MatrixXd &pseudoObsCov) {
+    ParameterVerticesManager *dp, const Eigen::MatrixXd &pseudoObsCov) {
 
+  double tolerance = 1e-6;
+
+  // if one pose sufficiently close is already available
+  PoseVertex *np = getNearestPoseByTimestamp_i(t);
+
+  if (np == NULL) {
+    cerr << "[FactorGraphFilter] Error: cannot interpolate, the graph is empty" << endl;
+    return NULL;
+  }
+
+  if (fabs(np->getTimestamp()-t) < tolerance) {
+    return np;
+  }
+
+  // otherwise we really need to interpolate
   // get the two poses between which t lies
 
   PoseMapIterator before, after;
-  after = _poses.lower_bound(t);
+  after = _poses.lower_bound(t); // after >= t
 
   if (after == _poses.end()) {
     cerr << "[FactorGraphFilter] Error: timestap "
@@ -722,15 +750,6 @@ PoseVertex *FactorGraphFilter_Impl::addInterpolatingPose_i(double t,
     return NULL;
   }
   
-  ParameterVerticesManager *dp = getParameterByName_i("SE3IntDelay");
-  if (dp == NULL) {
-   cerr << "[FactorGraphFilter] Error: could not find 'SE3IntDealy' parameter" << endl;
-   return NULL;
-  }
-  if (dp->getWindowSize() != 1) {
-    cerr << "[FactorGraphFilter] Error: 'SE3IntDealy' must not be time varying." << endl;
-  }
-
   SE3InterpolationEdge *edge = new SE3InterpolationEdge;
 
   edge->vertices()[0] = before->second;

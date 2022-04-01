@@ -89,10 +89,11 @@ class IMUIntegralHandler {
      *
      *  timestamp is automatically generated incremented the last one by dt
      *
+     *  @param zt measurement timestamp (for both accelerometer and gyroscope)
      *  @param za 3elem vector, accelerometer reading
      *  @param zw 3elem vector, gyroscope reading
      */
-    bool step(double *za, double *zw);
+    bool step(double zt, double *za, double *zw);
 
     void getCurrentDeltaPosition(double *x);
     void getCurrendDeltaOrientation(double *q);

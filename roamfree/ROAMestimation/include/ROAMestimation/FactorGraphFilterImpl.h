@@ -126,7 +126,8 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
 
     PoseVertexWrapper_Ptr addPose(double t);
 
-    PoseVertexWrapper_Ptr addInterpolatingPose(double t, const Eigen::MatrixXd &pseudoObsCov);
+    PoseVertexWrapper_Ptr addInterpolatingPose(double t, ParameterWrapper_Ptr delayParam, 
+        const Eigen::MatrixXd &pseudoObsCov);
 
     MeasurementEdgeWrapper_Ptr addMeasurement(const std::string& sensorName,
         double timestamp, const Eigen::VectorXd &z, const Eigen::MatrixXd &cov,
@@ -247,7 +248,7 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
 
     PoseVertex *addPose_i(double t);
 
-    PoseVertex *addInterpolatingPose_i(double t, const Eigen::MatrixXd &pseudoObsCov);
+    PoseVertex *addInterpolatingPose_i(double t, ParameterVerticesManager *delayParam, const Eigen::MatrixXd &pseudoObsCov);
 
     PoseVertex *getNewestPose_i();
     PoseVertex *getOldestPose_i();

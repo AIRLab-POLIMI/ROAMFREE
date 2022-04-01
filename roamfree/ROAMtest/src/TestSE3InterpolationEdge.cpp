@@ -30,8 +30,10 @@ int main(int argc, char *argv[]) {
   x2->setEstimate(x2e);
   x2->setFixed(true);
 
+  ParameterWrapper_Ptr delayParam = f->addConstantParameter("delay", 0, true);
+
   for (int k = 1; k< 100; k++) {
-    PoseVertexWrapper_Ptr xi = f->addInterpolatingPose(0.01*k, Eigen::MatrixXd::Identity(6,6));
+    PoseVertexWrapper_Ptr xi = f->addInterpolatingPose(0.01*k, delayParam, Eigen::MatrixXd::Identity(6,6));
   }
 
   f->estimate(10);
