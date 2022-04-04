@@ -21,6 +21,6 @@ Contributors:
 namespace ROAMfunctions {
 const bool PlaneDynamicModelM::_usedComponents[] = {true, true, true, true, true, true, false, false, false, true, true, true};
 
-const std::string PlaneDynamicModelM::_paramsNames[] = {"AirDensity", "FThrust", "FDrag", "FLat", "FLift", "MRoll", "MPitch", "MYaw", "CBar", "Cp", "Ibd", "Ibod", "Wind", "Gravity"};
+const std::string PlaneDynamicModelM::_paramsNames[] = {"AirDensity", "FThrust", "FDrag", "FLat", "FLift", "MRoll", "MPitch", "MYaw", "CBar", "Cp", "Ibd", "Ibod", "Wind"};
 
 } /* namespace ROAMfunctions */

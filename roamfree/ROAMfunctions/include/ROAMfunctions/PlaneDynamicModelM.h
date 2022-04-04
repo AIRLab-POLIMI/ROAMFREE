@@ -29,7 +29,7 @@ public:
   static const bool _usedComponents[];
 
   static const std::string _paramsNames[];
-  static const int _nParams = 14;
+  static const int _nParams = 13;
 
   static const unsigned int _ORDER = 2;
 
@@ -71,8 +71,6 @@ public:
     Eigen::Map<Eigen::Matrix<double, 3, 1> > ibd(params[10]);
     Eigen::Map<Eigen::Matrix<double, 3, 1> > ibod(params[11]);
     Eigen::Map<Eigen::Matrix<double, 3, 1> > wind(params[12]);
-    Eigen::Map<Eigen::Matrix<double, 1, 1> > gravity(params[13]);
-
 
     Eigen::MatrixBase<T> & err = const_cast<Eigen::MatrixBase<T>&>(const_ret);
 
@@ -116,7 +114,6 @@ public:
     Eigen::Map<Eigen::Matrix<double, 3, 1> > ibd(params[10]);
     Eigen::Map<Eigen::Matrix<double, 3, 1> > ibod(params[11]);
     Eigen::Map<Eigen::Matrix<double, 3, 1> > wind(params[12]);
-    Eigen::Map<Eigen::Matrix<double, 1, 1> > gravity(params[13]);
 
     Eigen::MatrixBase<T> & J = const_cast<Eigen::MatrixBase<T>&>(const_ret);
 

@@ -38,7 +38,7 @@ namespace ROAMfunctions
 		static const bool _usedComponents[];
 
 		static const std::string _paramsNames[];
-		static const int _nParams = 13;
+		static const int _nParams = 12;
 
 		static const unsigned int _ORDER = 2;
 
@@ -80,7 +80,6 @@ namespace ROAMfunctions
 			Eigen::Map<Eigen::VectorXd> cp(params[9], 3);
 			Eigen::Map<Eigen::VectorXd> ibd(params[10], 3);
 			Eigen::Map<Eigen::VectorXd> ibod(params[11], 3);
-			Eigen::Map<Eigen::VectorXd> gravity(params[12], 1);
 
 			Eigen::MatrixBase<T> &err = const_cast<Eigen::MatrixBase<T> &>(const_ret);
 
@@ -110,7 +109,6 @@ namespace ROAMfunctions
 			Eigen::Map<Eigen::VectorXd> cp(params[9], 3);
 			Eigen::Map<Eigen::VectorXd> ibd(params[10], 3);
 			Eigen::Map<Eigen::VectorXd> ibod(params[11], 3);
-			Eigen::Map<Eigen::VectorXd> gravity(params[12], 1);
 
 			Eigen::MatrixBase<T> &J = const_cast<Eigen::MatrixBase<T> &>(const_ret);
 

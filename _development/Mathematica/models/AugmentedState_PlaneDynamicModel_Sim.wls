@@ -15,6 +15,7 @@ Import[parentDir<>"QuaternionAlgebra.m"]
 (* ::Title:: *)
 (* Useful Functions *)
 
+
 VectProdMatrix[v_]:={{0,-v[[3]],v[[2]]},{v[[3]],0,-v[[1]]},{-v[[2]],v[[1]],0}}
 
 
@@ -64,7 +65,7 @@ WSprev = X[[37;;39]];
 (* ::Subsubtitle:: *)
 (* Parameters *)
 
-g= gravity[1]; (* gravity *); 
+
 
 CFT1=fThrust[1]; (* thrust force coefficients*);
 CFT2=fThrust[2];
@@ -167,6 +168,7 @@ n = z[1]+NOISESCONTROLS[[1]]; (* propeller speed *);
 (* ::Text:: *)
 (* Airspeed *)
 
+
 AIRS=VSprev-QuatToRot[QuatInv[QWSprev]] . WINDW;
 \[Alpha]=ArcTan[AIRS[[1]],AIRS[[3]]];
 \[Beta]=ArcSin[AIRS[[2]]/L2[AIRS]]; 
@@ -247,7 +249,7 @@ MBZ=qbar S b CMZ;
 forceBfPrev = {FT,0,0}+RWINDS . {FWX,FWY,FWZ};
 momentBfPrev = {MBX,MBY,MBZ};
 
-Ahatlong = QuatToRot[QuatInv[QWSprev]] . {0,0,-g} + 1/m (forceBfPrev);
+Ahatlong = 1/m (forceBfPrev);
 AlphaHatlong= Inverse[IB] . (momentBfPrev-WSprev\[Cross](IB . WSprev));
 
 (* take into account the fact that these accelerations are computed using current state, but will be integrated to get the next state *)

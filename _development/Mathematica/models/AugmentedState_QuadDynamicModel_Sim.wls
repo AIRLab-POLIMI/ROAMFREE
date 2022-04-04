@@ -107,7 +107,6 @@ IBOD={ibod[1],ibod[2],ibod[3]};(* off diagonal terms*)
 Ib = {{Exp[ibd[1]],ibod[1],ibod[2]},{ibod[1],Exp[ibd[2]],ibod[3]},{ibod[2],ibod[3],Exp[ibd[3]]}};
 Ibinv=Inverse[Ib]//FullSimplify;
 
-GRAVITY = {0.0,0.0, -gravity[1]};
 
 
 (* ::Section:: *)
@@ -173,7 +172,7 @@ RM3 = {0,0,-lambda[1] WSprev[[3]] SumRPM l2};
 
 forceBfPrev = (FT - FR+ FRR - FDL - FDQ )/m;
 forceBf =  QuatToRot[QuatInv[Q]].QuatToRot[QWSprev].forceBfPrev;
-AhatLong= forceBf+QuatToRot[QuatInv[Q]].GRAVITY+ {eta[5],eta[6],0};
+AhatLong= forceBf+ {eta[5],eta[6],0};
 Ahat = AhatLong;
 
 
