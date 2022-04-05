@@ -75,15 +75,21 @@ public:
     const static int _OFF = -1;
 
     switch (wrt) {
-    case -8: // jacobian wrt DispQ
+    case -10: // jacobian wrt DispQ
     {
-#     include "generated/LiDARTieFeatures_JErrDispQ.cppready"
+#     include "generated/LiDARTieFeatures_JErrQprev.cppready"
       return true;
       break;
     }
     case -7: // jacobian wrt Disp
     {
 #     include "generated/LiDARTieFeatures_JErrDisp.cppready"
+      return true;
+      break;
+    }
+    case -2: // jacobian wrt Q
+    {
+#     include "generated/LiDARTieFeatures_JErrQ.cppready"
       return true;
       break;
     }

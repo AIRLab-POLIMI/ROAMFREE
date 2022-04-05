@@ -19,8 +19,8 @@ Contributors:
 #include "LiDARTieFeaturesM.h"
 
 namespace ROAMfunctions {
-const bool LiDARTieFeaturesM::_usedComponents[] = { false, false, false, false,
-		false, false, true, true, false, false };
+const bool LiDARTieFeaturesM::_usedComponents[] = { false, true, false, false,
+		false, false, true, false, false, true, false, false };
 
 const std::string LiDARTieFeaturesM::_paramsNames[] = { };
 
