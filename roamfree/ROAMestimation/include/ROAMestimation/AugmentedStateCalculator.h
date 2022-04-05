@@ -78,6 +78,12 @@ public:
 
 #     include "generated/BackwardAugmentedStateEstimator_v7_DispQ.cppready"
 		}
+		if (_usedComponents[PREVIOUS_ORIENTATION])
+		{
+			Eigen::VectorBlock<Eigen::VectorXd> &&part = _x.segment(29, 4);
+
+#     include "generated/BackwardAugmentedStateEstimator_v7_Qprev.cppready"			
+		}
 
 		return true;
 
@@ -111,10 +117,6 @@ public:
 			OriginFrameProperties::getInstance().evaluateGravityVectorAt(x2, gravityVector);
 
 #     include "generated/BackwardAugmentedStateEstimator_v7_IMUintdP.cppready"
-		}
-		if (_usedComponents[PREVIOUS_ORIENTATION])
-		{
-			_x.segment(29, 4) = x1.segment(3, 4);
 		}
 		if (_usedComponents[PREVIOUS_LINEARVELOCITY])
 		{

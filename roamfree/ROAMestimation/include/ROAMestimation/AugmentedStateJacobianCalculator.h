@@ -126,6 +126,11 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
 #         include "generated/BackwardAugmentedStateEstimator_v7_JAugDispQX2.cppready"
           return true;
         }
+        case PREVIOUS_ORIENTATION: {
+          assert(ORDER > 0);
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugQprevX2.cppready"
+          return true;
+        }
 
         }
       }
@@ -155,6 +160,10 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
         }
         case DELTA_ORIENTATION: {
 #         include "generated/BackwardAugmentedStateEstimator_v7_JAugDispQX1.cppready"
+          return true;
+        }
+        case PREVIOUS_ORIENTATION: {
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugQprevX1.cppready"
           return true;
         }
 
@@ -234,6 +243,25 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
 
         break;
       }
+      case PREVIOUS_ORIENTATION: {
+        assert(ORDER > 0);
+        switch (x) {
+        case (ORDER + 1): {
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugQprevSO.cppready"
+          return true;
+        }
+        case (ORDER + 2): {
+#         include "generated/BackwardAugmentedStateEstimator_v7_JAugQprevqOS.cppready"
+          return true;
+        }
+        case (ORDER + 3): { // wrt gravity
+          // do nothing
+          return true;
+        }
+        }
+
+        break;
+      }
 
       }
 
@@ -267,11 +295,6 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
 #         include "generated/BackwardAugmentedStateEstimator_v7_JAugIMUintdPX2.cppready"
           return true;
         }
-        case PREVIOUS_ORIENTATION: {
-          assert(ORDER > 1);
-          // do nothing
-          return true;
-        }
         case PREVIOUS_LINEARVELOCITY: {
           assert(ORDER > 1);
           // do nothing
@@ -302,11 +325,6 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
           OriginFrameProperties::getInstance().evaluateGravityVectorAt(x2, gravityVector);
 
 #         include "generated/BackwardAugmentedStateEstimator_v7_JAugIMUintdPX1.cppready"
-          return true;
-        }
-        case PREVIOUS_ORIENTATION: {
-          assert(ORDER > 1);
-#         include "generated/BackwardAugmentedStateEstimator_v7_JAugQprevX1.cppready"
           return true;
         }
         case PREVIOUS_LINEARVELOCITY: {
@@ -442,25 +460,6 @@ class AugmentedStateJacobianCalculator: public GenericCalculator {
           OriginFrameProperties::getInstance().evaluateGravityVectorAt(x2, gravityVector);
 
 #         include "generated/BackwardAugmentedStateEstimator_v7_JAugIMUintdPgravity.cppready"
-          return true;
-        }
-        }
-
-        break;
-      }
-      case PREVIOUS_ORIENTATION: {
-        assert(ORDER > 1);
-        switch (x) {
-        case (ORDER + 1): {
-#         include "generated/BackwardAugmentedStateEstimator_v7_JAugQprevSO.cppready"
-          return true;
-        }
-        case (ORDER + 2): {
-#         include "generated/BackwardAugmentedStateEstimator_v7_JAugQprevqOS.cppready"
-          return true;
-        }
-        case (ORDER + 3): { // wrt gravity
-          // do nothing
           return true;
         }
         }
