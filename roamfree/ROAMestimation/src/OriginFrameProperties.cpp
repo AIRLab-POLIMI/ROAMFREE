@@ -36,4 +36,14 @@ void OriginFrameProperties::evaluateGravityVectorAt(const Eigen::VectorXd &x2,
 
 }
 
+void OriginFrameProperties::evaluateRLocalENUToWorldAt(const Eigen::VectorXd &x2,
+    Eigen::Matrix3d &RLocalENUtoWorld) {
+  
+  if (frametype == TangentPlane) {
+    RLocalENUtoWorld = Eigen::Matrix3d::Identity();
+  } else if (frametype == ECEF) {
+#   include "generated/RLocalENUToWorld.cppready"
+  }
+}
+
 }

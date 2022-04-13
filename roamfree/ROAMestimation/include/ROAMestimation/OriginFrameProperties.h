@@ -39,6 +39,7 @@ class OriginFrameProperties
         void operator=(OriginFrameProperties const&) = delete;
 
         void evaluateGravityVectorAt(const Eigen::VectorXd &x, Eigen::Vector3d &gravityVector);
+        void evaluateRLocalENUToWorldAt(const Eigen::VectorXd &x, Eigen::Matrix3d &Rltow);
 
         FusionFrameTypes frametype; //!< what is the type of fusion frame
 
