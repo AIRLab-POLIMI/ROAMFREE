@@ -42,6 +42,11 @@ class FactorGraphFilter {
     virtual void setSolverMethod(SolverMethod method) = 0;
 
     /**
+     *  \brief Set the threshold for early stopping estimation if chi2 does not improve more than 
+     */
+    virtual void setChi2Threshold(double threshold) = 0;
+
+    /**
      *  \brief set initial pose estimate and timestamp
      *
      * A call to this method is required before any addSequentialMeasurement call can be issued.

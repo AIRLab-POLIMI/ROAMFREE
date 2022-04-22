@@ -30,7 +30,6 @@
 #include "types.h"
 #include "Enums.h"
 
-#include "g2o/core/hyper_graph_action.h"
 #include "GenericVertex.h"
 #include "ParameterVerticesManager.h"
 
@@ -38,6 +37,8 @@
 #include "MeasurementEdgeWrapperImpl.h"
 
 #include "GenericEdgeInterface.h"
+
+#include "Chi2TestAction.h"
 
 namespace ROAMlog {
 class GraphLogger;
@@ -63,6 +64,8 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
     /* --------------------------- SOLVER LEVEL METHODS ---------------------------- */
 
     void setSolverMethod(SolverMethod method);
+
+    void setChi2Threshold(double threshold);
 
     PoseVertexWrapper_Ptr setInitialPose(const Eigen::VectorXd &x0, double t);
 
@@ -202,6 +205,8 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
 
     void computeCovariances();
 
+    bool _stopFlag;
+    Chi2TestAction *_stopAction;
     g2o::AutoIDSparseOptimizer *_optimizer;
 
     typedef PoseMap::iterator PoseMapIterator;

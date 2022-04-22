@@ -59,7 +59,8 @@ using namespace std;
 
 namespace ROAMestimation {
 
-FactorGraphFilter_Impl::FactorGraphFilter_Impl() {
+FactorGraphFilter_Impl::FactorGraphFilter_Impl() :
+  _stopAction( new Chi2TestAction(&_stopFlag) ) {
   initSolver();
 }
 
@@ -79,6 +80,9 @@ void FactorGraphFilter_Impl::initSolver() {
 
   _optimizer = g2oSolverFactory::getNewSolver();
   _optimizer->setVerbose(DEBUG_G2O_OPTIMIZER_VERBOSE);
+
+  _optimizer->setForceStopFlag(&_stopFlag);  
+  _optimizer->addPostIterationAction(_stopAction);
 
   // default solver is GaussNewton
   setSolverMethod(GaussNewton);
@@ -119,6 +123,10 @@ void FactorGraphFilter_Impl::setSolverMethod(SolverMethod method) {
     _optimizer->setUserLambdaInit(0.);
     break;
   }
+}
+
+void FactorGraphFilter_Impl::setChi2Threshold(double threshold) {
+  _stopAction->setChi2threshold(threshold);
 }
 
 PoseVertexWrapper_Ptr FactorGraphFilter_Impl::setInitialPose(
@@ -1782,6 +1790,9 @@ bool FactorGraphFilter_Impl::estimate_i(g2o::HyperGraph::EdgeSet &eset,
   double tInitialized = g2o::get_time();
 
 // run the optimization
+  _stopFlag = false;
+  _stopAction->reset();  
+
   bool ret = _optimizer->optimize(nIterations) || nIterations == 0;
   if (ret == false) {
 #   ifdef DEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES
