@@ -111,7 +111,7 @@ void IMUIntegralHandler::init(bool isMaster, double t0,
 }
 
 // TODO: have this method return the vecotr of edges that have been added
-bool IMUIntegralHandler::step(double zt, double* za, double* zw) {
+bool IMUIntegralHandler::step(double zt, const double* za, const double* zw) {
 
   static Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
 

@@ -93,7 +93,7 @@ class IMUIntegralHandler {
      *  @param za 3elem vector, accelerometer reading
      *  @param zw 3elem vector, gyroscope reading
      */
-    bool step(double zt, double *za, double *zw);
+    bool step(double zt, const double *za, const double *zw);
 
     void getCurrentDeltaPosition(double *x);
     void getCurrendDeltaOrientation(double *q);
