@@ -27,6 +27,7 @@
 
 #include "Enums.h"
 #include "interfaceTypes.h"
+#include "EstimationStats.h"
 
 namespace ROAMestimation {
 
@@ -109,6 +110,11 @@ class FactorGraphFilter {
      *  \brief gets the chi2 (meaningful only after an estimation)
      */
     virtual double getChi2() = 0;
+
+    /**
+     *  \brief gets a collection of statistics containing the grouped chi2s of all active edges
+     */
+    virtual std::map<std::string, EstimationStats> getEstimationStats() = 0;
 
     /**
      *  \brief writes the final hessian matrix to a file

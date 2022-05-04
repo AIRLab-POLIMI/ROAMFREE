@@ -2180,6 +2180,43 @@ double FactorGraphFilter_Impl::getChi2() {
   return _optimizer->chi2();
 }
 
+map<string, EstimationStats> FactorGraphFilter_Impl::getEstimationStats() {
+  map<string, EstimationStats> stats;
+
+  // collect the active edges
+
+  g2o::OptimizableGraph::EdgeContainer eset = _optimizer->activeEdges();
+
+  for (auto it = eset.begin(); it != eset.end(); ++it) {
+    g2o::OptimizableGraph::Edge *e = static_cast<g2o::OptimizableGraph::Edge *>(*it);
+
+    GenericEdgeInterface *ei;
+    BaseEdgeInterface *pi;
+    SE3InterpolationEdge *ie;
+
+    string category = "Unknown";
+
+    if ((ei = dynamic_cast<GenericEdgeInterface *>(e)) != NULL) {
+      category = ei->getCategory();
+    } else if ((pi = dynamic_cast<BaseEdgeInterface *>(e)) != NULL) {
+      category = pi->getCategory();
+    } else if ((ie = dynamic_cast<SE3InterpolationEdge *> (e)) != NULL) {
+      category = "SE3Interpolation";
+    }
+
+    auto stat = stats.find(category);
+
+    if (stat != stats.end()) {
+      (*stat).second.N++;
+      (*stat).second.chi2 += e->chi2();;
+    } else {           
+      stats.insert(pair<string, EstimationStats>(category, EstimationStats(1, e->dimension(), e->chi2())));
+    }
+  }
+
+  return stats;
+}
+
 void FactorGraphFilter_Impl::writeFinalHessian() {
   g2o::BlockSolverX *blocksolver =
       static_cast<g2o::BlockSolverX *>(_optimizer->solver());

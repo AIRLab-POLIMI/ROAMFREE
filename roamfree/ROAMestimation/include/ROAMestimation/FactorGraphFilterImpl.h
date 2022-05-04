@@ -80,6 +80,8 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
 
     double getChi2();
 
+    std::map<std::string, EstimationStats> getEstimationStats();
+
     void writeFinalHessian();
 
     /* --------------------------- SENSOR LEVEL METHODS ---------------------------- */
