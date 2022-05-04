@@ -33,6 +33,8 @@ namespace ROAMestimation {
 class ParameterWrapper {
 public:
 	virtual ~ParameterWrapper() {};
+	
+	virtual std::string getName() const = 0;
 
 	virtual bool getFixed() const = 0; //!< returns if the parameter is fixed or not during the estimation
 	virtual void setFixed(bool isFixed) = 0; //!< sets if the parameter is fixed or not during the estimation

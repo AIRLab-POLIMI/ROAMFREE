@@ -261,6 +261,10 @@ class ParameterVerticesManager {
       return _type;
     }
 
+    inline std::string getName() const {
+      return _name;
+    }
+
   protected:
 
     g2o::AutoIDSparseOptimizer * _optimizer;

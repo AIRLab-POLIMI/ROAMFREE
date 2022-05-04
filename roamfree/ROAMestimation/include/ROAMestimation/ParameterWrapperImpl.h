@@ -34,6 +34,10 @@ class ParameterWrapper_Impl: public ParameterWrapper {
   public:
     ParameterWrapper_Impl(ParameterVerticesManager *param);
 
+    inline virtual std::string getName() const {
+      return _param->getName();
+    }
+
     inline virtual bool getFixed() const {
       return _param->fixed();
     }
