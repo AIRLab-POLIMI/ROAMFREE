@@ -2198,6 +2198,13 @@ map<string, EstimationStats> FactorGraphFilter_Impl::getEstimationStats() {
 
     if ((ei = dynamic_cast<GenericEdgeInterface *>(e)) != NULL) {
       category = ei->getCategory();
+
+      // in this case it would be e.g. Camera_featXXXX, cut away after _
+      if (dynamic_cast< QuaternionGenericEdge<ImagePlaneProjectionM> *>(ei) != NULL) {
+        category = category.substr(0, category.find_last_of("_"));
+      } else {
+        category = ei->getCategory();
+      }      
     } else if ((pi = dynamic_cast<BaseEdgeInterface *>(e)) != NULL) {
       category = pi->getCategory();
     } else if ((ie = dynamic_cast<SE3InterpolationEdge *> (e)) != NULL) {
