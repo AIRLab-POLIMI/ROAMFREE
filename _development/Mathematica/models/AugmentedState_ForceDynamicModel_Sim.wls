@@ -57,9 +57,10 @@ WSprev = X[[37;;39]];
 (*Noises and Inputs*)
 
 
-Z=Table[Abs[z[i]],{i,1,6}];
+Z = Table[z[i],{i,1,6}];
 NOISES=Table[eta[i],{i,1,6}];
 ZNoise = Z + Table[NOISES[[i]],{i,1,6}];
+
 
 
 (* ::PageBreak:: *)
@@ -85,6 +86,7 @@ Ibinv=Inverse[Ib]//FullSimplify;
 
 AhatLong = ZNoise[[{1,2,3}]] + QuatToRot[QuatInv[Q]].{0,0,9.8066};  
 Ahat = AhatLong;
+Ahat
 AlphaHatLong = Ibinv.( Ib.ZNoise[[{4,5,6}]] +  SkewMatrix[W].(Ib.W));
 AlphaHat = AlphaHatLong;
 
@@ -202,6 +204,10 @@ Run["python ../fixMathematicaOutput_v2.py ForceDynamicModel_JErrWprev.mthout J 0
 
 Run["python ../fixMathematicaOutput_v2.py ForceDynamicModel_JErrIBD.mthout J 0 0"];
 Run["python ../fixMathematicaOutput_v2.py ForceDynamicModel_JErrIBOD.mthout J 0 0"];
+
+
+(* ::PageBreak:: *)
+(**)
 
 
 (* ::Subsection:: *)
