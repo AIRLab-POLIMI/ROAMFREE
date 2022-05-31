@@ -137,35 +137,37 @@ if flag == 1
         
         iT = unique(iT);
         
-        % find the poses that match the image timestamps
-        ipT = zeros(length(iT),1);
-        jT = 1;
-        for j = 1:size(x,1)
-            if (abs(x(j,1)-iT(jT)) < 1e-6)
-                ipT(jT) = j;
-                jT = jT + 1;
-                if jT > length(iT)
-                    break
+        if ~isempty(iT)        
+            % find the poses that match the image timestamps
+            ipT = zeros(length(iT),1);
+            jT = 1;
+            for j = 1:size(x,1)
+                if (abs(x(j,1)-iT(jT)) < 1e-6)
+                    ipT(jT) = j;
+                    jT = jT + 1;
+                    if jT > length(iT)
+                        break
+                    end
                 end
             end
-        end
-        
-        % plot trigger points
-        plot3(x(ipT,3)-x0, x(ipT,4)-y0, x(ipT,5), 'o', 'MarkerEdgeColor', [0.4940 0.1840 0.5560], 'MarkerFaceColor', [0.4940 0.1840 0.5560]);
-        
-        % plot landmakrs all together
-        if isfield(pluginConfig, 'applyTransform')
-            T = pluginConfig.applyTransform;        
-            tmp = (T*[Lw'; ones(1, size(Lw,1))])';
-            Lw = tmp(:,1:3);
-            
-            tmp = (T*[Lw_gcps'; ones(1, size(Lw_gcps,1))])';
-            Lw_gcps = tmp(:,1:3);
-        end
-        
-        plot3(Lw(:,1), Lw(:,2), Lw(:,3), '.', 'Color', [0.75 0.75 0.75]);
-        if (size(Lw_gcps,1)>0)
-            plot3(Lw_gcps(:,1), Lw_gcps(:,2), Lw_gcps(:,3), '^', 'MarkerEdgeColor', [0.8500, 0.3250, 0.0980], 'MarkerFaceColor', [0.8500, 0.3250, 0.0980]);
+
+            % plot trigger points
+            plot3(x(ipT,3)-x0, x(ipT,4)-y0, x(ipT,5), 'o', 'MarkerEdgeColor', [0.4940 0.1840 0.5560], 'MarkerFaceColor', [0.4940 0.1840 0.5560]);
+
+            % plot landmakrs all together
+            if isfield(pluginConfig, 'applyTransform')
+                T = pluginConfig.applyTransform;        
+                tmp = (T*[Lw'; ones(1, size(Lw,1))])';
+                Lw = tmp(:,1:3);
+
+                tmp = (T*[Lw_gcps'; ones(1, size(Lw_gcps,1))])';
+                Lw_gcps = tmp(:,1:3);
+            end
+
+            plot3(Lw(:,1), Lw(:,2), Lw(:,3), '.', 'Color', [0.75 0.75 0.75]);
+            if (size(Lw_gcps,1)>0)
+                plot3(Lw_gcps(:,1), Lw_gcps(:,2), Lw_gcps(:,3), '^', 'MarkerEdgeColor', [0.8500, 0.3250, 0.0980], 'MarkerFaceColor', [0.8500, 0.3250, 0.0980]);
+            end
         end
     end
 
