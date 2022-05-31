@@ -146,7 +146,7 @@ bool EuclideanFeatureHandler::initializeFeature_i(EuclideanTrackDescriptor &d, l
   Eigen::VectorXd Lw(3);
     
   if (initialize(d, K_par->getEstimate(), Lw)) {
-    
+
     const string &sensor = getFeatureParameterName(id);
 
     _filter->addSensor(sensor, ImagePlaneProjection, false, true);
@@ -184,6 +184,17 @@ bool EuclideanFeatureHandler::initializeFeature_i(EuclideanTrackDescriptor &d, l
 
       assert(ret);
     }
+
+    // add a weak regularizer on the Lw
+
+    Eigen::MatrixXd priorCov = 1e16*Eigen::MatrixXd::Identity(3,3);
+
+    _filter->addPriorOnConstantParameter(
+      Euclidean3DPrior,
+      sensor + "_Lw",
+      Lw,
+      priorCov
+    );
 
     // done
     d.zHistory.clear();
@@ -289,7 +300,6 @@ bool EuclideanFeatureHandler::initialize(const EuclideanTrackDescriptor &track,
     if (it->second.pose->hasBeenEstimated()) {
       cv::Mat T_WS_cv;
 
-      // TODO: this assume system is camera_centric
       buildProjectionMatrix(it->second.pose->getEstimate(), K_cv, T_WS_cv);
 
       curCams.push_back(T_WS_cv);
@@ -305,7 +315,8 @@ bool EuclideanFeatureHandler::initialize(const EuclideanTrackDescriptor &track,
   vector<cv::Point2f> firstObsVec, lastObsVec;
 
   cv::Vec4f triangulated3DPointInitTemp;
-  cv::Point3d triangulated3DPointInit, triangulated3DPoint;
+  cv::Point3d triangulated3DPointInit;
+  
 
   firstObsVec.push_back(curPoints.front());
   lastObsVec.push_back(curPoints.back());
@@ -321,6 +332,8 @@ bool EuclideanFeatureHandler::initialize(const EuclideanTrackDescriptor &track,
       / triangulated3DPointInitTemp[3];
 
   /* run Gauss-Newton with all the cameras
+  cv::Point3d triangulated3DPoint; 
+
   int resGN = GaussNewton(curCams, curPoints, triangulated3DPointInit,
       triangulated3DPoint);
 
@@ -351,7 +364,13 @@ bool EuclideanFeatureHandler::initialize(const EuclideanTrackDescriptor &track,
 #       include "../../ROAMfunctions/generated/ImagePlaneProjection_testZ.cppready"
 
         if (testz(0) < 0) {
-          // cerr << "[EuclideanFeatureHandler]: point behind camera: z = " << testz(0) << ". Initialization failed" << endl;
+          // cerr << "[EuclideanFeatureHandler]: point behind camera: z^(C) = " << testz(0) << ". Initialization failed" << endl;
+          resGN = -1;
+          break;
+        }
+
+        if (testz(0) > 10e3) {
+          // cerr << "[EuclideanFeatureHandler]: point too far: z^(C) = " << testz(0) << ". Initialization failed" << endl;
           resGN = -1;
           break;
         }
@@ -359,7 +378,7 @@ bool EuclideanFeatureHandler::initialize(const EuclideanTrackDescriptor &track,
     }
   }
 
-# ifdef DEBUG_PRINT_VISION_INFO_MESSAGES
+  # ifdef DEBUG_PRINT_VISION_INFO_MESSAGES
   if (resGN != -1) {
     cerr << "[EuclideanFeatureHandler] Track initialization: " << endl;
     cerr << "Triangulated3DPointInit: " << endl;
@@ -367,10 +386,10 @@ bool EuclideanFeatureHandler::initialize(const EuclideanTrackDescriptor &track,
     cerr << ", y: " << triangulated3DPointInit.y;
     cerr << ", z: " << triangulated3DPointInit.z << endl;
 
-    cerr << "Triangulated3DPoint: " << endl;
-    cerr << "x: " << triangulated3DPoint.x;
-    cerr << ", y: " << triangulated3DPoint.y;
-    cerr << ", z: " << triangulated3DPoint.z << endl;
+    // cerr << "Triangulated3DPoint: " << endl;
+    // cerr << "x: " << triangulated3DPoint.x;
+    // cerr << ", y: " << triangulated3DPoint.y;
+    // cerr << ", z: " << triangulated3DPoint.z << endl;
 
     cerr << "Measures. " << endl;
     for (auto it = track.zHistory.begin(); it != track.zHistory.end(); ++it) {
@@ -380,7 +399,7 @@ bool EuclideanFeatureHandler::initialize(const EuclideanTrackDescriptor &track,
   } else {
     cerr << "[EuclideanFeatureHandler] Track initialization: FAILED!" << endl;
   }
-# endif
+  # endif
 
   return resGN > 0;
 }

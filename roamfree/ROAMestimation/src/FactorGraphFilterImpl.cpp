@@ -2207,6 +2207,12 @@ map<string, EstimationStats> FactorGraphFilter_Impl::getEstimationStats() {
       }      
     } else if ((pi = dynamic_cast<BaseEdgeInterface *>(e)) != NULL) {
       category = pi->getCategory();
+
+      // group together all Camera_featXXXX_prior, 
+      int found;
+      if (dynamic_cast<Eucl3DPriorEdge *>(e) != NULL && ( found = category.find("feat")) != std::string::npos) {
+        category = category.substr(0, found-1) + "_Eucl3Dpriors";
+      }
     } else if ((ie = dynamic_cast<SE3InterpolationEdge *> (e)) != NULL) {
       category = "SE3Interpolation";
     }
