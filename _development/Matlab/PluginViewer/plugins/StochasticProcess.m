@@ -8,7 +8,7 @@ toPlot = {};
 
 for i=1:length(F)
     if strncmp(F(i).name, pluginConfig.parameterName, length(pluginConfig.parameterName))
-        if ~strncmp(F(i).name(end-7:end),'proc.log',8) && ~strcmp(F(i).name(end-3:end),'.txt')
+        if ~strncmp(F(i).name(end-7:end),'proc.log',8) && ~strcmp(F(i).name(end-3:end),'.txt') && ~strncmp(F(i).name(end-8:end),'prior.log',9)
             toPlot{end+1} = F(i).name;
         end
     end
@@ -32,7 +32,7 @@ it = 1;
 
 for i=1:length(toPlotRaw)
     if size(toPlotRaw{i},1) > size(toPlotRaw{it},1)
-        it = i
+        it = i;
     end
 end
 
