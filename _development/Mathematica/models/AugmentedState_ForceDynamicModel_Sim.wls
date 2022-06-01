@@ -87,7 +87,8 @@ Ibinv=Inverse[Ib]//FullSimplify;
 AhatLong = ZNoise[[{1,2,3}]] + QuatToRot[QuatInv[Q]].{0,0,9.8066};  
 Ahat = AhatLong;
 Ahat
-AlphaHatLong = Ibinv.( Ib.ZNoise[[{4,5,6}]] +  SkewMatrix[W].(Ib.W));
+(*AlphaHatLong = Ibinv.( Ib.ZNoise[[{4,5,6}]] +  SkewMatrix[W].(Ib.W));*)
+AlphaHatLong = ZNoise[[{4,5,6}]];
 AlphaHat = AlphaHatLong;
 
 
