@@ -29,6 +29,14 @@ MeasurementEdgeWrapper_Impl::MeasurementEdgeWrapper_Impl(
     _e(edge) {
 }
 
+const Eigen::VectorXd & MeasurementEdgeWrapper_Impl::getMeasurement() const {
+  return _e->getMeasurement();
+}
+
+void MeasurementEdgeWrapper_Impl::setMeasurement(const Eigen::VectorXd &z) {
+  _e->setMeasurement(z);
+}
+
 bool MeasurementEdgeWrapper_Impl::predict() {
   //TODO: there is an assert in the predictNextState method that make everything crash if the edge does not support prediction
   _e->predict();

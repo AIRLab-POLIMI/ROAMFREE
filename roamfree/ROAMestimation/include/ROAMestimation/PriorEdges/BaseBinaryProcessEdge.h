@@ -48,6 +48,12 @@ class BaseBinaryProcessEdge: public g2o::BaseBinaryEdge<D, Eigen::VectorXd,
       _noiseCov = noiseCov;
     }
 
+    virtual const Eigen::VectorXd &getMeasurement() const {
+      std::cerr << "[BaseBinaryProcessEdge] Warning: measurement plays no role here " << std::endl;
+
+      return _measurement;
+    }
+
     virtual void setMeasurement(const Eigen::VectorXd &measurement) {
       std::cerr << "[BaseBinaryProcessEdge] Warning: measurement plays no role here " << std::endl;
 

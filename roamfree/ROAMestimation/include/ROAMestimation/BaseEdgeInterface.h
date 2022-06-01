@@ -29,6 +29,8 @@ class BaseEdgeInterface {
 
   public:
     virtual void setNoiseCov(const Eigen::MatrixXd &noiseCov) = 0;
+
+    virtual const Eigen::VectorXd &getMeasurement() const = 0;
     virtual void setMeasurement(const Eigen::VectorXd &meas) = 0;
 
     /**

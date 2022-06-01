@@ -28,6 +28,9 @@ public:
 
   virtual ~MeasurementEdgeWrapper() {};
 
+	virtual const Eigen::VectorXd &getMeasurement() const = 0; //!< get a reference to the measurement
+	virtual void setMeasurement(const Eigen::VectorXd &x) = 0; //!< set the measurement
+
 	/*
 	 * \brief evaluates a prediction for the most recent pose in the edge
 	 *

@@ -19,6 +19,8 @@ Contributors:
 #ifndef MEASUREMENTEDGEWRAPPERIMPL_H_
 #define MEASUREMENTEDGEWRAPPERIMPL_H_
 
+#include <Eigen/Dense>
+
 #include "MeasurementEdgeWrapper.h"
 
 namespace ROAMestimation {
@@ -33,6 +35,9 @@ class MeasurementEdgeWrapper_Impl : public MeasurementEdgeWrapper {
 public:
 	MeasurementEdgeWrapper_Impl(BaseEdgeInterface *edge);
 	virtual ~MeasurementEdgeWrapper_Impl() {};
+
+	virtual const Eigen::VectorXd &getMeasurement() const; 
+	virtual void setMeasurement(const Eigen::VectorXd &x);
 
 	virtual bool predict();
 

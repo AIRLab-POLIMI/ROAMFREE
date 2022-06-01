@@ -57,6 +57,10 @@ class BasePriorEdge: public g2o::BaseUnaryEdge<D, Eigen::VectorXd, VertexXi>,
       ROAMmath::inv(_noiseCov, _information);
     }
 
+    virtual const Eigen::VectorXd &getMeasurement() const {
+      return _measurement;
+    }
+
     virtual void setMeasurement(const Eigen::VectorXd &measurement) {
       _measurement = measurement;
     }
