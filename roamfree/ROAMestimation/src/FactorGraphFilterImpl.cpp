@@ -129,6 +129,10 @@ void FactorGraphFilter_Impl::setChi2Threshold(double threshold) {
   _stopAction->setChi2threshold(threshold);
 }
 
+bool FactorGraphFilter_Impl::addPostIterationAction(g2o::HyperGraphAction* action) {
+  return _optimizer->addPostIterationAction(action);
+}
+
 PoseVertexWrapper_Ptr FactorGraphFilter_Impl::setInitialPose(
     const Eigen::VectorXd &x0, double t) {
 

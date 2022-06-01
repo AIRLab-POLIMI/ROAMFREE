@@ -29,6 +29,10 @@
 #include "interfaceTypes.h"
 #include "EstimationStats.h"
 
+namespace g2o {
+    class HyperGraphAction;
+}
+
 namespace ROAMestimation {
 
 class FactorGraphFilter {
@@ -120,6 +124,12 @@ class FactorGraphFilter {
      *  \brief writes the final hessian matrix to a file
      */
     virtual void writeFinalHessian() = 0;
+
+    /**
+     *  \brief registers an action to be run after each iteration of the optimization
+     */
+
+    virtual bool addPostIterationAction(g2o::HyperGraphAction* action) = 0;
 
 
     /* --------------------------- SENSOR LEVEL METHODS ---------------------------- */

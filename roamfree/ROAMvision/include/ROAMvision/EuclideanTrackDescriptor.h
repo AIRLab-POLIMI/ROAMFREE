@@ -22,6 +22,7 @@
 #include <Eigen/Dense>
 
 #include "ROAMestimation/ROAMestimation.h"
+
 #include "ObservationDescriptor.h"
 
 namespace ROAMvision {
@@ -31,10 +32,11 @@ class EuclideanTrackDescriptor {
   public:
 
     EuclideanTrackDescriptor() :
-        isInitialized(false) {
+        isInitialized(false), priorEdge(NULL) {
     }
 
     bool isInitialized;
+    ROAMestimation::MeasurementEdgeWrapper_Ptr priorEdge;
 
     ObservationMap zHistory;
 };

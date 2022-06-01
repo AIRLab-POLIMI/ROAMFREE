@@ -84,6 +84,8 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
 
     void writeFinalHessian();
 
+    bool addPostIterationAction(g2o::HyperGraphAction* action);
+
     /* --------------------------- SENSOR LEVEL METHODS ---------------------------- */
 
     bool addSensor(const std::string &name, MeasTypes type, bool isMaster,
@@ -221,7 +223,7 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
     ROAMlog::GraphLogger *_logger; //!< the object which handles low level logging
     std::string _logFolder;
 
-    SpatialIndex *_spatialIndex; //!< the object which maintains spatial informations about poses.
+    SpatialIndex *_spatialIndex; //!< the object which maintains spatial informations about poses.    
 
     /* --------------------------- STUFF FOR SENSORS ------------------------------- */
 

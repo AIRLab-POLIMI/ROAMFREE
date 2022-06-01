@@ -30,11 +30,15 @@
 
 namespace ROAMvision {
 
+class UpdateFeaturePriorAction;
+
 class EuclideanFeatureHandler: public ImageFeatureHandler {
 
   public:
     EuclideanFeatureHandler();
     EuclideanFeatureHandler(bool is_robust, double huber_width);
+
+    virtual ~EuclideanFeatureHandler();
 
     virtual bool init(
         ROAMestimation::FactorGraphFilter* f,
@@ -51,7 +55,7 @@ class EuclideanFeatureHandler: public ImageFeatureHandler {
     
     virtual bool initializeFeature(long int id);
     
-    virtual bool initializeFeature_i(EuclideanTrackDescriptor &d, long int id);
+    virtual void updateFeaturePriors();
 
     virtual bool getFeaturePositionInWorldFrame(long int id,
         Eigen::VectorXd &lw) const;
@@ -77,6 +81,8 @@ class EuclideanFeatureHandler: public ImageFeatureHandler {
 
     FeatureMap _features;
 
+    virtual bool initializeFeature_i(EuclideanTrackDescriptor &d, long int id);
+
     // methods for track initialization
     // TODO: these are based on opencv, this dependency should be dropped
     bool initialize(const EuclideanTrackDescriptor &track,
@@ -93,6 +99,8 @@ class EuclideanFeatureHandler: public ImageFeatureHandler {
     ROAMestimation::ParameterWrapper_Ptr K_par;
     
     ROAMestimation::ParameterWrapper_Ptr qOS_par;
+
+    UpdateFeaturePriorAction *_updateFeaturePriorAction;
 
     bool _is_robust;
     double _huber_width;

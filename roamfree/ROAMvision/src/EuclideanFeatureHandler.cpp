@@ -24,7 +24,7 @@
 
 #include "EuclideanFeatureHandler.h"
 
-#include "SufficientParallax.h"
+#include "UpdateFeaturePriorAction.h"
 
 using namespace std;
 using namespace ROAMestimation;
@@ -40,7 +40,10 @@ EuclideanFeatureHandler::EuclideanFeatureHandler()
 
 EuclideanFeatureHandler::EuclideanFeatureHandler(bool is_robust, double huber_width) 
   : _is_robust(is_robust), _huber_width(huber_width) {
+}
 
+EuclideanFeatureHandler::~EuclideanFeatureHandler() {
+  // TODO: delete _updateFeaturePriorsAction (but needs to be de-registered first)
 }
 
 bool EuclideanFeatureHandler::init(FactorGraphFilter* f, const string &name,
@@ -66,6 +69,10 @@ bool EuclideanFeatureHandler::init(FactorGraphFilter* f, const string &name,
   _filter->addConstantParameter(Euclidean2D, _sensorName + "_Cam_SKEW",
       SKEW, true);
 
+
+  _updateFeaturePriorAction = new UpdateFeaturePriorAction(this);
+
+  _filter->addPostIterationAction(_updateFeaturePriorAction);
 
   return true;
 }
@@ -185,20 +192,20 @@ bool EuclideanFeatureHandler::initializeFeature_i(EuclideanTrackDescriptor &d, l
       assert(ret);
     }
 
+    // done
+    d.zHistory.clear();
+    d.isInitialized = true;
+
     // add a weak regularizer on the Lw
 
-    Eigen::MatrixXd priorCov = 1e16*Eigen::MatrixXd::Identity(3,3);
+    Eigen::MatrixXd priorCov = 1e12*Eigen::MatrixXd::Identity(3,3);
 
-    _filter->addPriorOnConstantParameter(
+    d.priorEdge = _filter->addPriorOnConstantParameter(
       Euclidean3DPrior,
       sensor + "_Lw",
       Lw,
       priorCov
     );
-
-    // done
-    d.zHistory.clear();
-    d.isInitialized = true;
 
 #   ifdef DEBUG_PRINT_VISION_INFO_MESSAGES
       cerr << "[EuclideanFeatureHandler] Ready to estimate depth for track " << id  << endl;
@@ -207,6 +214,28 @@ bool EuclideanFeatureHandler::initializeFeature_i(EuclideanTrackDescriptor &d, l
     return true;
   }
   return false;
+}
+
+void EuclideanFeatureHandler::updateFeaturePriors() {
+  
+  Eigen::VectorXd tempz(3);
+
+  for (auto f = _features.begin(); f != _features.end(); ++f) {
+    if (f->second.isInitialized && f->second.priorEdge) {
+
+      std::cerr << f->second.priorEdge << std::endl;
+
+      getFeaturePositionInWorldFrame(f->first, tempz);
+
+      // Eigen::IOFormat ThreeDigitFormat(3, 0, ", ", "\n", "[", "]");
+
+      // std::cerr << "[EuclideanFeatureHandler] feature " << f->first << " moved by " 
+      //   << (f->second.priorEdge->getMeasurement() - tempz).transpose().format(ThreeDigitFormat) << std::endl;
+
+      f->second.priorEdge->setMeasurement(tempz);      
+    }
+  }
+
 }
 
 void EuclideanFeatureHandler::fixOlderPosesWRTVisibleFeatures() {
