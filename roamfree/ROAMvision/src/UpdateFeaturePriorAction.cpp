@@ -14,7 +14,7 @@ UpdateFeaturePriorAction::UpdateFeaturePriorAction(ROAMvision::EuclideanFeatureH
 
 g2o::HyperGraphAction* UpdateFeaturePriorAction::operator()(const g2o::HyperGraph* graph, Parameters* parameters) {
 
-    std::cerr << "[UpdateFeaturePriorAction] Updating feature priors" << std::endl;
+    // std::cerr << "[UpdateFeaturePriorAction] Updating feature priors" << std::endl;
 
     _featureHandler->updateFeaturePriors();
 
