@@ -198,7 +198,7 @@ bool EuclideanFeatureHandler::initializeFeature_i(EuclideanTrackDescriptor &d, l
 
     // add a weak regularizer on the Lw
 
-    Eigen::MatrixXd priorCov = 1e12*Eigen::MatrixXd::Identity(3,3);
+    Eigen::MatrixXd priorCov = 1e13*Eigen::MatrixXd::Identity(3,3);
 
     d.priorEdge = _filter->addPriorOnConstantParameter(
       Euclidean3DPrior,
