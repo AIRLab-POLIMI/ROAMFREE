@@ -223,8 +223,6 @@ void EuclideanFeatureHandler::updateFeaturePriors() {
   for (auto f = _features.begin(); f != _features.end(); ++f) {
     if (f->second.isInitialized && f->second.priorEdge) {
 
-      std::cerr << f->second.priorEdge << std::endl;
-
       getFeaturePositionInWorldFrame(f->first, tempz);
 
       // Eigen::IOFormat ThreeDigitFormat(3, 0, ", ", "\n", "[", "]");
