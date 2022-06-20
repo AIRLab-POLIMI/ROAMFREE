@@ -358,7 +358,7 @@ bool EuclideanFeatureHandler::initialize(const EuclideanTrackDescriptor &track,
   triangulated3DPointInit.z = triangulated3DPointInitTemp[2]
       / triangulated3DPointInitTemp[3];
 
-  /* run Gauss-Newton with all the cameras
+  // run Gauss-Newton with all the cameras
   cv::Point3d triangulated3DPoint; 
 
   int resGN = GaussNewton(curCams, curPoints, triangulated3DPointInit,
@@ -367,7 +367,7 @@ bool EuclideanFeatureHandler::initialize(const EuclideanTrackDescriptor &track,
   lw << triangulated3DPoint.x, triangulated3DPoint.y, triangulated3DPoint.z;
   //*/
 
-  // use directly opencv triangulation
+  /* use directly opencv triangulation
   int resGN = 1;
   lw << 
     triangulated3DPointInitTemp[0] / triangulated3DPointInitTemp[3], 
