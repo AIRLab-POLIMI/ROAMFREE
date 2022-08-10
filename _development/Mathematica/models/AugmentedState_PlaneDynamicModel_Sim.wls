@@ -66,7 +66,6 @@ WSprev = X[[37;;39]];
 (* Parameters *)
 
 
-
 CFT1=fThrust[1]; (* thrust force coefficients*);
 CFT2=fThrust[2];
 CFT3=fThrust[3];
@@ -135,7 +134,12 @@ IBOD =  Table[ibod[i],{i,1,3}];
 
 
 (* wind speed in world frame *)
-WINDW=Table[wind[i],{i,1,3}];
+(* Wind planar in world coordinates *)
+WINDXY = {windxy[1],windxy[2]};
+(* Wind vertical in world coordinates *)
+WINDZ = {windz[1]};
+(* Wind in world coordinates *)
+WIND={windxy[1],windxy[2],windz[1]}; 
 
 
 
@@ -169,7 +173,7 @@ n = z[1]+NOISESCONTROLS[[1]]; (* propeller speed *);
 (* Airspeed *)
 
 
-AIRS=VSprev-QuatToRot[QuatInv[QWSprev]] . WINDW;
+AIRS=VSprev-QuatToRot[QuatInv[QWSprev]] . WIND;
 \[Alpha]=ArcTan[AIRS[[1]],AIRS[[3]]];
 \[Beta]=ArcSin[AIRS[[2]]/L2[AIRS]]; 
 (* dynamic pressure *)
@@ -314,7 +318,8 @@ JErrCp=VecToZero[D[ERR,{CP}],NOISES];
 JErrIbd=VecToZero[D[ERR,{IBD}],NOISES];
 JErrIbod=VecToZero[D[ERR,{IBOD}],NOISES];
 
-JErrWind=VecToZero[D[ERR,{WINDW}],NOISES];
+JErrWindXY=VecToZero[D[ERR,{WINDXY}],NOISES];
+JErrWindZ=VecToZero[D[ERR,{WINDZ}],NOISES];
 
 
 
@@ -345,7 +350,8 @@ MyStringWrite[ToGoodC[JErrCBar],"PlaneDynamicModel_JErrCBar.mthout"];
 MyStringWrite[ToGoodC[JErrCp],"PlaneDynamicModel_JErrCp.mthout"];
 MyStringWrite[ToGoodC[JErrIbd],"PlaneDynamicModel_JErrIbd.mthout"];
 MyStringWrite[ToGoodC[JErrIbod],"PlaneDynamicModel_JErrIbod.mthout"];
-MyStringWrite[ToGoodC[JErrWind],"PlaneDynamicModel_JErrWind.mthout"];
+MyStringWrite[ToGoodC[JErrWindXY],"PlaneDynamicModel_JErrWindXY.mthout"];
+MyStringWrite[ToGoodC[JErrWindZ],"PlaneDynamicModel_JErrWindZ.mthout"];
 
 MyStringWrite[ToGoodC[Flatten[{SWhat,QWShat}]],"PlaneDynamicModel_predictor.mthout"];
 
@@ -373,7 +379,8 @@ Run["python ../fixMathematicaOutput_v2.py PlaneDynamicModel_JErrCBar.mthout J 0 
 Run["python ../fixMathematicaOutput_v2.py PlaneDynamicModel_JErrCp.mthout J 0 0"];
 Run["python ../fixMathematicaOutput_v2.py PlaneDynamicModel_JErrIbd.mthout J 0 0"];
 Run["python ../fixMathematicaOutput_v2.py PlaneDynamicModel_JErrIbod.mthout J 0 0"];
-Run["python ../fixMathematicaOutput_v2.py PlaneDynamicModel_JErrWind.mthout J 0 0"];
+Run["python ../fixMathematicaOutput_v2.py PlaneDynamicModel_JErrWindXY.mthout J 0 0"];
+Run["python ../fixMathematicaOutput_v2.py PlaneDynamicModel_JErrWindZ.mthout J 0 0"];
 
 Run["python ../fixMathematicaOutput_v2.py PlaneDynamicModel_predictor.mthout xhat 0 0"];
 

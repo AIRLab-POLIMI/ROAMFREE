@@ -29,7 +29,7 @@ public:
   static const bool _usedComponents[];
 
   static const std::string _paramsNames[];
-  static const int _nParams = 13;
+  static const int _nParams = 14;
 
   static const unsigned int _ORDER = 2;
 
@@ -70,7 +70,8 @@ public:
     Eigen::Map<Eigen::Matrix<double, 4, 1> > cp(params[9]);
     Eigen::Map<Eigen::Matrix<double, 3, 1> > ibd(params[10]);
     Eigen::Map<Eigen::Matrix<double, 3, 1> > ibod(params[11]);
-    Eigen::Map<Eigen::Matrix<double, 3, 1> > wind(params[12]);
+    Eigen::Map<Eigen::Matrix<double, 2, 1> > windxy(params[12]);
+    Eigen::Map<Eigen::Matrix<double, 1, 1> > windz(params[13]);
 
     Eigen::MatrixBase<T> & err = const_cast<Eigen::MatrixBase<T>&>(const_ret);
 
@@ -113,7 +114,8 @@ public:
     Eigen::Map<Eigen::Matrix<double, 4, 1> > cp(params[9]);
     Eigen::Map<Eigen::Matrix<double, 3, 1> > ibd(params[10]);
     Eigen::Map<Eigen::Matrix<double, 3, 1> > ibod(params[11]);
-    Eigen::Map<Eigen::Matrix<double, 3, 1> > wind(params[12]);
+    Eigen::Map<Eigen::Matrix<double, 2, 1> > windxy(params[12]);
+    Eigen::Map<Eigen::Matrix<double, 1, 1> > windz(params[13]);
 
     Eigen::MatrixBase<T> & J = const_cast<Eigen::MatrixBase<T>&>(const_ret);
 
@@ -265,9 +267,15 @@ public:
       return true;
       break;
     }
-    case 13: // jacobian wrt wind
+    case 13: // jacobian wrt windXY
     {
-#   include "generated/PlaneDynamicModel_JErrWind.cppready"
+#   include "generated/PlaneDynamicModel_JErrWindXY.cppready"
+      return true;
+      break;
+    }
+    case 14: // jacobian wrt windZ
+    {
+#   include "generated/PlaneDynamicModel_JErrWindZ.cppready"
       return true;
       break;
     }
