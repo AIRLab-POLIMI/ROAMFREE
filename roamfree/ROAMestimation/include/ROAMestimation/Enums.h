@@ -44,6 +44,7 @@ enum MeasTypes {
   IMUintegralDeltaQ,
   PlanarConstraint,
   QuadDynamicModel,
+  PoseDerivative,
   LiDARTieFeatures
 };
 

@@ -1,0 +1,6 @@
+double tmp0 = x(14+_OFF);
+double tmp1 = x(15+_OFF);
+double tmp2 = x(16+_OFF);
+err(1+_OFF) = tmp0 - std::fabs(z(1+_OFF))*tmp0;
+err(2+_OFF) = tmp1 - std::fabs(z(2+_OFF))*tmp1;
+err(3+_OFF) = tmp2 - std::fabs(z(3+_OFF))*tmp2;

@@ -37,6 +37,7 @@ Contributors:
 #include "IMUIntegralDeltaQM.h"
 #include "QuadDynamicModelM.h"
 #include "PlaneDynamicModelM.h"
+#include "PoseDerivativeM.h"
 #include "LiDARTieFeaturesM.h"
 #include "VectorFieldM.h"
 

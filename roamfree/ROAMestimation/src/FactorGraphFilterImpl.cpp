@@ -224,6 +224,9 @@ bool FactorGraphFilter_Impl::addSensor(const string& name, MeasTypes type,
   case QuadDynamicModel:
       s.order = QuadDynamicModelM::_ORDER;
       break;
+  case PoseDerivative:
+      s.order = PoseDerivativeM::_ORDER;
+      break;
   case PlaneDynamicModel:
       s.order = PlaneDynamicModelM::_ORDER;
       break;
@@ -1376,6 +1379,9 @@ GenericEdgeInterface *FactorGraphFilter_Impl::addMeasurement_i(
     break;
   case QuadDynamicModel:
       e = new QuaternionGenericEdge<QuadDynamicModelM>;
+      break;
+  case PoseDerivative:
+      e = new QuaternionGenericEdge<PoseDerivativeM>;
       break;
   case LiDARTieFeatures:
       e =  new QuaternionGenericEdge<LiDARTieFeaturesM>;
