@@ -17,7 +17,7 @@ public:
 
   static const unsigned int _ERROR_SIZE = 3;
   static const unsigned int _NOISE_SIZE = 3;
-  static const unsigned int _MEASUREMENT_SIZE = 3;
+  static const unsigned int _MEASUREMENT_SIZE = 0;
 
   const std::string* getParamsList() {
     return _paramsNames;
@@ -42,8 +42,7 @@ public:
 
     const static int _OFF = -1;
 
-#   include "generated/PoseDerivative_Err.cppready"
-
+    err << 0,0,0;
     return false;
   }
 
@@ -60,44 +59,44 @@ public:
       
     case -6: // jacobian wrt to Alpha
 			{
-#include "generated/PoseDerivative_JErrAlpha.cppready"
+        J = Eigen::MatrixXd::Zero(3,3);
 				return false; // "it is useless to evaluate me again"
 				break;
 			}
 			case -5: // jacobian wrt to A
 			{
-#include "generated/PoseDerivative_JErrA.cppready"
+        J = Eigen::MatrixXd::Zero(3,3);
 				return false; // "it is useless to evaluate me again"
 				break;
 			}
 			case -4: // jacobian wrt to W
 			{
-#include "generated/PoseDerivative_JErrW.cppready"
+        J = Eigen::MatrixXd::Zero(3,3);
 				return false;
 				break;
 			}
 			case -3: // jacobian wrt to V
 			{
-#include "generated/PoseDerivative_JErrV.cppready"
+        J = Eigen::MatrixXd::Zero(3,3);
 				return false;
 				break;
 			}
 			case -2: // jacobian wrt to Q
 			{
-#include "generated/PoseDerivative_JErrQ.cppready"
+        J = Eigen::MatrixXd::Zero(3,4);
 				return false;
 				break;
 			}
       case -1: // jacobian wrt to Q
 			{
-#include "generated/PoseDerivative_JErrP.cppready"
+        J = Eigen::MatrixXd::Zero(3,3);
 				return false;
 				break;
 			}
 
 			case 0: // jacobian wrt to noises
 			{
-#include "generated/PoseDerivative_JErrNoises.cppready"
+        J = Eigen::MatrixXd::Identity(3,3);
 				return false; // it is not the identity matrix
 				break;
 			}
