@@ -119,7 +119,8 @@ class CommandArgs
     bool convertString(const std::string& s, T& x) const
     {
       std::istringstream i(s);
-      bool status = (i >> x);
+      i >> x;
+      bool status = i.good();
       return status;
     }
 
