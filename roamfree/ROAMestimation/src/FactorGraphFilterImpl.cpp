@@ -233,6 +233,9 @@ bool FactorGraphFilter_Impl::addSensor(const string& name, MeasTypes type,
   case LiDARTieFeatures:
       s.order = LiDARTieFeaturesM::_ORDER;
       break;
+  case LiDAR2ImgTieFeatures:
+      s.order = LiDAR2ImageProjectionTieFeatureM::_ORDER;
+      break;
   default:
     cerr << "[FactorGraphFilter] Error: unknown measurement type" << endl;
     break;
