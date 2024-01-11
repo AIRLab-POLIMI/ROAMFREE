@@ -4,6 +4,8 @@ set(CATKIN_MSG FALSE)
 find_package(catkin QUIET)
 project(roamfree)
 
+option (DEBUG_WO_MESSAGES "Do not print messaged even in debug mode" OFF)
+
 if(catkin_FOUND)
 	catkin_package(INCLUDE_DIRS ROAMimu/include ROAMestimation/include ROAMvision/include
 	               LIBRARIES ROAMestimation ROAMimu ROAMvision)
@@ -63,8 +65,11 @@ set(CMAKE_CXX_FLAGS_DEBUG "-std=c++11 -g3 ${OTHERS_DEFINE}")
 set(CMAKE_CXX_FLAGS_RELEASE "-std=c++11 -O3 ${OTHERS_DEFINE}")
 
 
-if(CMAKE_BUILD_TYPE MATCHES Debug)	
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+
 	add_definitions( -DDEBUG_BUILD=1 )	
+
+    if (NOT DEBUG_WO_MESSAGES)
 	
 	# if uncommented, outputs to stderr the current active edges 
 	# and vertices before each estimation run.
@@ -74,6 +79,8 @@ if(CMAKE_BUILD_TYPE MATCHES Debug)
 	add_definitions( -DDEBUG_PRINT_INFO_MESSAGES)
 	add_definitions( -DDEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES)
 	add_definitions( -DDEBUG_PRINT_VISION_INFO_MESSAGES)
+
+    endif()
 	                  
 	# if enabled, in each edge the numeric jacobians are computed
 	# and the estimation aborts if substantial difference
