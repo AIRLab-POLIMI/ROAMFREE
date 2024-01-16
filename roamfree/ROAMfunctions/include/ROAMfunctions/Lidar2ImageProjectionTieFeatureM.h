@@ -17,7 +17,7 @@ public:
     static const unsigned int _ORDER = 1;
 
     static const unsigned int _ERROR_SIZE = 2;
-    static const unsigned int _NOISE_SIZE = 5;
+    static const unsigned int _NOISE_SIZE = 2;
     static const unsigned int _MEASUREMENT_SIZE = 5;
 
     const std::string* getParamsList() {
