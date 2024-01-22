@@ -61,6 +61,11 @@ class ImagePlaneProjectionM {
       Eigen::Map<Eigen::Vector2d> td(params[3]);
       Eigen::Map<Eigen::Vector2d> sk(params[4]);
 
+      Eigen::Map<Eigen::Vector2d> extrd(params[5]);
+      Eigen::Map<Eigen::Vector3d> extrdd(params[6]);
+      Eigen::Map<Eigen::Vector4d> exttd(params[7]);
+      Eigen::Map<Eigen::Vector2d> extsk(params[8]);
+
       Eigen::MatrixBase<T> & err = const_cast<Eigen::MatrixBase<T>&>(const_ret);
 
       const static int _OFF = -1;
@@ -80,6 +85,11 @@ class ImagePlaneProjectionM {
       Eigen::Map<Eigen::Vector4d> rd(params[2]);
       Eigen::Map<Eigen::Vector2d> td(params[3]);
       Eigen::Map<Eigen::Vector2d> sk(params[4]);
+
+      Eigen::Map<Eigen::Vector2d> extrd(params[5]);
+      Eigen::Map<Eigen::Vector3d> extrdd(params[6]);
+      Eigen::Map<Eigen::Vector4d> exttd(params[7]);
+      Eigen::Map<Eigen::Vector2d> extsk(params[8]);
 
       Eigen::MatrixBase<T> & J = const_cast<Eigen::MatrixBase<T>&>(const_ret);
 
@@ -134,6 +144,30 @@ class ImagePlaneProjectionM {
       case 5: // jacobian wrt skew
       {
 #     include "generated/ImagePlaneProjection_JErrSKEW.cppready"
+        return true;
+        break;
+      }
+      case 6: // jacobian wrt extended radial distortion
+      {
+#			include "generated/ImagePlaneProjection_JErrExtRD.cppready"
+        return true;
+        break;
+      }
+      case 7: // jacobian wrt extended radial distortion denominator
+      {
+#     include "generated/ImagePlaneProjection_JErrExtRDD.cppready"
+        return true;
+        break;
+      }
+      case 8: // jacobian wrt extended tangential distortion
+      {
+#     include "generated/ImagePlaneProjection_JErrExtTD.cppready"
+        return true;
+        break;
+      }
+      case 9: // jacobian wrt extended skew
+      {
+#     include "generated/ImagePlaneProjection_JErrExtSKEW.cppready"
         return true;
         break;
       }
