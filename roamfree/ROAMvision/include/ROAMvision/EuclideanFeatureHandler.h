@@ -40,15 +40,26 @@ class EuclideanFeatureHandler: public ImageFeatureHandler {
 
     virtual ~EuclideanFeatureHandler();
 
-    virtual bool init(
-        ROAMestimation::FactorGraphFilter* f,
-        const std::string &name, 
+
+    virtual bool init(ROAMestimation::FactorGraphFilter* f,
+        const std::string &name,
         const Eigen::VectorXd & T_OS,
-        const Eigen::VectorXd & K, 
-        const Eigen::VectorXd & RD, 
+        const Eigen::VectorXd & K,
+        const Eigen::VectorXd & RD,
         const Eigen::VectorXd & TD,
-        const Eigen::VectorXd & SKEW
-    );
+        const Eigen::VectorXd & SKEW) override;
+
+    virtual bool init(ROAMestimation::FactorGraphFilter* f,
+        const std::string &name,
+        const Eigen::VectorXd & T_OS,
+        const Eigen::VectorXd & K,
+        const Eigen::VectorXd & RD,
+        const Eigen::VectorXd & TD,
+        const Eigen::VectorXd & SKEW,
+                      const Eigen::VectorXd &ExtRD,
+                      const Eigen::VectorXd &ExtRdD,
+                      const Eigen::VectorXd &ExtTD,
+                      const Eigen::VectorXd &ExtSKEW);
 
     virtual bool addFeatureObservation(long int id, double t,
         const Eigen::VectorXd &z, const Eigen::MatrixXd &cov, bool dontInitialize = true);

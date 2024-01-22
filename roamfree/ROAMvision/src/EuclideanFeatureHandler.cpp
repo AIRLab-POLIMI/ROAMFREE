@@ -46,9 +46,32 @@ EuclideanFeatureHandler::~EuclideanFeatureHandler() {
   // TODO: delete _updateFeaturePriorsAction (but needs to be de-registered first)
 }
 
+
+
+bool EuclideanFeatureHandler::init(ROAMestimation::FactorGraphFilter* f,
+                                   const std::string &name,
+                                   const Eigen::VectorXd & T_OS,
+                                   const Eigen::VectorXd & K,
+                                   const Eigen::VectorXd & RD,
+                                   const Eigen::VectorXd & TD,
+                                   const Eigen::VectorXd & SKEW) {
+
+    Eigen::VectorXd ExtRD = Eigen::VectorXd::Zero(2, 1);
+    Eigen::VectorXd ExtRdD = Eigen::VectorXd::Zero(3, 1);
+    Eigen::VectorXd ExtTD = Eigen::VectorXd::Zero(4, 1);
+    Eigen::VectorXd ExtSKEW = Eigen::VectorXd::Zero(2, 1);
+
+    return init(f, name, T_OS, K, RD, TD, SKEW, ExtRD, ExtRdD, ExtTD, ExtSKEW);
+
+}
+
 bool EuclideanFeatureHandler::init(FactorGraphFilter* f, const string &name,
     const Eigen::VectorXd & T_OS, const Eigen::VectorXd & K,
-    const Eigen::VectorXd & RD, const Eigen::VectorXd & TD, const Eigen::VectorXd & SKEW) {
+    const Eigen::VectorXd & RD, const Eigen::VectorXd & TD, const Eigen::VectorXd & SKEW,
+                                   const Eigen::VectorXd & ExtRD,
+                                   const Eigen::VectorXd & ExtRdD,
+                                   const Eigen::VectorXd & ExtTD,
+                                   const Eigen::VectorXd & ExtSKEW) {
 
   _filter = f;
   _sensorName = name;
@@ -68,6 +91,15 @@ bool EuclideanFeatureHandler::init(FactorGraphFilter* f, const string &name,
       TD, true);
   _filter->addConstantParameter(Euclidean2D, _sensorName + "_Cam_SKEW",
       SKEW, true);
+
+  _filter->addConstantParameter(Euclidean2D, _sensorName + "_Cam_ExtRD",
+      ExtRD, true);
+  _filter->addConstantParameter(Euclidean3D, _sensorName + "_Cam_ExtRdD",
+      ExtRdD, true);
+  _filter->addConstantParameter(Euclidean4D, _sensorName + "_Cam_ExtTD",
+      ExtTD, true);
+  _filter->addConstantParameter(Euclidean2D, _sensorName + "_Cam_ExtSKEW",
+      ExtSKEW, true);
 
 
   _updateFeaturePriorAction = new UpdateFeaturePriorAction(this);
@@ -178,6 +210,11 @@ bool EuclideanFeatureHandler::initializeFeature_i(EuclideanTrackDescriptor &d, l
     _filter->shareParameter(_sensorName + "_Cam_RD", sensor + "_RD");
     _filter->shareParameter(_sensorName + "_Cam_TD", sensor + "_TD");
     _filter->shareParameter(_sensorName + "_Cam_SKEW", sensor + "_SKEW");
+
+    _filter->shareParameter(_sensorName + "_Cam_ExtRD", sensor + "_ExtRD");
+    _filter->shareParameter(_sensorName + "_Cam_ExtRdD", sensor + "_ExtRrD");
+    _filter->shareParameter(_sensorName + "_Cam_ExtTD", sensor + "_ExtTD");
+    _filter->shareParameter(_sensorName + "_Cam_ExtSKEW", sensor + "_ExtSKEW");
 
     _filter->addConstantParameter(Euclidean3D, sensor + "_Lw", d.zHistory.begin()->first, Lw, false);
 
