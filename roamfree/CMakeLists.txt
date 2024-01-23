@@ -5,18 +5,19 @@ find_package(catkin QUIET)
 project(roamfree)
 
 option (DEBUG_WO_MESSAGES "Do not print messaged even in debug mode" OFF)
+option (DEBUG_W_ANALITIC_JAC "Still use analytic jacobian " ON)
 
 if(catkin_FOUND)
-	catkin_package(INCLUDE_DIRS ROAMimu/include ROAMestimation/include ROAMvision/include
-	               LIBRARIES ROAMestimation ROAMimu ROAMvision)
-	set(CATKIN_MSG TRUE)
+        catkin_package(INCLUDE_DIRS ROAMimu/include ROAMestimation/include ROAMvision/include
+                       LIBRARIES ROAMestimation ROAMimu ROAMvision)
+        set(CATKIN_MSG TRUE)
 else()
-	set(CATKIN_MSG FALSE)
+        set(CATKIN_MSG FALSE)
 endif()
 
 # ----------------------- INCLUDES ----------------------------
 
-include_directories(ROAMestimation/include 
+include_directories(ROAMestimation/include
                     ROAMmath/include
                     ROAMlog/include
                     ROAMimu/include
@@ -37,7 +38,7 @@ include_directories("${Boost_INCLUDE_DIRS}")
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
-  
+
 # --- Eigen3
 
 find_package(Eigen3 REQUIRED)
@@ -67,44 +68,48 @@ set(CMAKE_CXX_FLAGS_RELEASE "-std=c++11 -O3 ${OTHERS_DEFINE}")
 
 if(CMAKE_BUILD_TYPE MATCHES Debug)
 
-	add_definitions( -DDEBUG_BUILD=1 )	
+        add_definitions( -DDEBUG_BUILD=1 )
 
     if (NOT DEBUG_WO_MESSAGES)
-	
-	# if uncommented, outputs to stderr the current active edges 
-	# and vertices before each estimation run.
-	add_definitions( -DDEBUG_PRINT_GRAPH_STRUCTURE )
-	
-	# if uncommented, outputs to stderr some Info messages
-	add_definitions( -DDEBUG_PRINT_INFO_MESSAGES)
-	add_definitions( -DDEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES)
-	add_definitions( -DDEBUG_PRINT_VISION_INFO_MESSAGES)
+
+        # if uncommented, outputs to stderr the current active edges
+        # and vertices before each estimation run.
+        add_definitions( -DDEBUG_PRINT_GRAPH_STRUCTURE )
+
+        # if uncommented, outputs to stderr some Info messages
+        add_definitions( -DDEBUG_PRINT_INFO_MESSAGES)
+        add_definitions( -DDEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES)
+        add_definitions( -DDEBUG_PRINT_VISION_INFO_MESSAGES)
 
     endif()
-	                  
-	# if enabled, in each edge the numeric jacobians are computed
-	# and the estimation aborts if substantial difference
-	# wrt the analytic one occurs. 
-	add_definitions( -DDEBUG_COMPARE_WITH_NUMERIC_JACOBIANS )
-	
-	# check if Jacobians are properly initialized in GLC factory
-	add_definitions( -DDEBUG_ARE_ALL_JACOBIANS_INITIALIZED )
-	
-	# the g2o optimizer constructor verbose flag 
-	add_definitions( -DDEBUG_G2O_OPTIMIZER_VERBOSE=1 )
 
-	# disable OpenMP in g2o TODO check message
-	set( G2O_USE_OPENMP OFF CACHE BOOL "Build g2o with OpenMP support (EXPERIMENTAL)" FORCE)
-	
-	set(BUILD_TYPE_MSG "Debug") 
+        # if enabled, in each edge the numeric jacobians are computed
+        # and the estimation aborts if substantial difference
+        # wrt the analytic one occurs.
+        add_definitions( -DDEBUG_COMPARE_WITH_NUMERIC_JACOBIANS )
+
+        if (DEBUG_W_ANALITIC_JAC)
+            add_definitions( -DDEBUG_WITH_ANALYTIC_JACOBIANS )
+        endif(DEBUG_W_ANALITIC_JAC)
+
+        # check if Jacobians are properly initialized in GLC factory
+        add_definitions( -DDEBUG_ARE_ALL_JACOBIANS_INITIALIZED )
+
+        # the g2o optimizer constructor verbose flag
+        add_definitions( -DDEBUG_G2O_OPTIMIZER_VERBOSE=1 )
+
+        # disable OpenMP in g2o TODO check message
+        set( G2O_USE_OPENMP OFF CACHE BOOL "Build g2o with OpenMP support (EXPERIMENTAL)" FORCE)
+
+        set(BUILD_TYPE_MSG "Debug")
 
 else()
-	add_definitions( -DDEBUG_G2O_OPTIMIZER_VERBOSE=0 )
-	
-	#enable OpenMP in g2o
-	set( G2O_USE_OPENMP ON CACHE BOOL "Build g2o with OpenMP support (EXPERIMENTAL)" FORCE)
-	
-	set(BUILD_TYPE_MSG "Release")
+        add_definitions( -DDEBUG_G2O_OPTIMIZER_VERBOSE=0 )
+
+        #enable OpenMP in g2o
+        set( G2O_USE_OPENMP ON CACHE BOOL "Build g2o with OpenMP support (EXPERIMENTAL)" FORCE)
+
+        set(BUILD_TYPE_MSG "Release")
 endif()
 
 
