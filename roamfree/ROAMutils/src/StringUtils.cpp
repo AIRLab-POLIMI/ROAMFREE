@@ -25,7 +25,7 @@ namespace ROAMutils {
 
 std::string StringUtils::writeNiceTimestamp(double t) {
 	std::stringstream s;
-	s << std::fixed << fmod(t, 100);
+	s << std::fixed << t;
 	return s.str();
 }
 

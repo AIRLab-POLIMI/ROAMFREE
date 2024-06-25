@@ -384,6 +384,7 @@ Run["python ../fixMathematicaOutput_v2.py PlaneDynamicModel_JErrWindZ.mthout J 0
 
 Run["python ../fixMathematicaOutput_v2.py PlaneDynamicModel_predictor.mthout xhat 0 0"];
 
+Run["python ../fixMathematicaOutput_v2.py PlaneDynamicModel_Err.mthout err 0 1"];
 
 
 Run["mv *.cppready ../../../roamfree/ROAMfunctions/generated"]
