@@ -40,6 +40,7 @@ Contributors:
 #include "PoseDerivativeM.h"
 #include "LiDARTieFeaturesM.h"
 #include "VectorFieldM.h"
+#include "AbsoluteVelocityM.h"
 
 #endif /* ALLFUNCTIONS_H_ */
 

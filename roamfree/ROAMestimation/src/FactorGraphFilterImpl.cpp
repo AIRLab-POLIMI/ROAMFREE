@@ -233,6 +233,9 @@ bool FactorGraphFilter_Impl::addSensor(const string& name, MeasTypes type,
   case LiDARTieFeatures:
       s.order = LiDARTieFeaturesM::_ORDER;
       break;
+  case AbsoluteVelocity:
+      s.order = AbsoluteVelocityM::_ORDER;
+      break;
   default:
     cerr << "[FactorGraphFilter] Error: unknown measurement type" << endl;
     break;
@@ -1386,7 +1389,9 @@ GenericEdgeInterface *FactorGraphFilter_Impl::addMeasurement_i(
   case LiDARTieFeatures:
       e =  new QuaternionGenericEdge<LiDARTieFeaturesM>;
       break;
-    
+  case AbsoluteVelocity:
+      e = new QuaternionGenericEdge<AbsoluteVelocityM>;
+      break;    
   default:
     cerr << "[FactorGraphFilter] Error: unknown measurement type" << endl;
     return NULL;

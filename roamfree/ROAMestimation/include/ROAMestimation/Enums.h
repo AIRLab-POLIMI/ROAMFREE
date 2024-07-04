@@ -45,7 +45,8 @@ enum MeasTypes {
   PlanarConstraint,
   QuadDynamicModel,
   PoseDerivative,
-  LiDARTieFeatures
+  LiDARTieFeatures,
+  AbsoluteVelocity
 };
 
 enum ParameterTypes {
