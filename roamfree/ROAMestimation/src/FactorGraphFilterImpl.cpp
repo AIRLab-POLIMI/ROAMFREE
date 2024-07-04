@@ -233,6 +233,9 @@ bool FactorGraphFilter_Impl::addSensor(const string& name, MeasTypes type,
   case LiDARTieFeatures:
       s.order = LiDARTieFeaturesM::_ORDER;
       break;
+  case LiDAR2ImgTieFeatures:
+      s.order = LiDAR2ImageProjectionTieFeatureM::_ORDER;
+      break;
   case AbsoluteVelocity:
       s.order = AbsoluteVelocityM::_ORDER;
       break;
@@ -320,6 +323,11 @@ bool FactorGraphFilter_Impl::shareParameter(const string &from,
   }
 
   _params[to] = toshare->second;
+
+#ifdef DEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES
+  cerr << "[FactorGraphFilter] Info: Parameter'" << from << "' connected to '" << to << "'."
+       << endl;
+#endif
 
   return true;
 }
@@ -1388,6 +1396,9 @@ GenericEdgeInterface *FactorGraphFilter_Impl::addMeasurement_i(
       break;
   case LiDARTieFeatures:
       e =  new QuaternionGenericEdge<LiDARTieFeaturesM>;
+      break;
+  case LiDAR2ImgTieFeatures:
+      e =  new QuaternionGenericEdge<LiDAR2ImageProjectionTieFeatureM>;
       break;
   case AbsoluteVelocity:
       e = new QuaternionGenericEdge<AbsoluteVelocityM>;

@@ -46,6 +46,7 @@ enum MeasTypes {
   QuadDynamicModel,
   PoseDerivative,
   LiDARTieFeatures,
+  LiDAR2ImgTieFeatures,
   AbsoluteVelocity
 };
 

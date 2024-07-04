@@ -39,6 +39,7 @@ Contributors:
 #include "PlaneDynamicModelM.h"
 #include "PoseDerivativeM.h"
 #include "LiDARTieFeaturesM.h"
+#include "Lidar2ImageProjectionTieFeatureM.h"
 #include "VectorFieldM.h"
 #include "AbsoluteVelocityM.h"
 
