@@ -1544,6 +1544,83 @@ PoseVertex* FactorGraphFilter_Impl::getNearestPoseByTimestamp_i(double t,
   }
 }
 
+std::pair<PoseVertexWrapper_Ptr,PoseVertexWrapper_Ptr> FactorGraphFilter_Impl::getNearestTwoPoseByTimestamp(
+    double t) {
+
+  std::pair<PoseVertex*,PoseVertex*> pose_pair = getNearestTwoPoseByTimestamp_i(t);
+
+  PoseVertexWrapper_Ptr closest, closestSecond;
+
+  if(pose_pair.first != NULL)
+  {
+    closest = PoseVertexWrapper_Ptr(new PoseVertexWrapper_Impl(pose_pair.first));
+  }
+  else
+  {
+    closest = NULL;
+  }
+
+  if(pose_pair.second != NULL)
+  {
+    closestSecond = PoseVertexWrapper_Ptr(new PoseVertexWrapper_Impl(pose_pair.second));
+  }
+  else
+  {
+    closestSecond = NULL;
+  }
+
+  return std::make_pair(closest, closestSecond);
+}
+
+std::pair<PoseVertex*,PoseVertex*> FactorGraphFilter_Impl::getNearestTwoPoseByTimestamp_i(double t) {
+
+  if (_poses.size() == 0) {
+    return std::make_pair(nullptr,nullptr);
+  }
+
+
+  PoseMapIterator after;
+  after = _poses.upper_bound(t);
+
+  if (after == _poses.begin()) {
+    return std::make_pair(after->second, after->second);
+  }
+
+  PoseMapIterator before = after;
+  --before;
+
+  PoseMapIterator closest;
+
+  if (after == _poses.end())
+  {
+    closest = before;
+  }
+  else
+  {
+    double t_before = before->second->getTimestamp();
+    double t_after = after->second->getTimestamp();
+    
+    if(t-t_before>t-t_after)
+    {
+      closest = after;
+    }
+    else
+    {
+      closest = before;
+    }
+  }  
+
+  if(closest==_poses.begin())
+  {
+    return std::make_pair(closest->second, closest->second);
+  }
+
+  PoseMapIterator closestSecond = closest;
+  --closestSecond;
+
+  return std::make_pair(closest->second, closestSecond->second);
+}
+
 PoseVertexWrapper_Ptr FactorGraphFilter_Impl::getNewestPose() {
   PoseVertex *last = getNewestPose_i();
 

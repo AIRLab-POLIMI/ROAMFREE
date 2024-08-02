@@ -174,6 +174,9 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
     PoseVertexWrapper_Ptr getNearestPoseByTimestamp(double t, bool onlyBefore =
         false);
 
+    std::pair<PoseVertexWrapper_Ptr,PoseVertexWrapper_Ptr> getNearestTwoPoseByTimestamp(
+    double t);
+
     PoseVertexWrapperVector_Ptr getNeighbourPosesByDistance(
         PoseVertexWrapper_Ptr sample, double d);
 
@@ -271,6 +274,7 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
     PoseVertex *getNthOldestPose_i(int n);
 
     PoseVertex *getNearestPoseByTimestamp_i(double t, bool onlyBefore = false);
+    std::pair<PoseVertex*,PoseVertex*> getNearestTwoPoseByTimestamp_i(double t);
 
     bool checkSensorOrder(const struct Sensor &sensor, const PoseVertex *v2,
         const PoseVertex *v1, const PoseVertex *v0);

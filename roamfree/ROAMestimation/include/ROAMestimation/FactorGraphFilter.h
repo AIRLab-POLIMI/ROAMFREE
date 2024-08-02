@@ -465,6 +465,15 @@ class FactorGraphFilter {
      */
     virtual PoseVertexWrapper_Ptr getNearestPoseByTimestamp(double t,
         bool onlyBefore = false) = 0;
+    
+    /**
+     * \brief returns the two pose whose timestamp is nearer with respect to t
+     *
+     * @param t the searched timestamp
+     *
+     * @return a pair of wrappers to the pose vertex found, or NULL if there are no poses in the graph
+     */
+    virtual std::pair<PoseVertexWrapper_Ptr,PoseVertexWrapper_Ptr> getNearestTwoPoseByTimestamp(double t) = 0;
 
     /**
      *  \brief perform a spatial query
