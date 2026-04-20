@@ -6,7 +6,7 @@ which accompanies this distribution, and is available at
 https://www.gnu.org/licenses/lgpl.html
 
 Contributors:
-    Davide A. Cucci (davide.cucci@epfl.ch)    
+    Davide A. Cucci (davide.cucci@epfl.ch)
 */
 
 /*
@@ -26,6 +26,7 @@ Contributors:
 #include "Eucl3DGaussMarkovProcessEdge.h"
 #include "Eucl3DPriorEdge.h"
 #include "Eucl4DPriorEdge.h"
+#include "Eucl6DPriorEdge.h"
 #include "QuaternionPriorEdge.h"
 #include "SE3PriorEdge.h"
 #include "Matrix3DPriorEdge.h"

@@ -6,7 +6,7 @@ which accompanies this distribution, and is available at
 https://www.gnu.org/licenses/lgpl.html
 
 Contributors:
-    Davide A. Cucci (davide.cucci@epfl.ch)    
+    Davide A. Cucci (davide.cucci@epfl.ch)
 */
 
 /*
@@ -25,6 +25,7 @@ Contributors:
 #include "Eucl2DV.h"
 #include "Eucl3DV.h"
 #include "Eucl4DV.h"
+#include "Eucl6DV.h"
 #include "MagParamsV.h"
 #include "Matrix3DV.h"
 #include "PlaneDynamicModelM.h"

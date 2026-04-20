@@ -56,6 +56,7 @@ enum ParameterTypes {
   Euclidean2D,
   Euclidean3D,
   Euclidean4D,
+  Euclidean6D,
   Quaternion,
   Matrix3D,
   SE3,
@@ -67,6 +68,7 @@ enum PriorEdgeTypes {
   Euclidean2DPrior,
   Euclidean3DPrior,
   Euclidean4DPrior,
+  Euclidean6DPrior,
   QuaternionPrior,
   SE3Prior,
   FHPPriorOnHomogeneousPoint

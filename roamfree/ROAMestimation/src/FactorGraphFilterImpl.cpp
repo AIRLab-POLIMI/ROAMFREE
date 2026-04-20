@@ -537,6 +537,9 @@ MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnConstantParameter(
   case Euclidean4DPrior:
     priorif = new Eucl4DPriorEdge;
     break;
+  case Euclidean6DPrior:
+    priorif = new Eucl6DPriorEdge;
+    break;
   case QuaternionPrior:
     priorif = new QuaternionPriorEdge;
     break;

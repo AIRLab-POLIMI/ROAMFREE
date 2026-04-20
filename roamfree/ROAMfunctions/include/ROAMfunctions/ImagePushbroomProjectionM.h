@@ -24,6 +24,10 @@
 
 #include <iostream>
 
+namespace Eigen {
+  typedef Matrix<double, 6, 1> Vector6d;
+}
+
 namespace ROAMfunctions {
 
 class ImagePushbroomProjectionM {
