@@ -71,7 +71,8 @@ class EuclideanFeatureHandler: public ImageFeatureHandler {
 	const Eigen::VectorXd & T_OS,
 	const Eigen::VectorXd & K,
 	const Eigen::VectorXd & AD,
-	const Eigen::VectorXd & ND);
+	const Eigen::VectorXd & ND,
+	const double sensorWidth);
 
     virtual bool addFeatureObservation(long int id, double t,
         const Eigen::VectorXd &z, const Eigen::MatrixXd &cov, bool dontInitialize = true);

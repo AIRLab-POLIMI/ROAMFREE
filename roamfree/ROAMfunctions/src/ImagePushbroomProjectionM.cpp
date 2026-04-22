@@ -22,6 +22,6 @@ Contributors:
 namespace ROAMfunctions {
 const bool ImagePushbroomProjectionM::_usedComponents[] = {true, true, false, false, false, false, false, false, false, false, false, false};
 
-const std::string ImagePushbroomProjectionM::_paramsNames[] = {"Lw", "CM", "AD", "ND"};
+const std::string ImagePushbroomProjectionM::_paramsNames[] = {"Lw", "CM", "AD", "ND", "SW"};
 
 } /* namespace ROAMfunctions */

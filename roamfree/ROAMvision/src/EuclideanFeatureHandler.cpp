@@ -114,7 +114,8 @@ bool EuclideanFeatureHandler::init(FactorGraphFilter *f, const string &name,
 				   const Eigen::VectorXd & T_OS,
 				   const Eigen::VectorXd & K,
 				   const Eigen::VectorXd & AD,
-				   const Eigen::VectorXd & ND) {
+				   const Eigen::VectorXd & ND,
+				   const double sensorWidth) {
   _filter = f;
   _sensorName = name;
   _camera_model = CAMERA_MODEL_PUSHBROOM;
@@ -128,6 +129,8 @@ bool EuclideanFeatureHandler::init(FactorGraphFilter *f, const string &name,
   K_par = _filter->addConstantParameter(Euclidean2D, _sensorName + "_Cam_CM", K, true);
   _filter->addConstantParameter(Euclidean6D, _sensorName + "_Cam_AD", AD, true);
   _filter->addConstantParameter(Euclidean6D, _sensorName + "_Cam_ND", ND, true);
+  _filter->addConstantParameter(_sensorName + "_Cam_SW", sensorWidth, true);
+  cerr << " * Sensor width is " << sensorWidth << endl;
 
   _updateFeaturePriorAction = new UpdateFeaturePriorAction(this);
   _filter->addPostIterationAction(_updateFeaturePriorAction);
@@ -255,6 +258,7 @@ bool EuclideanFeatureHandler::initializeFeature_i(EuclideanTrackDescriptor &d, l
       _filter->shareParameter(_sensorName + "_Cam_CM", sensor + "_CM");
       _filter->shareParameter(_sensorName + "_Cam_AD", sensor + "_AD");
       _filter->shareParameter(_sensorName + "_Cam_ND", sensor + "_ND");
+      _filter->shareParameter(_sensorName + "_Cam_SW", sensor + "_SW");
       break;
     }
 
