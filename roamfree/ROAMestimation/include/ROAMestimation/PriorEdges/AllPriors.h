@@ -26,6 +26,7 @@ Contributors:
 #include "Eucl3DGaussMarkovProcessEdge.h"
 #include "Eucl3DPriorEdge.h"
 #include "Eucl4DPriorEdge.h"
+#include "Eucl5DPriorEdge.h"
 #include "Eucl6DPriorEdge.h"
 #include "QuaternionPriorEdge.h"
 #include "SE3PriorEdge.h"

@@ -25,6 +25,7 @@ Contributors:
 #include "Eucl2DV.h"
 #include "Eucl3DV.h"
 #include "Eucl4DV.h"
+#include "Eucl5DV.h"
 #include "Eucl6DV.h"
 #include "MagParamsV.h"
 #include "Matrix3DV.h"

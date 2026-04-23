@@ -69,6 +69,13 @@ g2o::OptimizableGraph::Vertex * ParameterVerticesManager::newVertex(
     gv->setTimestamp(tstamp);
   }
     break;
+  case Euclidean5D: {
+    GenericVertex<Eucl5DV> *gv = new GenericVertex<Eucl5DV>;
+    v = gv;
+    v2 = gv;
+    gv->setTimestamp(tstamp);
+  }
+    break;
   case Euclidean6D: {
     GenericVertex<Eucl6DV> *gv = new GenericVertex<Eucl6DV>;
     v = gv;
