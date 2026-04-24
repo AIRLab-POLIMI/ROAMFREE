@@ -127,7 +127,7 @@ bool EuclideanFeatureHandler::init(FactorGraphFilter *f, const string &name,
   qOS_par = _filter->addConstantParameter(Quaternion, _sensorName + "_Cam_qOS", qOS, true);
 
   K_par = _filter->addConstantParameter(Euclidean2D, _sensorName + "_Cam_CM", K, true);
-  _filter->addConstantParameter(Euclidean5D, _sensorName + "_Cam_AD", AD, true);
+  _filter->addConstantParameter(Euclidean6D, _sensorName + "_Cam_AD", AD, true);
   _filter->addConstantParameter(Euclidean6D, _sensorName + "_Cam_ND", ND, true);
   _filter->addConstantParameter(_sensorName + "_Cam_SW", sensorWidth, true);
   cerr << " * Sensor width is " << sensorWidth << endl;
