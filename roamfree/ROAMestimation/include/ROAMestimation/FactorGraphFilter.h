@@ -529,8 +529,9 @@ class FactorGraphFilter {
      * according to their 'fixed' property
      *
      * @param nIterations the number of Gauss-Newton/Levenberg-Marquardt iteration to perform.
+     * @param includeFixedPoses whether to include edges from fixed poses (e.g. to estimate auxilliary parameters)
      */
-    virtual bool estimate(int nIterations) = 0;
+    virtual bool estimate(int nIterations, bool includeFixedPoses=false) = 0;
 
     /**
      *  \brief runs the estimations considering the markov blanket of the provided pose vector

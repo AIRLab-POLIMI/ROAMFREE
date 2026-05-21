@@ -1737,7 +1737,7 @@ PoseVertex *FactorGraphFilter_Impl::getNthOldestPose_i(int n) {
   }
 }
 
-bool FactorGraphFilter_Impl::estimate(int nIterations) {
+bool FactorGraphFilter_Impl::estimate(int nIterations, bool includeFixedPoses) {
 
 // we handle priors only in case of full estimation
   handlePriorsOnOldestPose();
@@ -1748,7 +1748,7 @@ bool FactorGraphFilter_Impl::estimate(int nIterations) {
 
   g2o::HyperGraph::EdgeSet eset;
   for (auto pit = _poses.begin(); pit != _poses.end(); ++pit) {
-    if (!pit->second->fixed()) {
+    if (!pit->second->fixed() || includeFixedPoses) {
       eset.insert(pit->second->edges().begin(), pit->second->edges().end());
     }
   }
