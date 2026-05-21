@@ -190,7 +190,7 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
 
     /* --------------------------- ESTIMATION CONTROM METHODS ------------------------- */
 
-    bool estimate(int nIterations);
+    bool estimate(int nIterations, bool includeFixedPoses=false);
 
     bool estimate(PoseVertexWrapperVector poses, int nIterations);
     
