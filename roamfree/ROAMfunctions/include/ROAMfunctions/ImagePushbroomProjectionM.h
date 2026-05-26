@@ -24,10 +24,6 @@
 
 #include <iostream>
 
-namespace Eigen {
-   typedef Matrix<double, 6, 1> Vector6d;
-}
-
 namespace ROAMfunctions {
 
 class ImagePushbroomProjectionM {
@@ -62,8 +58,8 @@ class ImagePushbroomProjectionM {
 
       Eigen::Map<Eigen::Vector3d> lw(params[0]);
       Eigen::Map<Eigen::Vector2d> cm(params[1]);
-      Eigen::Map<Eigen::Vector6d> ad(params[2]);
-      Eigen::Map<Eigen::Vector6d> nd(params[3]);
+      Eigen::Map<Eigen::Vector4d> ad(params[2]);
+      Eigen::Map<Eigen::Vector4d> nd(params[3]);
       Eigen::Map<Eigen::Matrix<double, 1, 1>> sw(params[4]);
 
       Eigen::MatrixBase<T> & err = const_cast<Eigen::MatrixBase<T>&>(const_ret);
@@ -82,8 +78,8 @@ class ImagePushbroomProjectionM {
 
       Eigen::Map<Eigen::Vector3d> lw(params[0]);
       Eigen::Map<Eigen::Vector2d> cm(params[1]);
-      Eigen::Map<Eigen::Vector6d> ad(params[2]);
-      Eigen::Map<Eigen::Vector6d> nd(params[3]);
+      Eigen::Map<Eigen::Vector4d> ad(params[2]);
+      Eigen::Map<Eigen::Vector4d> nd(params[3]);
       Eigen::Map<Eigen::Matrix<double, 1, 1>> sw(params[4]);
 
       Eigen::MatrixBase<T> & J = const_cast<Eigen::MatrixBase<T>&>(const_ret);
