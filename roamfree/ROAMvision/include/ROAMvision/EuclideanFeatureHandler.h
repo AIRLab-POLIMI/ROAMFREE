@@ -35,6 +35,11 @@ enum CameraModel {
   CAMERA_MODEL_PUSHBROOM,
 };
 
+enum PushbroomBasis {
+  PUSHBROOM_BASIS_REGULAR,
+  PUSHBROOM_BASIS_LEGENDRE,
+};
+
 class UpdateFeaturePriorAction;
 
 class EuclideanFeatureHandler: public ImageFeatureHandler {
@@ -72,7 +77,8 @@ class EuclideanFeatureHandler: public ImageFeatureHandler {
 	const Eigen::VectorXd & K,
 	const Eigen::VectorXd & AD,
 	const Eigen::VectorXd & ND,
-	const double sensorWidth);
+	const double sensorWidth,
+	const PushbroomBasis basis);
 
     virtual bool addFeatureObservation(long int id, double t,
         const Eigen::VectorXd &z, const Eigen::MatrixXd &cov, bool dontInitialize = true);
@@ -130,6 +136,7 @@ class EuclideanFeatureHandler: public ImageFeatureHandler {
     double _huber_width;
 
     CameraModel _camera_model;
+    PushbroomBasis _pushbroom_basis;
 };
 
 } /* namespace ROAMvision */

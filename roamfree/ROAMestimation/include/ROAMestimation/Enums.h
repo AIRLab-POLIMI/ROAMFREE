@@ -40,6 +40,7 @@ enum MeasTypes {
   FixedFeaturePose,
   ImagePlaneProjection,
   ImagePushbroomProjection,
+  ImagePushbroomProjectionLegendre,
   FramedHomogeneousPoint,
   IMUintegralDeltaP,
   IMUintegralDeltaQ,

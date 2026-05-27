@@ -32,6 +32,7 @@ Contributors:
 #include "FixedFeaturePoseM.h"
 #include "ImagePlaneProjectionM.h"
 #include "ImagePushbroomProjectionM.h"
+#include "ImagePushbroomProjectionLegendreM.h"
 #include "FramedHomogeneousPointM.h"
 #include "DisplacementM.h"
 #include "IMUIntegralDeltaPM.h"

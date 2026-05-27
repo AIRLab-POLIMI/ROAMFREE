@@ -221,6 +221,9 @@ bool FactorGraphFilter_Impl::addSensor(const string& name, MeasTypes type,
   case ImagePushbroomProjection:
     s.order = ImagePushbroomProjectionM::_ORDER;
     break;
+  case ImagePushbroomProjectionLegendre:
+    s.order = ImagePushbroomProjectionLegendreM::_ORDER;
+    break;
   case FramedHomogeneousPoint:
     s.order = FramedHomogeneousPointM::_ORDER;
     break;
@@ -1398,6 +1401,9 @@ GenericEdgeInterface *FactorGraphFilter_Impl::addMeasurement_i(
   case ImagePushbroomProjection:
     e = new QuaternionGenericEdge<ImagePushbroomProjectionM>;
     break;
+  case ImagePushbroomProjectionLegendre:
+    e = new QuaternionGenericEdge<ImagePushbroomProjectionLegendreM>;
+    break;
   case FramedHomogeneousPoint:
     e = new QuaternionGenericEdge<FramedHomogeneousPointM>;
     break;
@@ -2317,7 +2323,8 @@ map<string, EstimationStats> FactorGraphFilter_Impl::getEstimationStats() {
 
       // in this case it would be e.g. Camera_featXXXX, cut away after _
       if (dynamic_cast< QuaternionGenericEdge<ImagePlaneProjectionM> *>(ei) != NULL ||
-	  dynamic_cast< QuaternionGenericEdge<ImagePushbroomProjectionM> *>(ei) != NULL) {
+	  dynamic_cast< QuaternionGenericEdge<ImagePushbroomProjectionM> *>(ei) != NULL ||
+	  dynamic_cast< QuaternionGenericEdge<ImagePushbroomProjectionLegendreM> *>(ei) != NULL) {
         category = category.substr(0, category.find_last_of("_"));
       } else {
         category = ei->getCategory();

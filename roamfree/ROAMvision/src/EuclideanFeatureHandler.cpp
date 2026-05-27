@@ -115,10 +115,12 @@ bool EuclideanFeatureHandler::init(FactorGraphFilter *f, const string &name,
 				   const Eigen::VectorXd & K,
 				   const Eigen::VectorXd & AD,
 				   const Eigen::VectorXd & ND,
-				   const double sensorWidth) {
+				   const double sensorWidth,
+				   const PushbroomBasis basis) {
   _filter = f;
   _sensorName = name;
   _camera_model = CAMERA_MODEL_PUSHBROOM;
+  _pushbroom_basis = basis;
 
   Eigen::VectorXd SO = T_OS.head(3);
   Eigen::VectorXd qOS = T_OS.tail(4);
@@ -222,8 +224,19 @@ bool EuclideanFeatureHandler::initializeFeature_i(EuclideanTrackDescriptor &d, l
       _filter->addSensor(sensor, ImagePlaneProjection, false, true);
       break;
     case CAMERA_MODEL_PUSHBROOM:
-      _filter->addSensor(sensor, ImagePushbroomProjection, false, true);
+      switch (_pushbroom_basis) {
+      case PUSHBROOM_BASIS_REGULAR:
+	_filter->addSensor(sensor, ImagePushbroomProjection, false, true);
+	break;
+      case PUSHBROOM_BASIS_LEGENDRE:
+	_filter->addSensor(sensor, ImagePushbroomProjectionLegendre, false, true);
+	break;
+      default:
+	assert(false);
+      }
       break;
+    default:
+      assert(false);
     }
 
     // it does not work, there is no sensor called _sensorName + "_Cam"
