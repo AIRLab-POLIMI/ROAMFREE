@@ -47,7 +47,7 @@ class FactorGraphFilter {
     virtual void setSolverMethod(SolverMethod method) = 0;
 
     /**
-     *  \brief Set the threshold for early stopping estimation if chi2 does not improve more than 
+     *  \brief Set the threshold for early stopping estimation if chi2 does not improve more than
      */
     virtual void setChi2Threshold(double threshold) = 0;
 
@@ -407,6 +407,16 @@ class FactorGraphFilter {
      */
     virtual bool forgetOldNodes(double l) = 0;
 
+
+    /**
+     * \brief Fix or unfix all poses
+     *
+     * All poses in the graph will be fixed or unfixed. Note that this does not affect
+     * subsequent poses (they will be unfixed by default).
+     *
+     * @param fixed whether to fix or unfix the poses
+     */
+    virtual void setAllPosesFixed(bool fixed) = 0;
     /* --------------------------- PRIOR CONTROL METHODS ------------------------------ */
 
     /**
@@ -465,7 +475,7 @@ class FactorGraphFilter {
      */
     virtual PoseVertexWrapper_Ptr getNearestPoseByTimestamp(double t,
         bool onlyBefore = false) = 0;
-    
+
     /**
      * \brief returns the two pose whose timestamp is nearer with respect to t
      *
@@ -543,13 +553,13 @@ class FactorGraphFilter {
      * @param nIterations the number of Gauss-Newton/Levenberg-Marquardt iteration to perform.
      */
     virtual bool estimate(PoseVertexWrapperVector poses, int nIterations) = 0;
-    
+
     /**
      *  \brief compytes the cross correlation covariances between the parameters
      */
-    
+
     virtual void computeCrossCovariances() = 0;
-    
+
     virtual ~FactorGraphFilter() {
     }
 };

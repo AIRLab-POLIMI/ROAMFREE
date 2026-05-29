@@ -156,6 +156,8 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
 
     bool forgetOldNodes(double l);
 
+    void setAllPosesFixed(bool fixed);
+
     /* --------------------------- PRIOR CONTROL METHODS ------------------------------ */
 
     MeasurementEdgeWrapper_Ptr addPriorOnPose(PoseVertexWrapper_Ptr pose,
