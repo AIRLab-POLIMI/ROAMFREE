@@ -2009,6 +2009,12 @@ bool FactorGraphFilter_Impl::forgetOldNodes(double l) {
   return forgetNodes_i(toForget);
 }
 
+void FactorGraphFilter_Impl::setAllPosesFixed(bool fixed) {
+    for(PoseMapIterator it = _poses.begin(); it != _poses.end(); ++it) {
+	it->second->setFixed(fixed);
+    }
+}
+
 void FactorGraphFilter_Impl::deferMeasurement(struct Sensor& sensor, double t,
     const Eigen::VectorXd& z, const Eigen::MatrixXd& cov) {
   struct Measurement meas(sensor, t, z, cov);
