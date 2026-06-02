@@ -21,6 +21,7 @@
 
 #include <string>
 #include <vector>
+#include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include <Eigen/Dense>
@@ -407,6 +408,25 @@ class FactorGraphFilter {
      */
     virtual bool forgetOldNodes(double l) = 0;
 
+    /**
+     * \brief Set the trajectory estimate
+     *
+     * This overload takes a function returning the pose estimate for every timestep
+     *
+     * @param trajectory a function returning the pose estimate for every timestep;
+     */
+    virtual void setTrajectoryEstimate(boost::function<Eigen::VectorXd (double, const Eigen::VectorXd*)> trajectoryFunc) = 0;
+
+    /**
+     * \brief Set the trajectory estimate
+     *
+     * This overload takes a map from timestamps to pose estimates. This will be interpolated if a pose is not provided
+     * closer than 1e-6 second from the required timestamp
+     *
+     * @param trajectory a function returning the pose estimate for every timestep;
+     * @return success
+     */
+    virtual bool setTrajectoryEstimate(std::map<double, Eigen::VectorXd>) = 0;
 
     /**
      * \brief Fix or unfix all poses
