@@ -1,0 +1,16 @@
+double tmp0 = sw(1+_OFF);
+double tmp1 = z(1+_OFF);
+double tmp2 = std::pow(tmp0,2);
+double tmp3 = std::pow(tmp1,2);
+double tmp4 = std::pow(tmp0,3);
+double tmp5 = std::pow(tmp1,3);
+double tmp6 = std::pow(tmp0,4);
+double tmp7 = std::pow(tmp1,4);
+J(1+_OFF,1+_OFF) = 0;
+J(1+_OFF,2+_OFF) = 0;
+J(1+_OFF,3+_OFF) = 0;
+J(1+_OFF,4+_OFF) = 0;
+J(2+_OFF,1+_OFF) = (-1.*(tmp2 - 6.*tmp0*tmp1 + 6.*tmp3))/std::pow(tmp0,2);
+J(2+_OFF,2+_OFF) = (tmp4 - 12.*tmp2*tmp1 + 30.*tmp0*tmp3 - 20.*tmp5)/std::pow(tmp0,3);
+J(2+_OFF,3+_OFF) = (-1.*(tmp6 - 20.*tmp4*tmp1 + 90.*tmp2*tmp3 - 140.*tmp0*tmp5 + 70.*tmp7))/std::pow(tmp0,4);
+J(2+_OFF,4+_OFF) = (std::pow(tmp0,5) - 30.*tmp6*tmp1 + 210.*tmp4*tmp3 - 560.*tmp2*tmp5 + 630.*tmp0*tmp7 - 252.*std::pow(tmp1,5))/std::pow(tmp0,5);

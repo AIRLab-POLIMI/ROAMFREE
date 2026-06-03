@@ -6,6 +6,7 @@ project(roamfree)
 
 option (DEBUG_WO_MESSAGES "Do not print messaged even in debug mode" OFF)
 option (DEBUG_W_ANALITIC_JAC "Still use analytic jacobian " ON)
+option (DEBUG_G2O_VERBOSE "Print debug information from optimizer" OFF)
 
 if(catkin_FOUND)
         catkin_package(INCLUDE_DIRS ROAMimu/include ROAMestimation/include ROAMvision/include
@@ -62,8 +63,8 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 
 # ----------------------- GCC FLAGS ----------------------------
 
-set(CMAKE_CXX_FLAGS_DEBUG "-std=c++11 -g3 ${OTHERS_DEFINE}")
-set(CMAKE_CXX_FLAGS_RELEASE "-std=c++11 -O3 ${OTHERS_DEFINE}")
+#set(CMAKE_CXX_FLAGS_DEBUG "-std=c++11 -g3 ${OTHERS_DEFINE}")
+#set(CMAKE_CXX_FLAGS_RELEASE "-std=c++11 -O3 ${OTHERS_DEFINE}")
 
 
 if(CMAKE_BUILD_TYPE MATCHES Debug)
@@ -95,23 +96,23 @@ if(CMAKE_BUILD_TYPE MATCHES Debug)
         # check if Jacobians are properly initialized in GLC factory
         add_definitions( -DDEBUG_ARE_ALL_JACOBIANS_INITIALIZED )
 
-        # the g2o optimizer constructor verbose flag
-        add_definitions( -DDEBUG_G2O_OPTIMIZER_VERBOSE=1 )
-
-        # disable OpenMP in g2o TODO check message
+         # disable OpenMP in g2o TODO check message
         set( G2O_USE_OPENMP OFF CACHE BOOL "Build g2o with OpenMP support (EXPERIMENTAL)" FORCE)
 
         set(BUILD_TYPE_MSG "Debug")
 
 else()
-        add_definitions( -DDEBUG_G2O_OPTIMIZER_VERBOSE=0 )
-
         #enable OpenMP in g2o
         set( G2O_USE_OPENMP ON CACHE BOOL "Build g2o with OpenMP support (EXPERIMENTAL)" FORCE)
 
         set(BUILD_TYPE_MSG "Release")
 endif()
 
+if(DEBUG_G2O_VERBOSE)
+        add_definitions( -DDEBUG_G2O_OPTIMIZER_VERBOSE=1 )
+else()
+	add_definitions( -DDEBUG_G2O_OPTIMIZER_VERBOSE=0 )
+endif()
 
 # -------------------------------------------------------------
 

@@ -1,0 +1,13 @@
+double tmp0 = sw(1+_OFF);
+double tmp1 = 1/tmp0;
+double tmp2 = z(1+_OFF);
+double tmp3 = tmp1*tmp2;
+double tmp4 = -0.5 + tmp3;
+J(1+_OFF,1+_OFF) = 0;
+J(1+_OFF,2+_OFF) = 0;
+J(1+_OFF,3+_OFF) = 0;
+J(1+_OFF,4+_OFF) = 0;
+J(2+_OFF,1+_OFF) = -std::pow(tmp4,2);
+J(2+_OFF,2+_OFF) = -std::pow(tmp4,3);
+J(2+_OFF,3+_OFF) = -std::pow(tmp4,4);
+J(2+_OFF,4+_OFF) = -std::pow(tmp4,5);

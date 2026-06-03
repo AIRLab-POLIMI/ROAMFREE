@@ -6,7 +6,7 @@ which accompanies this distribution, and is available at
 https://www.gnu.org/licenses/lgpl.html
 
 Contributors:
-    Davide A. Cucci (davide.cucci@epfl.ch)    
+    Davide A. Cucci (davide.cucci@epfl.ch)
 */
 
 /*
@@ -31,6 +31,8 @@ Contributors:
 #include "FixedFeaturePositionM.h"
 #include "FixedFeaturePoseM.h"
 #include "ImagePlaneProjectionM.h"
+#include "ImagePushbroomProjectionM.h"
+#include "ImagePushbroomProjectionLegendreM.h"
 #include "FramedHomogeneousPointM.h"
 #include "DisplacementM.h"
 #include "IMUIntegralDeltaPM.h"
@@ -44,4 +46,3 @@ Contributors:
 #include "AbsoluteVelocityM.h"
 
 #endif /* ALLFUNCTIONS_H_ */
-

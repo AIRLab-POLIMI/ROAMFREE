@@ -23,6 +23,7 @@
 #include <string>
 
 #include <boost/shared_ptr.hpp>
+#include <boost/function.hpp>
 #include <Eigen/Dense>
 
 #include "FactorGraphFilter.h"
@@ -128,12 +129,12 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
         const std::string &name, ParameterWrapperVector_Ptr toblend);
 
     ParameterWrapper_Ptr getParameterByName(const std::string &name);
-    
+
     /* --------------------------- POSES AND EDGES LEVEL METHODS ---------------------- */
 
     PoseVertexWrapper_Ptr addPose(double t);
 
-    PoseVertexWrapper_Ptr addInterpolatingPose(double t, ParameterWrapper_Ptr delayParam, 
+    PoseVertexWrapper_Ptr addInterpolatingPose(double t, ParameterWrapper_Ptr delayParam,
         const Eigen::MatrixXd &pseudoObsCov);
 
     MeasurementEdgeWrapper_Ptr addMeasurement(const std::string& sensorName,
@@ -155,6 +156,10 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
     bool marginalizeOldNodes(double l);
 
     bool forgetOldNodes(double l);
+
+    void setTrajectoryEstimate(boost::function<Eigen::VectorXd (double, const Eigen::VectorXd*)> trajectoryFunc);
+    bool setTrajectoryEstimate(std::map<double, Eigen::VectorXd>);
+    void setAllPosesFixed(bool fixed);
 
     /* --------------------------- PRIOR CONTROL METHODS ------------------------------ */
 
@@ -190,10 +195,10 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
 
     /* --------------------------- ESTIMATION CONTROM METHODS ------------------------- */
 
-    bool estimate(int nIterations);
+    bool estimate(int nIterations, bool includeFixedPoses=false);
 
     bool estimate(PoseVertexWrapperVector poses, int nIterations);
-    
+
     void computeCrossCovariances();
     /* --------------------------- OTHER STUFF ---------------------------------------- */
 
@@ -226,7 +231,7 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
     ROAMlog::GraphLogger *_logger; //!< the object which handles low level logging
     std::string _logFolder;
 
-    SpatialIndex *_spatialIndex; //!< the object which maintains spatial informations about poses.    
+    SpatialIndex *_spatialIndex; //!< the object which maintains spatial informations about poses.
 
     /* --------------------------- STUFF FOR SENSORS ------------------------------- */
 
@@ -252,7 +257,7 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
 
     //! collection for the parameter descriptors
     std::map<std::string, boost::shared_ptr<ParameterVerticesManager> > _params;
-    
+
 
     /* --------------------------- STUFF FOR POSES AND MEASUREMENTS ------------------- */
 

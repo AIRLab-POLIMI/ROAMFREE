@@ -69,6 +69,20 @@ g2o::OptimizableGraph::Vertex * ParameterVerticesManager::newVertex(
     gv->setTimestamp(tstamp);
   }
     break;
+  case Euclidean5D: {
+    GenericVertex<Eucl5DV> *gv = new GenericVertex<Eucl5DV>;
+    v = gv;
+    v2 = gv;
+    gv->setTimestamp(tstamp);
+  }
+    break;
+  case Euclidean6D: {
+    GenericVertex<Eucl6DV> *gv = new GenericVertex<Eucl6DV>;
+    v = gv;
+    v2 = gv;
+    gv->setTimestamp(tstamp);
+  }
+    break;
   case Quaternion: {
     GenericVertex<QuaternionV> *gv = new GenericVertex<QuaternionV>;
     v = gv;
@@ -224,7 +238,7 @@ g2o::OptimizableGraph::Edge* ParameterVerticesManager::addRandomWalkProcessEdge(
 
     break;
   }
-  
+
   default:
     std::cerr
         << "[ParameterVerticesManager] Error: non implemented for this parameter type"
@@ -290,7 +304,7 @@ g2o::OptimizableGraph::Edge* ParameterVerticesManager::addGaussMarkovProcessEdge
 
     break;
   }
-  
+
   default:
     std::cerr
         << "[ParameterVerticesManager] Error: non implemented for this parameter type"

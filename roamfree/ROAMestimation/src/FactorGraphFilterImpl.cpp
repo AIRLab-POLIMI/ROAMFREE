@@ -81,7 +81,7 @@ void FactorGraphFilter_Impl::initSolver() {
   _optimizer = g2oSolverFactory::getNewSolver();
   _optimizer->setVerbose(DEBUG_G2O_OPTIMIZER_VERBOSE);
 
-  _optimizer->setForceStopFlag(&_stopFlag);  
+  _optimizer->setForceStopFlag(&_stopFlag);
   _optimizer->addPostIterationAction(_stopAction);
 
   // default solver is GaussNewton
@@ -218,6 +218,12 @@ bool FactorGraphFilter_Impl::addSensor(const string& name, MeasTypes type,
   case ImagePlaneProjection:
     s.order = ImagePlaneProjectionM::_ORDER;
     break;
+  case ImagePushbroomProjection:
+    s.order = ImagePushbroomProjectionM::_ORDER;
+    break;
+  case ImagePushbroomProjectionLegendre:
+    s.order = ImagePushbroomProjectionLegendreM::_ORDER;
+    break;
   case FramedHomogeneousPoint:
     s.order = FramedHomogeneousPointM::_ORDER;
     break;
@@ -272,8 +278,8 @@ bool FactorGraphFilter_Impl::setSensorFrame(const string& sensor,
         << endl;
     return false;
   }
-  
-  // TODO: extra copy, this is because of method signatures 
+
+  // TODO: extra copy, this is because of method signatures
   Eigen::VectorXd OS = s.head(3);
   Eigen::VectorXd qOS = s.tail(4);
 
@@ -534,6 +540,12 @@ MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnConstantParameter(
   case Euclidean4DPrior:
     priorif = new Eucl4DPriorEdge;
     break;
+  case Euclidean5DPrior:
+    priorif = new Eucl5DPriorEdge;
+    break;
+  case Euclidean6DPrior:
+    priorif = new Eucl6DPriorEdge;
+    break;
   case QuaternionPrior:
     priorif = new QuaternionPriorEdge;
     break;
@@ -552,6 +564,7 @@ MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnConstantParameter(
   priorif->setMeasurement(x0);
   priorif->setNoiseCov(cov);
   priorif->setCategory(name+"_prior");
+  priorif->setTimestamp(cnst_par->getNextPriorIndex());
 
   _optimizer->addEdge(edge);
 
@@ -605,10 +618,10 @@ MeasurementEdgeWrapper_Ptr FactorGraphFilter_Impl::addPriorOnTimeVaryingParamete
     break;
   case Euclidean2DPrior:
     priorif = new Eucl2DPriorEdge;
-    break; 
+    break;
   case Euclidean3DPrior:
     priorif = new Eucl3DPriorEdge;
-    break;    
+    break;
   case SE3Prior:
     priorif = new SE3PriorEdge;
     break;
@@ -696,7 +709,7 @@ PoseVertex *FactorGraphFilter_Impl::addPose_i(double t) {
   return v;
 }
 
-PoseVertexWrapper_Ptr FactorGraphFilter_Impl::addInterpolatingPose(double t, 
+PoseVertexWrapper_Ptr FactorGraphFilter_Impl::addInterpolatingPose(double t,
   ParameterWrapper_Ptr dp, const Eigen::MatrixXd &pseudoObsCov) {
 
   assert(dp != NULL);
@@ -758,7 +771,7 @@ PoseVertex *FactorGraphFilter_Impl::addInterpolatingPose_i(double t,
   }
 
   --before;
-  
+
   if(t - before->second->getTimestamp() < 1e-6) {
     return before->second;
   }
@@ -775,15 +788,15 @@ PoseVertex *FactorGraphFilter_Impl::addInterpolatingPose_i(double t,
   if (xi == NULL) {
     return NULL;
   }
-  
+
   SE3InterpolationEdge *edge = new SE3InterpolationEdge;
 
   edge->vertices()[0] = before->second;
   edge->vertices()[1] = xi;
   edge->vertices()[2] = after->second;
-  
+
   dp->getVerticesPointers(t, edge->vertices(), 3);
- 
+
   ROAMmath::invDiagonal(pseudoObsCov, edge->information());
 
   edge->init();
@@ -1385,6 +1398,12 @@ GenericEdgeInterface *FactorGraphFilter_Impl::addMeasurement_i(
   case ImagePlaneProjection:
     e = new QuaternionGenericEdge<ImagePlaneProjectionM>;
     break;
+  case ImagePushbroomProjection:
+    e = new QuaternionGenericEdge<ImagePushbroomProjectionM>;
+    break;
+  case ImagePushbroomProjectionLegendre:
+    e = new QuaternionGenericEdge<ImagePushbroomProjectionLegendreM>;
+    break;
   case FramedHomogeneousPoint:
     e = new QuaternionGenericEdge<FramedHomogeneousPointM>;
     break;
@@ -1402,7 +1421,7 @@ GenericEdgeInterface *FactorGraphFilter_Impl::addMeasurement_i(
       break;
   case AbsoluteVelocity:
       e = new QuaternionGenericEdge<AbsoluteVelocityM>;
-      break;    
+      break;
   default:
     cerr << "[FactorGraphFilter] Error: unknown measurement type" << endl;
     return NULL;
@@ -1599,7 +1618,7 @@ std::pair<PoseVertex*,PoseVertex*> FactorGraphFilter_Impl::getNearestTwoPoseByTi
   {
     double t_before = before->second->getTimestamp();
     double t_after = after->second->getTimestamp();
-    
+
     if(t-t_before>t-t_after)
     {
       closest = after;
@@ -1608,7 +1627,7 @@ std::pair<PoseVertex*,PoseVertex*> FactorGraphFilter_Impl::getNearestTwoPoseByTi
     {
       closest = before;
     }
-  }  
+  }
 
   if(closest==_poses.begin())
   {
@@ -1724,7 +1743,7 @@ PoseVertex *FactorGraphFilter_Impl::getNthOldestPose_i(int n) {
   }
 }
 
-bool FactorGraphFilter_Impl::estimate(int nIterations) {
+bool FactorGraphFilter_Impl::estimate(int nIterations, bool includeFixedPoses) {
 
 // we handle priors only in case of full estimation
   handlePriorsOnOldestPose();
@@ -1735,7 +1754,7 @@ bool FactorGraphFilter_Impl::estimate(int nIterations) {
 
   g2o::HyperGraph::EdgeSet eset;
   for (auto pit = _poses.begin(); pit != _poses.end(); ++pit) {
-    if (!pit->second->fixed()) {
+    if (!pit->second->fixed() || includeFixedPoses) {
       eset.insert(pit->second->edges().begin(), pit->second->edges().end());
     }
   }
@@ -1856,20 +1875,20 @@ bool FactorGraphFilter_Impl::estimate_i(g2o::HyperGraph::EdgeSet &eset,
    // --- end of LBW WORKAROUND */
 
 // stuff for estimation time statistics
-  static ofstream ftStats(_logFolder+"/timeStats.txt"); 
+  static ofstream ftStats(_logFolder+"/timeStats.txt");
   ftStats.precision(6);
 
   double tStart = g2o::get_time();
 
 // if logging is enabled, write the current factor graph to a file
   if (_writeGraph == true) {
-    ofstream f(_logFolder+"/graph.txt"); 
+    ofstream f(_logFolder+"/graph.txt");
     assert(f.is_open());
     f << writeFactorGraph();
     f.close();
 
     /* debug graph in dot, useless
-     ofstream fdot(_logFolder+"/graph.dot"); 
+     ofstream fdot(_logFolder+"/graph.dot");
      fdot << writeFactorGraphToDot();
      fdot.close();
      //*/
@@ -1882,7 +1901,7 @@ bool FactorGraphFilter_Impl::estimate_i(g2o::HyperGraph::EdgeSet &eset,
   _optimizer->initializeOptimization(eset);
 
   if (_writeHessianStructure == true) {
-    ofstream fid(_logFolder+"/Hstruct.txt"); 
+    ofstream fid(_logFolder+"/Hstruct.txt");
 
     if (fid.is_open()) {
       fid << writeVertexIdMap();
@@ -1894,7 +1913,7 @@ bool FactorGraphFilter_Impl::estimate_i(g2o::HyperGraph::EdgeSet &eset,
 
 // run the optimization
   _stopFlag = false;
-  _stopAction->reset();  
+  _stopAction->reset();
 
   bool ret = _optimizer->optimize(nIterations) || nIterations == 0;
   if (ret == false) {
@@ -1929,10 +1948,10 @@ bool FactorGraphFilter_Impl::estimate_i(g2o::HyperGraph::EdgeSet &eset,
   ftStats << (tInitialized - tStart) << ", " << (tOptimized - tInitialized)
       << ", " << (tCovariancesAndSpatial - tOptimized) << ", "
       << (tLogging - tCovariancesAndSpatial) << endl;
-      
-# ifdef DEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES      
+
+# ifdef DEBUG_PRINT_FACTORGRAPHFILTER_INFO_MESSAGES
   std::cerr << _optimizer->_statistics[nIterations-1] << std::endl;
-# endif  
+# endif
 
   return true;
 }
@@ -2007,6 +2026,66 @@ bool FactorGraphFilter_Impl::forgetOldNodes(double l) {
   }
 
   return forgetNodes_i(toForget);
+}
+
+void FactorGraphFilter_Impl::setTrajectoryEstimate(boost::function<Eigen::VectorXd (double, const Eigen::VectorXd*)> trajectoryFunc) {
+    Eigen::VectorXd estimate = _poses.begin()->second->estimate();
+    for(PoseMapIterator it = _poses.begin(); it != _poses.end(); ++it) {
+	estimate = trajectoryFunc(it->first, &estimate);
+	it->second->setEstimate(estimate);
+    }
+}
+bool FactorGraphFilter_Impl::setTrajectoryEstimate(std::map<double, Eigen::VectorXd> trajectory) {
+    auto after = trajectory.begin();
+
+    for(PoseMapIterator it = _poses.begin(); it != _poses.end(); ++it) {
+	double ti = it->first;
+	while(after->first <= ti + 1e-6 && after != trajectory.end()) {
+	    ++after;
+	}
+
+	if (after == trajectory.begin()) {
+	    return false;
+	}
+	auto before = after;
+	--before;
+
+	// This should not happen except if trajectory has points closer than 1e-6 seconds
+	while (before->first > ti && before != trajectory.begin()) {
+	    --before;
+	    --after;
+	}
+
+	if (before->first + 1e-6 >= ti) {
+	    it->second->setEstimate(before->second);
+	} else if (after == trajectory.end()) {
+	    return false;
+	} else if (after->first - 1e-6 <= ti) {
+	    it->second->setEstimate(after->second);
+	} else {
+	    // We have to interpolate
+	    double t1 = before->first;
+	    double t2 = after->first;
+	    const Eigen::VectorXd& x1 = before->second;
+	    const Eigen::VectorXd& x2 = after->second;
+
+	    Eigen::VectorXd x(7);
+
+	    const double delay = 0.0;
+	    const int _OFF = -1;
+
+#include "generated/SE3InterpolationEdge_Xhat.cppready"
+
+	    it->second->setEstimate(x);
+	}
+    }
+    return true;
+}
+
+void FactorGraphFilter_Impl::setAllPosesFixed(bool fixed) {
+    for(PoseMapIterator it = _poses.begin(); it != _poses.end(); ++it) {
+	it->second->setFixed(fixed);
+    }
 }
 
 void FactorGraphFilter_Impl::deferMeasurement(struct Sensor& sensor, double t,
@@ -2178,30 +2257,30 @@ void FactorGraphFilter_Impl::computeCovariances() {
 }
 
 void FactorGraphFilter_Impl::computeCrossCovariances() {
-  
+
   // a map tempIndex() -> file_name avoids duplicates in case of shared parameters
   std::map<std::pair<int, int>, std::string> vertexmap;
-  
+
  for (auto p1_it = _params.begin(); p1_it != _params.end(); ++p1_it) {
      boost::shared_ptr<ParameterVerticesManager> p1 = p1_it->second;
-    
+
      if (p1->fixed() == false && p1->getCrossCovariance().size() > 0) {
-      
+
          const std::string &param_1_name = p1->_name;
-         
+
          int iter_self_1 = 0;
          for(auto v_it = p1->_v.begin(); v_it != p1->_v.end(); ++v_it) {
-             
-            g2o::OptimizableGraph::Vertex *v1 = v_it->second; 
-           
+
+            g2o::OptimizableGraph::Vertex *v1 = v_it->second;
+
             if (v1->tempIndex() >= 0) {
-                
+
                 int iter_self_2 = 0;
                 for(auto v2_it = p1->_v.begin(); v2_it != p1->_v.end(); ++v2_it) {
-                
+
                     g2o::OptimizableGraph::Vertex *v2 = v2_it->second;
                     if(v2->tempIndex()>=0){
-                        
+
                         if(v2->tempIndex() > v1->tempIndex()) {
                             std::string cur_name = param_1_name+"_"+param_1_name+"("+to_string(iter_self_1)+","+to_string(iter_self_2)+")";
                             vertexmap[std::pair<int, int>(v1->tempIndex(), v2->tempIndex())] = cur_name;
@@ -2209,44 +2288,44 @@ void FactorGraphFilter_Impl::computeCrossCovariances() {
                         iter_self_2++;
                     }
                 }
-                
+
                 iter_self_1++;
             }
-           
+
          }
-         
-         const std::list<ParameterWrapper_Ptr> &tmp_list = p1->getCrossCovariance();	  
+
+         const std::list<ParameterWrapper_Ptr> &tmp_list = p1->getCrossCovariance();
 
          for( auto p2_it = tmp_list.begin(); p2_it !=tmp_list.end(); ++p2_it) {
-          
+
              ParameterVerticesManager *pvm = boost::static_pointer_cast<ParameterWrapper_Impl>(*p2_it)->_param;
-	    
-             const std::string &param_2_name = pvm->_name;	   	   
+
+             const std::string &param_2_name = pvm->_name;
              int iter_1 =0;
              for (auto v_it = p1->_v.begin(); v_it != p1->_v.end(); ++v_it) {
-	
+
                  g2o::OptimizableGraph::Vertex *v1 = v_it->second;
-                
-                 if (v1->tempIndex() >= 0) { //there might be parameters not involved in current estimation	  
-                    
+
+                 if (v1->tempIndex() >= 0) { //there might be parameters not involved in current estimation
+
                      int iter_2 = 0;
                      for (auto v2_it = pvm->_v.begin(); v2_it != pvm->_v.end(); ++v2_it) {
-                        
+
                          g2o::OptimizableGraph::Vertex *v2 = v2_it->second;
                          if(v2->tempIndex() >=0) {
                              std::string cur_name = param_1_name+"_"+param_2_name+"("+to_string(iter_1)+","+to_string(iter_2)+")";
                              vertexmap[std::pair<int, int>(v1->tempIndex(), v2->tempIndex())] = cur_name;
                              iter_2++;
-                         }	      
+                         }
                      }
-                     
+
                      iter_1++;
-                 }	 
+                 }
              }
          }
      }
   }
-  
+
  // create the blockIndices pairs
  vector<pair<int, int> > blockIndices;
  for (auto it = vertexmap.begin(); it != vertexmap.end(); ++it) {
@@ -2264,7 +2343,7 @@ void FactorGraphFilter_Impl::computeCrossCovariances() {
     const std::string &file_name = p_it->second;
 
     Eigen::MatrixXd *gg = spinv.block(tempindices.first, tempindices.second);
-    
+
     ofstream crossCorrFile(_logFolder+"/"+file_name+".txt");
     crossCorrFile << gg->format(CSVFormat) ;
     crossCorrFile.close();
@@ -2303,15 +2382,17 @@ map<string, EstimationStats> FactorGraphFilter_Impl::getEstimationStats() {
       category = ei->getCategory();
 
       // in this case it would be e.g. Camera_featXXXX, cut away after _
-      if (dynamic_cast< QuaternionGenericEdge<ImagePlaneProjectionM> *>(ei) != NULL) {
+      if (dynamic_cast< QuaternionGenericEdge<ImagePlaneProjectionM> *>(ei) != NULL ||
+	  dynamic_cast< QuaternionGenericEdge<ImagePushbroomProjectionM> *>(ei) != NULL ||
+	  dynamic_cast< QuaternionGenericEdge<ImagePushbroomProjectionLegendreM> *>(ei) != NULL) {
         category = category.substr(0, category.find_last_of("_"));
       } else {
         category = ei->getCategory();
-      }      
+      }
     } else if ((pi = dynamic_cast<BaseEdgeInterface *>(e)) != NULL) {
       category = pi->getCategory();
 
-      // group together all Camera_featXXXX_prior, 
+      // group together all Camera_featXXXX_prior,
       int found;
       if (dynamic_cast<Eucl3DPriorEdge *>(e) != NULL && ( found = category.find("feat")) != std::string::npos) {
         category = category.substr(0, found-1) + "_Eucl3Dpriors";
@@ -2325,7 +2406,7 @@ map<string, EstimationStats> FactorGraphFilter_Impl::getEstimationStats() {
     if (stat != stats.end()) {
       (*stat).second.N++;
       (*stat).second.chi2 += e->chi2();;
-    } else {           
+    } else {
       stats.insert(pair<string, EstimationStats>(category, EstimationStats(1, e->dimension(), e->chi2())));
     }
   }
@@ -2340,7 +2421,7 @@ void FactorGraphFilter_Impl::writeFinalHessian() {
   g2o::LinearSolverCSparse<g2o::BlockSolverX::PoseMatrixType> *cspsolver =
       static_cast<g2o::LinearSolverCSparse<g2o::BlockSolverX::PoseMatrixType> *>(blocksolver->linearSolver());
 
-  g2o::writeCs2Octave((_logFolder+"/H.txt").c_str(), cspsolver->getccsA(), true); 
+  g2o::writeCs2Octave((_logFolder+"/H.txt").c_str(), cspsolver->getccsA(), true);
 }
 
 MeasurementEdgeWrapperVector_Ptr FactorGraphFilter_Impl::handleDeferredMeasurements() {
@@ -2482,7 +2563,7 @@ void FactorGraphFilter_Impl::setLowLevelLogging(bool lowLevelLogging,
       _logger = new ROAMlog::GraphLogger(folder, _optimizer);
     }
   }
-  
+
   // TODO: do something if user ever attemps to CHANGE the log folder
   _logFolder = folder;
 

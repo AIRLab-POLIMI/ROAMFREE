@@ -34,11 +34,11 @@ using namespace ROAMestimation;
 
 namespace ROAMvision {
 
-EuclideanFeatureHandler::EuclideanFeatureHandler() 
+EuclideanFeatureHandler::EuclideanFeatureHandler()
   : EuclideanFeatureHandler(false, -1.0) {
 }
 
-EuclideanFeatureHandler::EuclideanFeatureHandler(bool is_robust, double huber_width) 
+EuclideanFeatureHandler::EuclideanFeatureHandler(bool is_robust, double huber_width)
   : _is_robust(is_robust), _huber_width(huber_width) {
 }
 
@@ -75,10 +75,11 @@ bool EuclideanFeatureHandler::init(FactorGraphFilter* f, const string &name,
 
   _filter = f;
   _sensorName = name;
+  _camera_model = CAMERA_MODEL_BROWN;
 
   Eigen::VectorXd SO = T_OS.head(3);
   Eigen::VectorXd qOS = T_OS.tail(4);
-  
+
   _filter->addConstantParameter(Euclidean3D, _sensorName + "_Cam_SO", SO, true);
   qOS_par = _filter->addConstantParameter(Quaternion, _sensorName + "_Cam_qOS", qOS, true);
 
@@ -108,6 +109,36 @@ bool EuclideanFeatureHandler::init(FactorGraphFilter* f, const string &name,
 
   return true;
 }
+
+bool EuclideanFeatureHandler::init(FactorGraphFilter *f, const string &name,
+				   const Eigen::VectorXd & T_OS,
+				   const Eigen::VectorXd & K,
+				   const Eigen::VectorXd & AD,
+				   const Eigen::VectorXd & ND,
+				   const double sensorWidth,
+				   const PushbroomBasis basis) {
+  _filter = f;
+  _sensorName = name;
+  _camera_model = CAMERA_MODEL_PUSHBROOM;
+  _pushbroom_basis = basis;
+
+  Eigen::VectorXd SO = T_OS.head(3);
+  Eigen::VectorXd qOS = T_OS.tail(4);
+
+  _filter->addConstantParameter(Euclidean3D, _sensorName + "_Cam_SO", SO, true);
+  qOS_par = _filter->addConstantParameter(Quaternion, _sensorName + "_Cam_qOS", qOS, true);
+
+  K_par = _filter->addConstantParameter(Euclidean2D, _sensorName + "_Cam_CM", K, true);
+  _filter->addConstantParameter(Euclidean4D, _sensorName + "_Cam_AD", AD, true);
+  _filter->addConstantParameter(Euclidean4D, _sensorName + "_Cam_ND", ND, true);
+  _filter->addConstantParameter(_sensorName + "_Cam_SW", sensorWidth, true);
+  cerr << " * Sensor width is " << sensorWidth << endl;
+
+  _updateFeaturePriorAction = new UpdateFeaturePriorAction(this);
+  _filter->addPostIterationAction(_updateFeaturePriorAction);
+  return true;
+}
+
 
 bool EuclideanFeatureHandler::addFeatureObservation(long int id, double t,
     const Eigen::VectorXd &z, const Eigen::MatrixXd &cov, bool dontInitialize) {
@@ -150,7 +181,7 @@ bool EuclideanFeatureHandler::addFeatureObservation(long int id, double t,
 
   } else { // it has already been initialized, just add the measurement
     const string &sensor = getFeatureParameterName(id);
-    
+
     MeasurementEdgeWrapper_Ptr ret = _filter->addMeasurement(sensor, t, z, cov,
         cur_frame);
 
@@ -164,11 +195,11 @@ bool EuclideanFeatureHandler::initializeFeature(long int id)
 {
   auto it = _features.find(id);
   if ( it != _features.end() ) {
-    return initializeFeature_i(it->second, id); 
-  } else {    
+    return initializeFeature_i(it->second, id);
+  } else {
     cerr << "[EuclideanFeatureHandler]: ERROR, feature " << id << " does not exist." << endl;
     return false;
-  }  
+  }
 }
 
 bool EuclideanFeatureHandler::initializeFeature_i(EuclideanTrackDescriptor &d, long int id) {
@@ -176,19 +207,37 @@ bool EuclideanFeatureHandler::initializeFeature_i(EuclideanTrackDescriptor &d, l
     cerr << "[EuclideanFeatureHandler] Feature " << id << " is already initialized " << endl;
     return true;
   }
-  
+
 # ifdef DEBUG_PRINT_VISION_INFO_MESSAGES
     cerr << "[EuclideanFeatureHandler] Initializing track " << id << endl;
 # endif
 
   // TODO: if initialization is succesful
   Eigen::VectorXd Lw(3);
-    
+
   if (initialize(d, K_par->getEstimate(), Lw)) {
 
     const string &sensor = getFeatureParameterName(id);
 
-    _filter->addSensor(sensor, ImagePlaneProjection, false, true);
+    switch (_camera_model) {
+    case CAMERA_MODEL_BROWN:
+      _filter->addSensor(sensor, ImagePlaneProjection, false, true);
+      break;
+    case CAMERA_MODEL_PUSHBROOM:
+      switch (_pushbroom_basis) {
+      case PUSHBROOM_BASIS_REGULAR:
+	_filter->addSensor(sensor, ImagePushbroomProjection, false, true);
+	break;
+      case PUSHBROOM_BASIS_LEGENDRE:
+	_filter->addSensor(sensor, ImagePushbroomProjectionLegendre, false, true);
+	break;
+      default:
+	assert(false);
+      }
+      break;
+    default:
+      assert(false);
+    }
 
     // it does not work, there is no sensor called _sensorName + "_Cam"
     // we have to share manually the parameters
@@ -206,15 +255,25 @@ bool EuclideanFeatureHandler::initializeFeature_i(EuclideanTrackDescriptor &d, l
 
     // add parameter vertices
 
-    _filter->shareParameter(_sensorName + "_Cam_CM", sensor + "_CM");
-    _filter->shareParameter(_sensorName + "_Cam_RD", sensor + "_RD");
-    _filter->shareParameter(_sensorName + "_Cam_TD", sensor + "_TD");
-    _filter->shareParameter(_sensorName + "_Cam_SKEW", sensor + "_SKEW");
+    switch (_camera_model) {
+    case CAMERA_MODEL_BROWN:
+      _filter->shareParameter(_sensorName + "_Cam_CM", sensor + "_CM");
+      _filter->shareParameter(_sensorName + "_Cam_RD", sensor + "_RD");
+      _filter->shareParameter(_sensorName + "_Cam_TD", sensor + "_TD");
+      _filter->shareParameter(_sensorName + "_Cam_SKEW", sensor + "_SKEW");
 
-    _filter->shareParameter(_sensorName + "_Cam_ExtRD", sensor + "_ExtRD");
-    _filter->shareParameter(_sensorName + "_Cam_ExtRdD", sensor + "_ExtRrD");
-    _filter->shareParameter(_sensorName + "_Cam_ExtTD", sensor + "_ExtTD");
-    _filter->shareParameter(_sensorName + "_Cam_ExtSKEW", sensor + "_ExtSKEW");
+      _filter->shareParameter(_sensorName + "_Cam_ExtRD", sensor + "_ExtRD");
+      _filter->shareParameter(_sensorName + "_Cam_ExtRdD", sensor + "_ExtRrD");
+      _filter->shareParameter(_sensorName + "_Cam_ExtTD", sensor + "_ExtTD");
+      _filter->shareParameter(_sensorName + "_Cam_ExtSKEW", sensor + "_ExtSKEW");
+      break;
+    case CAMERA_MODEL_PUSHBROOM:
+      _filter->shareParameter(_sensorName + "_Cam_CM", sensor + "_CM");
+      _filter->shareParameter(_sensorName + "_Cam_AD", sensor + "_AD");
+      _filter->shareParameter(_sensorName + "_Cam_ND", sensor + "_ND");
+      _filter->shareParameter(_sensorName + "_Cam_SW", sensor + "_SW");
+      break;
+    }
 
     _filter->addConstantParameter(Euclidean3D, sensor + "_Lw", d.zHistory.begin()->first, Lw, false);
 
@@ -254,7 +313,7 @@ bool EuclideanFeatureHandler::initializeFeature_i(EuclideanTrackDescriptor &d, l
 }
 
 void EuclideanFeatureHandler::updateFeaturePriors() {
-  
+
   Eigen::VectorXd tempz(3);
 
   for (auto f = _features.begin(); f != _features.end(); ++f) {
@@ -264,10 +323,10 @@ void EuclideanFeatureHandler::updateFeaturePriors() {
 
       // Eigen::IOFormat ThreeDigitFormat(3, 0, ", ", "\n", "[", "]");
 
-      // std::cerr << "[EuclideanFeatureHandler] feature " << f->first << " moved by " 
+      // std::cerr << "[EuclideanFeatureHandler] feature " << f->first << " moved by "
       //   << (f->second.priorEdge->getMeasurement() - tempz).transpose().format(ThreeDigitFormat) << std::endl;
 
-      f->second.priorEdge->setMeasurement(tempz);      
+      f->second.priorEdge->setMeasurement(tempz);
     }
   }
 
@@ -353,7 +412,9 @@ bool EuclideanFeatureHandler::initialize(const EuclideanTrackDescriptor &track,
   K_cv.at<double>(0, 0) = K(0);
   K_cv.at<double>(1, 1) = K(0);
   K_cv.at<double>(0, 2) = K(1);
-  K_cv.at<double>(1, 2) = K(2);
+  if (_camera_model == CAMERA_MODEL_BROWN) {
+    K_cv.at<double>(1, 2) = K(2);
+  }
   K_cv.at<double>(2, 2) = 1.0;
 
   vector<cv::Mat> curCams;
@@ -367,6 +428,7 @@ bool EuclideanFeatureHandler::initialize(const EuclideanTrackDescriptor &track,
       buildProjectionMatrix(it->second.pose->getEstimate(), K_cv, T_WS_cv);
 
       curCams.push_back(T_WS_cv);
+      // TODO pushbroom : correct for distortion estimate
       curPoints.push_back(cv::Point2f(it->second.z(0), it->second.z(1)));
     }
   }
@@ -380,7 +442,7 @@ bool EuclideanFeatureHandler::initialize(const EuclideanTrackDescriptor &track,
 
   cv::Vec4f triangulated3DPointInitTemp;
   cv::Point3d triangulated3DPointInit;
-  
+
 
   firstObsVec.push_back(curPoints.front());
   lastObsVec.push_back(curPoints.back());
@@ -396,7 +458,7 @@ bool EuclideanFeatureHandler::initialize(const EuclideanTrackDescriptor &track,
       / triangulated3DPointInitTemp[3];
 
   // run Gauss-Newton with all the cameras
-  cv::Point3d triangulated3DPoint; 
+  cv::Point3d triangulated3DPoint;
 
   int resGN = GaussNewton(curCams, curPoints, triangulated3DPointInit,
       triangulated3DPoint);
@@ -406,17 +468,17 @@ bool EuclideanFeatureHandler::initialize(const EuclideanTrackDescriptor &track,
 
   /* use directly opencv triangulation
   int resGN = 1;
-  lw << 
-    triangulated3DPointInitTemp[0] / triangulated3DPointInitTemp[3], 
-    triangulated3DPointInitTemp[1] / triangulated3DPointInitTemp[3], 
+  lw <<
+    triangulated3DPointInitTemp[0] / triangulated3DPointInitTemp[3],
+    triangulated3DPointInitTemp[1] / triangulated3DPointInitTemp[3],
     triangulated3DPointInitTemp[2] / triangulated3DPointInitTemp[3];
   //*/
 
   if (resGN != -1) {
     // test that the triangulated points lies in front of each camera
-    
+
     const Eigen::VectorXd &qos = qOS_par->getEstimate();
-    
+
     for (auto it = track.zHistory.begin(); it != track.zHistory.end(); ++it) {
 
       Eigen::VectorXd testz(1); // it could be a double, but automated equation generation always works with vectors
@@ -425,7 +487,18 @@ bool EuclideanFeatureHandler::initialize(const EuclideanTrackDescriptor &track,
       if (it->second.pose->hasBeenEstimated()) {
         const Eigen::VectorXd & x = it->second.pose->getEstimate();
 
-#       include "../../ROAMfunctions/generated/ImagePlaneProjection_testZ.cppready"
+	switch (_camera_model) {
+	case CAMERA_MODEL_BROWN:
+	  {
+#           include "../../ROAMfunctions/generated/ImagePlaneProjection_testZ.cppready"
+	  }
+	  break;
+	case CAMERA_MODEL_PUSHBROOM:
+	  {
+#           include "../../ROAMfunctions/generated/ImagePushbroomProjection_testZ.cppready"
+	  }
+	  break;
+	}
 
         if (testz(0) < 0) {
           // cerr << "[EuclideanFeatureHandler]: point behind camera: z^(C) = " << testz(0) << ". Initialization failed" << endl;
@@ -472,16 +545,16 @@ void EuclideanFeatureHandler::buildProjectionMatrix(const Eigen::VectorXd &two,
     const cv::Mat &K, cv::Mat &projMat) {
 
   cv::Mat T_SW_cv(3, 4, CV_64F);
-  
+
   const Eigen::VectorXd &qos = qOS_par->getEstimate();
 
   Eigen::Map<Eigen::Matrix<double, 3, 4, Eigen::RowMajor>> Tcw(T_SW_cv.ptr<double>());
 
   // RF eigen pose (x,q) from world to camera is transformed in
   // cv transformation matrix from camera to world.
-  
+
   const static int _OFF = -1;
-  
+
 # include "generated/FromRFtoCV.cppready"
 
   projMat = K * T_SW_cv;
@@ -629,4 +702,3 @@ int EuclideanFeatureHandler::point2D3DJacobian(const vector<cv::Mat> &cameras,
 }
 
 } /* namespace ROAMvision */
-

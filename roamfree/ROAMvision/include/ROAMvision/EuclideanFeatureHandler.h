@@ -30,6 +30,16 @@
 
 namespace ROAMvision {
 
+enum CameraModel {
+  CAMERA_MODEL_BROWN,
+  CAMERA_MODEL_PUSHBROOM,
+};
+
+enum PushbroomBasis {
+  PUSHBROOM_BASIS_REGULAR,
+  PUSHBROOM_BASIS_LEGENDRE,
+};
+
 class UpdateFeaturePriorAction;
 
 class EuclideanFeatureHandler: public ImageFeatureHandler {
@@ -56,16 +66,25 @@ class EuclideanFeatureHandler: public ImageFeatureHandler {
         const Eigen::VectorXd & RD,
         const Eigen::VectorXd & TD,
         const Eigen::VectorXd & SKEW,
-                      const Eigen::VectorXd &ExtRD,
-                      const Eigen::VectorXd &ExtRdD,
-                      const Eigen::VectorXd &ExtTD,
-                      const Eigen::VectorXd &ExtSKEW);
+        const Eigen::VectorXd &ExtRD,
+        const Eigen::VectorXd &ExtRdD,
+        const Eigen::VectorXd &ExtTD,
+        const Eigen::VectorXd &ExtSKEW);
+
+    virtual bool init(ROAMestimation::FactorGraphFilter* f,
+	const std::string &name,
+	const Eigen::VectorXd & T_OS,
+	const Eigen::VectorXd & K,
+	const Eigen::VectorXd & AD,
+	const Eigen::VectorXd & ND,
+	const double sensorWidth,
+	const PushbroomBasis basis);
 
     virtual bool addFeatureObservation(long int id, double t,
         const Eigen::VectorXd &z, const Eigen::MatrixXd &cov, bool dontInitialize = true);
-    
+
     virtual bool initializeFeature(long int id);
-    
+
     virtual void updateFeaturePriors();
 
     virtual bool getFeaturePositionInWorldFrame(long int id,
@@ -108,13 +127,16 @@ class EuclideanFeatureHandler: public ImageFeatureHandler {
         cv::Mat &projMat);
 
     ROAMestimation::ParameterWrapper_Ptr K_par;
-    
+
     ROAMestimation::ParameterWrapper_Ptr qOS_par;
 
     UpdateFeaturePriorAction *_updateFeaturePriorAction;
 
     bool _is_robust;
     double _huber_width;
+
+    CameraModel _camera_model;
+    PushbroomBasis _pushbroom_basis;
 };
 
 } /* namespace ROAMvision */

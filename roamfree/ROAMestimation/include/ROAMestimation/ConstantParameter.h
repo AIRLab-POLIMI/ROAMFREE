@@ -69,6 +69,15 @@ class ConstantParameter: public ParameterVerticesManager {
 
     virtual void prepareForPoseRemoval(double mintstamp, double maxtstamp) {
     }
+
+    inline double getNextPriorIndex() {
+        return _nbPriors++;
+    }
+
+  protected:
+    // Number of existing priors on this parameter, this is used as timestamp to disambiguate
+    // different priors and avoid reading uninitialized memory
+    double _nbPriors = 0.0;
 };
 
 } /* namespace ROAMestimation */
