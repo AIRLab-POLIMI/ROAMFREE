@@ -21,6 +21,7 @@
 
 #include <string>
 #include <vector>
+#include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include <Eigen/Dense>
@@ -47,7 +48,7 @@ class FactorGraphFilter {
     virtual void setSolverMethod(SolverMethod method) = 0;
 
     /**
-     *  \brief Set the threshold for early stopping estimation if chi2 does not improve more than 
+     *  \brief Set the threshold for early stopping estimation if chi2 does not improve more than
      */
     virtual void setChi2Threshold(double threshold) = 0;
 
@@ -407,6 +408,35 @@ class FactorGraphFilter {
      */
     virtual bool forgetOldNodes(double l) = 0;
 
+    /**
+     * \brief Set the trajectory estimate
+     *
+     * This overload takes a function returning the pose estimate for every timestep
+     *
+     * @param trajectory a function returning the pose estimate for every timestep;
+     */
+    virtual void setTrajectoryEstimate(boost::function<Eigen::VectorXd (double, const Eigen::VectorXd*)> trajectoryFunc) = 0;
+
+    /**
+     * \brief Set the trajectory estimate
+     *
+     * This overload takes a map from timestamps to pose estimates. This will be interpolated if a pose is not provided
+     * closer than 1e-6 second from the required timestamp
+     *
+     * @param trajectory a function returning the pose estimate for every timestep;
+     * @return success
+     */
+    virtual bool setTrajectoryEstimate(std::map<double, Eigen::VectorXd>) = 0;
+
+    /**
+     * \brief Fix or unfix all poses
+     *
+     * All poses in the graph will be fixed or unfixed. Note that this does not affect
+     * subsequent poses (they will be unfixed by default).
+     *
+     * @param fixed whether to fix or unfix the poses
+     */
+    virtual void setAllPosesFixed(bool fixed) = 0;
     /* --------------------------- PRIOR CONTROL METHODS ------------------------------ */
 
     /**
@@ -465,7 +495,7 @@ class FactorGraphFilter {
      */
     virtual PoseVertexWrapper_Ptr getNearestPoseByTimestamp(double t,
         bool onlyBefore = false) = 0;
-    
+
     /**
      * \brief returns the two pose whose timestamp is nearer with respect to t
      *
@@ -529,8 +559,9 @@ class FactorGraphFilter {
      * according to their 'fixed' property
      *
      * @param nIterations the number of Gauss-Newton/Levenberg-Marquardt iteration to perform.
+     * @param includeFixedPoses whether to include edges from fixed poses (e.g. to estimate auxilliary parameters)
      */
-    virtual bool estimate(int nIterations) = 0;
+    virtual bool estimate(int nIterations, bool includeFixedPoses=false) = 0;
 
     /**
      *  \brief runs the estimations considering the markov blanket of the provided pose vector
@@ -542,13 +573,13 @@ class FactorGraphFilter {
      * @param nIterations the number of Gauss-Newton/Levenberg-Marquardt iteration to perform.
      */
     virtual bool estimate(PoseVertexWrapperVector poses, int nIterations) = 0;
-    
+
     /**
      *  \brief compytes the cross correlation covariances between the parameters
      */
-    
+
     virtual void computeCrossCovariances() = 0;
-    
+
     virtual ~FactorGraphFilter() {
     }
 };

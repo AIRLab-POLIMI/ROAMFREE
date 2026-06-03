@@ -23,6 +23,7 @@
 #include <string>
 
 #include <boost/shared_ptr.hpp>
+#include <boost/function.hpp>
 #include <Eigen/Dense>
 
 #include "FactorGraphFilter.h"
@@ -156,6 +157,10 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
 
     bool forgetOldNodes(double l);
 
+    void setTrajectoryEstimate(boost::function<Eigen::VectorXd (double, const Eigen::VectorXd*)> trajectoryFunc);
+    bool setTrajectoryEstimate(std::map<double, Eigen::VectorXd>);
+    void setAllPosesFixed(bool fixed);
+
     /* --------------------------- PRIOR CONTROL METHODS ------------------------------ */
 
     MeasurementEdgeWrapper_Ptr addPriorOnPose(PoseVertexWrapper_Ptr pose,
@@ -190,7 +195,7 @@ class FactorGraphFilter_Impl: public FactorGraphFilter {
 
     /* --------------------------- ESTIMATION CONTROM METHODS ------------------------- */
 
-    bool estimate(int nIterations);
+    bool estimate(int nIterations, bool includeFixedPoses=false);
 
     bool estimate(PoseVertexWrapperVector poses, int nIterations);
     

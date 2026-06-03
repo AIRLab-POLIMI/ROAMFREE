@@ -1724,7 +1724,7 @@ PoseVertex *FactorGraphFilter_Impl::getNthOldestPose_i(int n) {
   }
 }
 
-bool FactorGraphFilter_Impl::estimate(int nIterations) {
+bool FactorGraphFilter_Impl::estimate(int nIterations, bool includeFixedPoses) {
 
 // we handle priors only in case of full estimation
   handlePriorsOnOldestPose();
@@ -1735,7 +1735,7 @@ bool FactorGraphFilter_Impl::estimate(int nIterations) {
 
   g2o::HyperGraph::EdgeSet eset;
   for (auto pit = _poses.begin(); pit != _poses.end(); ++pit) {
-    if (!pit->second->fixed()) {
+    if (!pit->second->fixed() || includeFixedPoses) {
       eset.insert(pit->second->edges().begin(), pit->second->edges().end());
     }
   }
@@ -2007,6 +2007,66 @@ bool FactorGraphFilter_Impl::forgetOldNodes(double l) {
   }
 
   return forgetNodes_i(toForget);
+}
+
+void FactorGraphFilter_Impl::setTrajectoryEstimate(boost::function<Eigen::VectorXd (double, const Eigen::VectorXd*)> trajectoryFunc) {
+    Eigen::VectorXd estimate = _poses.begin()->second->estimate();
+    for(PoseMapIterator it = _poses.begin(); it != _poses.end(); ++it) {
+	estimate = trajectoryFunc(it->first, &estimate);
+	it->second->setEstimate(estimate);
+    }
+}
+bool FactorGraphFilter_Impl::setTrajectoryEstimate(std::map<double, Eigen::VectorXd> trajectory) {
+    auto after = trajectory.begin();
+
+    for(PoseMapIterator it = _poses.begin(); it != _poses.end(); ++it) {
+	double ti = it->first;
+	while(after->first <= ti + 1e-6 && after != trajectory.end()) {
+	    ++after;
+	}
+
+	if (after == trajectory.begin()) {
+	    return false;
+	}
+	auto before = after;
+	--before;
+
+	// This should not happen except if trajectory has points closer than 1e-6 seconds
+	while (before->first > ti && before != trajectory.begin()) {
+	    --before;
+	    --after;
+	}
+
+	if (before->first + 1e-6 >= ti) {
+	    it->second->setEstimate(before->second);
+	} else if (after == trajectory.end()) {
+	    return false;
+	} else if (after->first - 1e-6 <= ti) {
+	    it->second->setEstimate(after->second);
+	} else {
+	    // We have to interpolate
+	    double t1 = before->first;
+	    double t2 = after->first;
+	    const Eigen::VectorXd& x1 = before->second;
+	    const Eigen::VectorXd& x2 = after->second;
+
+	    Eigen::VectorXd x(7);
+
+	    const double delay = 0.0;
+	    const int _OFF = -1;
+
+#include "generated/SE3InterpolationEdge_Xhat.cppready"
+
+	    it->second->setEstimate(x);
+	}
+    }
+    return true;
+}
+
+void FactorGraphFilter_Impl::setAllPosesFixed(bool fixed) {
+    for(PoseMapIterator it = _poses.begin(); it != _poses.end(); ++it) {
+	it->second->setFixed(fixed);
+    }
 }
 
 void FactorGraphFilter_Impl::deferMeasurement(struct Sensor& sensor, double t,
